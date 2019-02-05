@@ -33,14 +33,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.ObjIntConsumer;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
- * Basic implementation of {@code Multiset<E>} backed by an instance of {@code
- * Map<E, Count>}.
+ * Basic implementation of {@code Multiset<E>} backed by an instance of {@code Map<E, Count>}.
  *
- * <p>For serialization to work, the subclass must specify explicit {@code
- * readObject} and {@code writeObject} methods.
+ * <p>For serialization to work, the subclass must specify explicit {@code readObject} and {@code
+ * writeObject} methods.
  *
  * @author Kevin Bourrillion
  */
@@ -72,9 +71,9 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implement
   /**
    * {@inheritDoc}
    *
-   * <p>Invoking {@link Multiset.Entry#getCount} on an entry in the returned
-   * set always returns the current count of that element in the multiset, as
-   * opposed to the count at the time the entry was retrieved.
+   * <p>Invoking {@link Multiset.Entry#getCount} on an entry in the returned set always returns the
+   * current count of that element in the multiset, as opposed to the count at the time the entry
+   * was retrieved.
    */
   @Override
   public Set<Multiset.Entry<E>> entrySet() {
@@ -126,7 +125,8 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implement
     };
   }
 
-  @Override public void forEachEntry(ObjIntConsumer<? super E> action) {
+  @Override
+  public void forEachEntry(ObjIntConsumer<? super E> action) {
     checkNotNull(action);
     backingMap.forEach((element, count) -> action.accept(element, count.get()));
   }
@@ -204,7 +204,7 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implement
   }
 
   @Override
-  public int count(@Nullable Object element) {
+  public int count(@NullableDecl Object element) {
     Count frequency = Maps.safeGet(backingMap, element);
     return (frequency == null) ? 0 : frequency.get();
   }
@@ -214,13 +214,12 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implement
   /**
    * {@inheritDoc}
    *
-   * @throws IllegalArgumentException if the call would result in more than
-   *     {@link Integer#MAX_VALUE} occurrences of {@code element} in this
-   *     multiset.
+   * @throws IllegalArgumentException if the call would result in more than {@link
+   *     Integer#MAX_VALUE} occurrences of {@code element} in this multiset.
    */
   @CanIgnoreReturnValue
   @Override
-  public int add(@Nullable E element, int occurrences) {
+  public int add(@NullableDecl E element, int occurrences) {
     if (occurrences == 0) {
       return count(element);
     }
@@ -242,7 +241,7 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implement
 
   @CanIgnoreReturnValue
   @Override
-  public int remove(@Nullable Object element, int occurrences) {
+  public int remove(@NullableDecl Object element, int occurrences) {
     if (occurrences == 0) {
       return count(element);
     }
@@ -270,7 +269,7 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implement
   // Roughly a 33% performance improvement over AbstractMultiset.setCount().
   @CanIgnoreReturnValue
   @Override
-  public int setCount(@Nullable E element, int count) {
+  public int setCount(@NullableDecl E element, int count) {
     checkNonnegative(count, "count");
 
     Count existingCounter;
@@ -291,7 +290,7 @@ abstract class AbstractMapBasedMultiset<E> extends AbstractMultiset<E> implement
     return oldCount;
   }
 
-  private static int getAndSet(@Nullable Count i, int count) {
+  private static int getAndSet(@NullableDecl Count i, int count) {
     if (i == null) {
       return 0;
     }
