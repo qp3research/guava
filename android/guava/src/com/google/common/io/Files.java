@@ -27,6 +27,8 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.TreeTraverser;
+import com.google.common.graph.SuccessorsFunction;
+import com.google.common.graph.Traverser;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -265,7 +267,8 @@ public final class Files {
    *     helpful predefined constants
    * @return a string containing all the characters from the file
    * @throws IOException if an I/O error occurs
-   * @deprecated Prefer {@code asCharSource(file, charset).read()}.
+   * @deprecated Prefer {@code asCharSource(file, charset).read()}. This method is scheduled to be
+   *     removed in January 2019.
    */
   @Deprecated
   public static String toString(File file, Charset charset) throws IOException {
@@ -332,7 +335,8 @@ public final class Files {
    * @param charset the charset used to encode the output stream; see {@link StandardCharsets} for
    *     helpful predefined constants
    * @throws IOException if an I/O error occurs
-   * @deprecated Prefer {@code asCharSink(to, charset).write(from)}.
+   * @deprecated Prefer {@code asCharSink(to, charset).write(from)}. This method is scheduled to be
+   *     removed in January 2019.
    */
   @Deprecated
   public static void write(CharSequence from, File to, Charset charset) throws IOException {
@@ -347,7 +351,8 @@ public final class Files {
    * @param charset the charset used to encode the output stream; see {@link StandardCharsets} for
    *     helpful predefined constants
    * @throws IOException if an I/O error occurs
-   * @deprecated Prefer {@code asCharSink(to, charset, FileWriteMode.APPEND).write(from)}.
+   * @deprecated Prefer {@code asCharSink(to, charset, FileWriteMode.APPEND).write(from)}. This
+   *     method is scheduled to be removed in January 2019.
    */
   @Deprecated
   public static void append(CharSequence from, File to, Charset charset) throws IOException {
@@ -362,7 +367,8 @@ public final class Files {
    *     helpful predefined constants
    * @param to the appendable object
    * @throws IOException if an I/O error occurs
-   * @deprecated Prefer {@code asCharSource(from, charset).copyTo(to)}.
+   * @deprecated Prefer {@code asCharSource(from, charset).copyTo(to)}. This method is scheduled to
+   *     be removed in January 2019.
    */
   @Deprecated
   public static void copy(File from, Charset charset, Appendable to) throws IOException {
@@ -512,7 +518,8 @@ public final class Files {
    *     helpful predefined constants
    * @return the first line, or null if the file is empty
    * @throws IOException if an I/O error occurs
-   * @deprecated Prefer {@code asCharSource(file, charset).readFirstLine()}.
+   * @deprecated Prefer {@code asCharSource(file, charset).readFirstLine()}. This method is
+   *     scheduled to be removed in January 2019.
    */
   @Deprecated
   public static String readFirstLine(File file, Charset charset) throws IOException {
@@ -566,7 +573,8 @@ public final class Files {
    * @param callback the {@link LineProcessor} to use to handle the lines
    * @return the output of processing the lines
    * @throws IOException if an I/O error occurs
-   * @deprecated Prefer {@code asCharSource(file, charset).readLines(callback)}.
+   * @deprecated Prefer {@code asCharSource(file, charset).readLines(callback)}. This method is
+   *     scheduled to be removed in January 2019.
    */
   @Deprecated
   @CanIgnoreReturnValue // some processors won't return a useful result
@@ -584,7 +592,8 @@ public final class Files {
    * @param processor the object to which the bytes of the file are passed.
    * @return the result of the byte processor
    * @throws IOException if an I/O error occurs
-   * @deprecated Prefer {@code asByteSource(file).read(processor)}.
+   * @deprecated Prefer {@code asByteSource(file).read(processor)}. This method is scheduled to be
+   *     removed in January 2019.
    */
   @Deprecated
   @CanIgnoreReturnValue // some processors won't return a useful result
@@ -600,7 +609,8 @@ public final class Files {
    * @return the {@link HashCode} of all of the bytes in the file
    * @throws IOException if an I/O error occurs
    * @since 12.0
-   * @deprecated Prefer {@code asByteSource(file).hash(hashFunction)}.
+   * @deprecated Prefer {@code asByteSource(file).hash(hashFunction)}. This method is scheduled to
+   *     be removed in January 2019.
    */
   @Deprecated
   public static HashCode hash(File file, HashFunction hashFunction) throws IOException {
@@ -707,12 +717,12 @@ public final class Files {
    * to the original. The following heuristics are used:
    *
    * <ul>
-   * <li>empty string becomes .
-   * <li>. stays as .
-   * <li>fold out ./
-   * <li>fold out ../ when possible
-   * <li>collapse multiple slashes
-   * <li>delete trailing slashes (unless the path is just "/")
+   *   <li>empty string becomes .
+   *   <li>. stays as .
+   *   <li>fold out ./
+   *   <li>fold out ../ when possible
+   *   <li>collapse multiple slashes
+   *   <li>delete trailing slashes (unless the path is just "/")
    * </ul>
    *
    * <p>These heuristics do not always match the behavior of the filesystem. In particular, consider
@@ -790,8 +800,8 @@ public final class Files {
   }
 
   /**
-   * Returns the file name without its
-   * <a href="http://en.wikipedia.org/wiki/Filename_extension">file extension</a> or path. This is
+   * Returns the file name without its <a
+   * href="http://en.wikipedia.org/wiki/Filename_extension">file extension</a> or path. This is
    * similar to the {@code basename} unix command. The result does not include the '{@code .}'.
    *
    * @param file The name of the file to trim the extension from. This can be either a fully
@@ -815,7 +825,11 @@ public final class Files {
    * given directory or even be infinite if there is a symbolic link loop.
    *
    * @since 15.0
+   * @deprecated The returned {@link TreeTraverser} type is deprecated. Use the replacement method
+   *     {@link #fileTraverser()} instead with the same semantics as this method. This method is
+   *     scheduled to be removed in April 2018.
    */
+  @Deprecated
   public static TreeTraverser<File> fileTreeTraverser() {
     return FILE_TREE_TRAVERSER;
   }
@@ -824,15 +838,7 @@ public final class Files {
       new TreeTraverser<File>() {
         @Override
         public Iterable<File> children(File file) {
-          // check isDirectory() just because it may be faster than listFiles() on a non-directory
-          if (file.isDirectory()) {
-            File[] files = file.listFiles();
-            if (files != null) {
-              return Collections.unmodifiableList(Arrays.asList(files));
-            }
-          }
-
-          return Collections.emptyList();
+          return fileTreeChildren(file);
         }
 
         @Override
@@ -840,6 +846,51 @@ public final class Files {
           return "Files.fileTreeTraverser()";
         }
       };
+
+  /**
+   * Returns a {@link Traverser} instance for the file and directory tree. The returned traverser
+   * starts from a {@link File} and will return all files and directories it encounters.
+   *
+   * <p><b>Warning:</b> {@code File} provides no support for symbolic links, and as such there is no
+   * way to ensure that a symbolic link to a directory is not followed when traversing the tree. In
+   * this case, iterables created by this traverser could contain files that are outside of the
+   * given directory or even be infinite if there is a symbolic link loop.
+   *
+   * <p>If available, consider using {@link MoreFiles#fileTraverser()} instead. It behaves the same
+   * except that it doesn't follow symbolic links and returns {@code Path} instances.
+   *
+   * <p>If the {@link File} passed to one of the {@link Traverser} methods does not exist or is not
+   * a directory, no exception will be thrown and the returned {@link Iterable} will contain a
+   * single element: that file.
+   *
+   * <p>Example: {@code Files.fileTraverser().breadthFirst("/")} may return files with the following
+   * paths: {@code ["/", "/etc", "/home", "/usr", "/etc/config.txt", "/etc/fonts", ...]}
+   *
+   * @since 23.5
+   */
+  public static Traverser<File> fileTraverser() {
+    return Traverser.forTree(FILE_TREE);
+  }
+
+  private static final SuccessorsFunction<File> FILE_TREE =
+      new SuccessorsFunction<File>() {
+        @Override
+        public Iterable<File> successors(File file) {
+          return fileTreeChildren(file);
+        }
+      };
+
+  private static Iterable<File> fileTreeChildren(File file) {
+    // check isDirectory() just because it may be faster than listFiles() on a non-directory
+    if (file.isDirectory()) {
+      File[] files = file.listFiles();
+      if (files != null) {
+        return Collections.unmodifiableList(Arrays.asList(files));
+      }
+    }
+
+    return Collections.emptyList();
+  }
 
   /**
    * Returns a predicate that returns the result of {@link File#isDirectory} on input files.

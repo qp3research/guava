@@ -35,14 +35,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
- * A general-purpose bimap implementation using any two backing {@code Map}
- * instances.
+ * A general-purpose bimap implementation using any two backing {@code Map} instances.
  *
- * <p>Note that this class contains {@code equals()} calls that keep it from
- * supporting {@code IdentityHashMap} backing maps.
+ * <p>Note that this class contains {@code equals()} calls that keep it from supporting {@code
+ * IdentityHashMap} backing maps.
  *
  * @author Kevin Bourrillion
  * @author Mike Bostock
@@ -52,8 +51,7 @@ abstract class AbstractBiMap<K, V> extends ForwardingMap<K, V>
     implements BiMap<K, V>, Serializable {
 
   private transient Map<K, V> delegate;
-  @RetainedWith
-  transient AbstractBiMap<V, K> inverse;
+  @RetainedWith transient AbstractBiMap<V, K> inverse;
 
   /** Package-private constructor for creating a map-backed bimap. */
   AbstractBiMap(Map<K, V> forward, Map<V, K> backward) {
@@ -71,25 +69,21 @@ abstract class AbstractBiMap<K, V> extends ForwardingMap<K, V>
     return delegate;
   }
 
-  /**
-   * Returns its input, or throws an exception if this is not a valid key.
-   */
+  /** Returns its input, or throws an exception if this is not a valid key. */
   @CanIgnoreReturnValue
-  K checkKey(@Nullable K key) {
+  K checkKey(@NullableDecl K key) {
     return key;
   }
 
-  /**
-   * Returns its input, or throws an exception if this is not a valid value.
-   */
+  /** Returns its input, or throws an exception if this is not a valid value. */
   @CanIgnoreReturnValue
-  V checkValue(@Nullable V value) {
+  V checkValue(@NullableDecl V value) {
     return value;
   }
 
   /**
-   * Specifies the delegate maps going in each direction. Called by the
-   * constructor and by subclasses during deserialization.
+   * Specifies the delegate maps going in each direction. Called by the constructor and by
+   * subclasses during deserialization.
    */
   void setDelegates(Map<K, V> forward, Map<V, K> backward) {
     checkState(delegate == null);
@@ -112,7 +106,7 @@ abstract class AbstractBiMap<K, V> extends ForwardingMap<K, V>
   // Query Operations (optimizations)
 
   @Override
-  public boolean containsValue(@Nullable Object value) {
+  public boolean containsValue(@NullableDecl Object value) {
     return inverse.containsKey(value);
   }
 
@@ -120,17 +114,17 @@ abstract class AbstractBiMap<K, V> extends ForwardingMap<K, V>
 
   @CanIgnoreReturnValue
   @Override
-  public V put(@Nullable K key, @Nullable V value) {
+  public V put(@NullableDecl K key, @NullableDecl V value) {
     return putInBothMaps(key, value, false);
   }
 
   @CanIgnoreReturnValue
   @Override
-  public V forcePut(@Nullable K key, @Nullable V value) {
+  public V forcePut(@NullableDecl K key, @NullableDecl V value) {
     return putInBothMaps(key, value, true);
   }
 
-  private V putInBothMaps(@Nullable K key, @Nullable V value, boolean force) {
+  private V putInBothMaps(@NullableDecl K key, @NullableDecl V value, boolean force) {
     checkKey(key);
     checkValue(value);
     boolean containedKey = containsKey(key);
@@ -156,7 +150,7 @@ abstract class AbstractBiMap<K, V> extends ForwardingMap<K, V>
 
   @CanIgnoreReturnValue
   @Override
-  public V remove(@Nullable Object key) {
+  public V remove(@NullableDecl Object key) {
     return containsKey(key) ? removeFromBothMaps(key) : null;
   }
 
@@ -461,9 +455,7 @@ abstract class AbstractBiMap<K, V> extends ForwardingMap<K, V>
       return inverse.checkKey(value);
     }
 
-    /**
-     * @serialData the forward bimap
-     */
+    /** @serialData the forward bimap */
     @GwtIncompatible // java.io.ObjectOutputStream
     private void writeObject(ObjectOutputStream stream) throws IOException {
       stream.defaultWriteObject();
