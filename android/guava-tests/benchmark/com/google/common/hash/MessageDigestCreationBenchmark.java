@@ -33,13 +33,11 @@ public class MessageDigestCreationBenchmark {
 
   private MessageDigest md;
 
-  @BeforeExperiment
-  void setUp() throws Exception {
+  @BeforeExperiment void setUp() throws Exception {
     md = MessageDigest.getInstance(algorithm);
   }
 
-  @Benchmark
-  int getInstance(int reps) throws Exception {
+  @Benchmark int getInstance(int reps) throws Exception {
     int retValue = 0;
     for (int i = 0; i < reps; i++) {
       retValue ^= MessageDigest.getInstance(algorithm).getDigestLength();
@@ -47,8 +45,7 @@ public class MessageDigestCreationBenchmark {
     return retValue;
   }
 
-  @Benchmark
-  int clone(int reps) throws Exception {
+  @Benchmark int clone(int reps) throws Exception {
     int retValue = 0;
     for (int i = 0; i < reps; i++) {
       retValue ^= ((MessageDigest) md.clone()).getDigestLength();

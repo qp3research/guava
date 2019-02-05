@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.SortedSet;
 
 /**
- * Create integer sets for testing collections that are sorted by natural ordering.
+ * Create integer sets for testing collections that are sorted by natural
+ * ordering.
  *
  * @author Chris Povirk
  * @author Jared Levy

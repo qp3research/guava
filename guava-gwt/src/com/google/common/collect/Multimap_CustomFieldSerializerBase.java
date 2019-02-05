@@ -21,13 +21,14 @@ import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.client.rpc.SerializationStreamReader;
 import com.google.gwt.user.client.rpc.SerializationStreamWriter;
 import java.util.Collection;
-import java.util.Map.Entry;
+import java.util.Map;
 
 /**
- * This class contains static utility methods for writing {@code Multimap} GWT field serializers.
- * Serializers should delegate to {@link #serialize(SerializationStreamWriter, Multimap)} and to
- * either {@link #instantiate(SerializationStreamReader, ImmutableMultimap.Builder)} or {@link
- * #populate(SerializationStreamReader, Multimap)}.
+ * This class contains static utility methods for writing {@code Multimap} GWT
+ * field serializers. Serializers should delegate to
+ * {@link #serialize(SerializationStreamWriter, Multimap)} and to either
+ * {@link #instantiate(SerializationStreamReader, ImmutableMultimap.Builder)} or
+ * {@link #populate(SerializationStreamReader, Multimap)}.
  *
  * @author Chris Povirk
  */
@@ -67,7 +68,7 @@ public final class Multimap_CustomFieldSerializerBase {
   public static void serialize(SerializationStreamWriter writer, Multimap<?, ?> instance)
       throws SerializationException {
     writer.writeInt(instance.asMap().size());
-    for (Entry<?, ? extends Collection<?>> entry : instance.asMap().entrySet()) {
+    for (Map.Entry<?, ? extends Collection<?>> entry : instance.asMap().entrySet()) {
       writer.writeObject(entry.getKey());
       writer.writeInt(entry.getValue().size());
       for (Object value : entry.getValue()) {

@@ -16,6 +16,7 @@
 
 package com.google.common.base;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.annotations.GwtCompatible;
@@ -219,7 +220,8 @@ public class PreconditionsTest extends TestCase {
   }
 
   public void testCheckNotNull_complexMessage_success() {
-    String result = Preconditions.checkNotNull(NON_NULL_STRING, "%s", IGNORE_ME);
+    String result = Preconditions.checkNotNull(
+        NON_NULL_STRING, "%s", IGNORE_ME);
     assertSame(NON_NULL_STRING, result);
   }
 
@@ -378,7 +380,27 @@ public class PreconditionsTest extends TestCase {
     }
   }
 
-  @GwtIncompatible("Reflection")
+  public void testFormat() {
+    assertEquals("%s", Preconditions.format("%s"));
+    assertEquals("5", Preconditions.format("%s", 5));
+    assertEquals("foo [5]", Preconditions.format("foo", 5));
+    assertEquals("foo [5, 6, 7]", Preconditions.format("foo", 5, 6, 7));
+    assertEquals("%s 1 2", Preconditions.format("%s %s %s", "%s", 1, 2));
+    assertEquals(" [5, 6]", Preconditions.format("", 5, 6));
+    assertEquals("123", Preconditions.format("%s%s%s", 1, 2, 3));
+    assertEquals("1%s%s", Preconditions.format("%s%s%s", 1));
+    assertEquals("5 + 6 = 11", Preconditions.format("%s + 6 = 11", 5));
+    assertEquals("5 + 6 = 11", Preconditions.format("5 + %s = 11", 6));
+    assertEquals("5 + 6 = 11", Preconditions.format("5 + 6 = %s", 11));
+    assertEquals("5 + 6 = 11", Preconditions.format("%s + %s = %s", 5, 6, 11));
+    assertEquals("null [null, null]",
+        Preconditions.format("%s", null, null, null));
+    assertEquals("null [5, 6]", Preconditions.format(null, 5, 6));
+    assertEquals("null", Preconditions.format("%s", (Object) null));
+    assertEquals("(Object[])null", Preconditions.format("%s", (Object[]) null));
+  }
+
+    @GwtIncompatible("Reflection")
   public void testAllOverloads_checkArgument() throws Exception {
     for (ImmutableList<Class<?>> sig : allSignatures(boolean.class)) {
       Method checkArgumentMethod =
@@ -443,7 +465,7 @@ public class PreconditionsTest extends TestCase {
       assertThat(throwable).hasMessage("");
     } else {
       assertThat(throwable)
-          .hasMessage(Strings.lenientFormat("", Arrays.copyOfRange(params, 2, params.length)));
+          .hasMessage(Preconditions.format("", Arrays.copyOfRange(params, 2, params.length)));
     }
   }
 
@@ -471,7 +493,11 @@ public class PreconditionsTest extends TestCase {
   }
 
   private static final ImmutableList<Class<?>> possibleParamTypes =
-      ImmutableList.of(char.class, int.class, long.class, Object.class);
+      ImmutableList.of(
+          char.class,
+          int.class,
+          long.class,
+          Object.class);
 
   /**
    * Returns a list of parameters for invoking an overload of checkState, checkArgument or
@@ -493,7 +519,7 @@ public class PreconditionsTest extends TestCase {
         allOverloads.add(
             ImmutableList.<Class<?>>builder()
                 .add(predicateType)
-                .add(String.class) // the format string
+                .add(String.class)  // the format string
                 .addAll(curr)
                 .build());
       }
@@ -514,20 +540,20 @@ public class PreconditionsTest extends TestCase {
     int anInt = 1;
     // With a boxed predicate, no overloads can be selected in phase 1
     // ambiguous without the call to .booleanValue to unbox the Boolean
-    Preconditions.checkState(boxedBoolean.booleanValue(), "", 1);
+    checkState(boxedBoolean.booleanValue(), "",  1);
     // ambiguous without the cast to Object because the boxed predicate prevents any overload from
     // being selected in phase 1
-    Preconditions.checkState(boxedBoolean, "", (Object) boxedLong);
+    checkState(boxedBoolean, "", (Object) boxedLong);
 
     // ternaries introduce their own problems. because of the ternary (which requires a boxing
     // operation) no overload can be selected in phase 1.  and in phase 2 it is ambiguous since it
     // matches with the second parameter being boxed and without it being boxed.  The cast to Object
     // avoids this.
-    Preconditions.checkState(aBoolean, "", aBoolean ? "" : anInt, (Object) anInt);
+    checkState(aBoolean, "", aBoolean ? "" : anInt, (Object) anInt);
 
     // ambiguous without the .booleanValue() call since the boxing forces us into phase 2 resolution
     short s = 2;
-    Preconditions.checkState(boxedBoolean.booleanValue(), "", s);
+    checkState(boxedBoolean.booleanValue(), "", s);
   }
 
   @GwtIncompatible // NullPointerTester
@@ -536,19 +562,15 @@ public class PreconditionsTest extends TestCase {
     tester.testAllPublicStaticMethods(Preconditions.class);
   }
 
-  private static final Object IGNORE_ME =
-      new Object() {
-        @Override
-        public String toString() {
-          throw new AssertionFailedError();
-        }
-      };
+  private static final Object IGNORE_ME = new Object() {
+    @Override public String toString() {
+      throw new AssertionFailedError();
+    }
+  };
 
   private static class Message {
     boolean invoked;
-
-    @Override
-    public String toString() {
+    @Override public String toString() {
       assertFalse(invoked);
       invoked = true;
       return "A message";

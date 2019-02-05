@@ -25,7 +25,8 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * This class implements the GWT serialization of {@link RegularImmutableSortedSet}.
+ * This class implements the GWT serialization of
+ * {@link RegularImmutableSortedSet}.
  *
  * @author Chris Povirk
  */

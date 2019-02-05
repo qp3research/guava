@@ -106,9 +106,8 @@ public class BigIntegerMathTest extends TestCase {
 
   @GwtIncompatible // TODO
   public void testConstantSqrt2PrecomputedBits() {
-    assertEquals(
-        BigIntegerMath.sqrt(
-            BigInteger.ZERO.setBit(2 * BigIntegerMath.SQRT2_PRECOMPUTE_THRESHOLD + 1), FLOOR),
+    assertEquals(BigIntegerMath.sqrt(
+        BigInteger.ZERO.setBit(2 * BigIntegerMath.SQRT2_PRECOMPUTE_THRESHOLD + 1), FLOOR),
         BigIntegerMath.SQRT2_PRECOMPUTED_BITS);
   }
 
@@ -125,8 +124,7 @@ public class BigIntegerMathTest extends TestCase {
       try {
         BigIntegerMath.log2(ZERO, mode);
         fail("Expected IllegalArgumentException");
-      } catch (IllegalArgumentException expected) {
-      }
+      } catch (IllegalArgumentException expected) {}
     }
   }
 
@@ -135,8 +133,7 @@ public class BigIntegerMathTest extends TestCase {
       try {
         BigIntegerMath.log2(BigInteger.valueOf(-1), mode);
         fail("Expected IllegalArgumentException");
-      } catch (IllegalArgumentException expected) {
-      }
+      } catch (IllegalArgumentException expected) {}
     }
   }
 
@@ -213,8 +210,7 @@ public class BigIntegerMathTest extends TestCase {
       try {
         BigIntegerMath.log10(ZERO, mode);
         fail("Expected IllegalArgumentException");
-      } catch (IllegalArgumentException expected) {
-      }
+      } catch (IllegalArgumentException expected) {}
     }
   }
 
@@ -224,8 +220,7 @@ public class BigIntegerMathTest extends TestCase {
       try {
         BigIntegerMath.log10(BigInteger.valueOf(-1), mode);
         fail("Expected IllegalArgumentException");
-      } catch (IllegalArgumentException expected) {
-      }
+      } catch (IllegalArgumentException expected) {}
     }
   }
 
@@ -323,8 +318,7 @@ public class BigIntegerMathTest extends TestCase {
       try {
         BigIntegerMath.sqrt(BigInteger.valueOf(-1), mode);
         fail("Expected IllegalArgumentException");
-      } catch (IllegalArgumentException expected) {
-      }
+      } catch (IllegalArgumentException expected) {}
     }
   }
 
@@ -479,8 +473,7 @@ public class BigIntegerMathTest extends TestCase {
         try {
           BigIntegerMath.divide(p, ZERO, mode);
           fail("Expected ArithmeticException");
-        } catch (ArithmeticException expected) {
-        }
+        } catch (ArithmeticException expected) {}
       }
     }
   }
@@ -501,8 +494,7 @@ public class BigIntegerMathTest extends TestCase {
     try {
       BigIntegerMath.factorial(-1);
       fail("Expected IllegalArgumentException");
-    } catch (IllegalArgumentException expected) {
-    }
+    } catch (IllegalArgumentException expected) {}
   }
 
   public void testBinomialSmall() {
@@ -518,10 +510,10 @@ public class BigIntegerMathTest extends TestCase {
   private static void runBinomialTest(int firstN, int lastN) {
     for (int n = firstN; n <= lastN; n++) {
       for (int k = 0; k <= n; k++) {
-        BigInteger expected =
-            BigIntegerMath.factorial(n)
-                .divide(BigIntegerMath.factorial(k))
-                .divide(BigIntegerMath.factorial(n - k));
+        BigInteger expected = BigIntegerMath
+            .factorial(n)
+            .divide(BigIntegerMath.factorial(k))
+            .divide(BigIntegerMath.factorial(n - k));
         assertEquals(expected, BigIntegerMath.binomial(n, k));
       }
     }
@@ -532,13 +524,11 @@ public class BigIntegerMathTest extends TestCase {
       try {
         BigIntegerMath.binomial(n, -1);
         fail("Expected IllegalArgumentException");
-      } catch (IllegalArgumentException expected) {
-      }
+      } catch (IllegalArgumentException expected) {}
       try {
         BigIntegerMath.binomial(n, n + 1);
         fail("Expected IllegalArgumentException");
-      } catch (IllegalArgumentException expected) {
-      }
+      } catch (IllegalArgumentException expected) {}
     }
   }
 

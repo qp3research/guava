@@ -21,14 +21,12 @@ import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.collect.ImmutableCollection;
-import com.google.errorprone.annotations.ForOverride;
-import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
 /**
  * A future made up of a collection of sub-futures.
@@ -44,7 +42,7 @@ abstract class AggregateFuture<InputT, OutputT> extends AbstractFuture.TrustedFu
    * In certain circumstances, this field might theoretically not be visible to an afterDone() call
    * triggered by cancel(). For details, see the comments on the fields of TimeoutFuture.
    */
-  @NullableDecl private RunningState runningState;
+  private RunningState runningState;
 
   @Override
   protected final void afterDone() {
@@ -83,7 +81,9 @@ abstract class AggregateFuture<InputT, OutputT> extends AbstractFuture.TrustedFu
     return null;
   }
 
-  /** Must be called at the end of each sub-class's constructor. */
+  /**
+   * Must be called at the end of each sub-class's constructor.
+   */
   final void init(RunningState runningState) {
     this.runningState = runningState;
     runningState.init();
@@ -204,7 +204,9 @@ abstract class AggregateFuture<InputT, OutputT> extends AbstractFuture.TrustedFu
       }
     }
 
-    /** Handles the input at the given index completing. */
+    /**
+     * Handles the input at the given index completing.
+     */
     private void handleOneInputDone(int index, Future<? extends InputT> future) {
       // The only cases in which this Future should already be done are (a) if it was cancelled or
       // (b) if an input failed and we propagated that immediately because of allMustSucceed.
@@ -264,10 +266,8 @@ abstract class AggregateFuture<InputT, OutputT> extends AbstractFuture.TrustedFu
      * reference to {@link RunningState}, which should free all associated memory when all the
      * futures complete and the listeners are released.
      *
-     * <p>TODO(user): Write tests for memory retention
+     * TODO(user): Write tests for memory retention
      */
-    @ForOverride
-    @OverridingMethodsMustInvokeSuper
     void releaseResourcesAfterFailure() {
       this.futures = null;
     }
@@ -278,8 +278,7 @@ abstract class AggregateFuture<InputT, OutputT> extends AbstractFuture.TrustedFu
      * <p>If {@code allMustSucceed} is true, called as each future completes; otherwise, called for
      * each future when all futures complete.
      */
-    abstract void collectOneValue(
-        boolean allMustSucceed, int index, @NullableDecl InputT returnValue);
+    abstract void collectOneValue(boolean allMustSucceed, int index, @Nullable InputT returnValue);
 
     abstract void handleAllCompleted();
 

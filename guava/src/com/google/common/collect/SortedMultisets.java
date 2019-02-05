@@ -28,10 +28,11 @@ import java.util.Iterator;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
- * Provides static utility methods for creating and working with {@link SortedMultiset} instances.
+ * Provides static utility methods for creating and working with
+ * {@link SortedMultiset} instances.
  *
  * @author Louis Wasserman
  */
@@ -39,7 +40,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 final class SortedMultisets {
   private SortedMultisets() {}
 
-  /** A skeleton implementation for {@link SortedMultiset#elementSet}. */
+  /**
+   * A skeleton implementation for {@link SortedMultiset#elementSet}.
+   */
   static class ElementSet<E> extends Multisets.ElementSet<E> implements SortedSet<E> {
     @Weak private final SortedMultiset<E> multiset;
 
@@ -50,11 +53,6 @@ final class SortedMultisets {
     @Override
     final SortedMultiset<E> multiset() {
       return multiset;
-    }
-
-    @Override
-    public Iterator<E> iterator() {
-      return Multisets.elementIterator(multiset().entrySet().iterator());
     }
 
     @Override
@@ -88,7 +86,9 @@ final class SortedMultisets {
     }
   }
 
-  /** A skeleton navigable implementation for {@link SortedMultiset#elementSet}. */
+  /**
+   * A skeleton navigable implementation for {@link SortedMultiset#elementSet}.
+   */
   @GwtIncompatible // Navigable
   static class NavigableElementSet<E> extends ElementSet<E> implements NavigableSet<E> {
     NavigableElementSet(SortedMultiset<E> multiset) {

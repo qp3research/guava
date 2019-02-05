@@ -40,11 +40,10 @@ public class NullCacheTest extends TestCase {
 
   public void testGet() {
     Object computed = new Object();
-    LoadingCache<Object, Object> cache =
-        CacheBuilder.newBuilder()
-            .maximumSize(0)
-            .removalListener(listener)
-            .build(constantLoader(computed));
+    LoadingCache<Object, Object> cache = CacheBuilder.newBuilder()
+        .maximumSize(0)
+        .removalListener(listener)
+        .build(constantLoader(computed));
 
     Object key = new Object();
     assertSame(computed, cache.getUnchecked(key));
@@ -58,11 +57,10 @@ public class NullCacheTest extends TestCase {
 
   public void testGet_expireAfterWrite() {
     Object computed = new Object();
-    LoadingCache<Object, Object> cache =
-        CacheBuilder.newBuilder()
-            .expireAfterWrite(0, SECONDS)
-            .removalListener(listener)
-            .build(constantLoader(computed));
+    LoadingCache<Object, Object> cache = CacheBuilder.newBuilder()
+        .expireAfterWrite(0, SECONDS)
+        .removalListener(listener)
+        .build(constantLoader(computed));
 
     Object key = new Object();
     assertSame(computed, cache.getUnchecked(key));
@@ -76,11 +74,10 @@ public class NullCacheTest extends TestCase {
 
   public void testGet_expireAfterAccess() {
     Object computed = new Object();
-    LoadingCache<Object, Object> cache =
-        CacheBuilder.newBuilder()
-            .expireAfterAccess(0, SECONDS)
-            .removalListener(listener)
-            .build(constantLoader(computed));
+    LoadingCache<Object, Object> cache = CacheBuilder.newBuilder()
+        .expireAfterAccess(0, SECONDS)
+        .removalListener(listener)
+        .build(constantLoader(computed));
 
     Object key = new Object();
     assertSame(computed, cache.getUnchecked(key));
@@ -93,18 +90,15 @@ public class NullCacheTest extends TestCase {
   }
 
   public void testGet_computeNull() {
-    LoadingCache<Object, Object> cache =
-        CacheBuilder.newBuilder()
-            .maximumSize(0)
-            .removalListener(listener)
-            .build(constantLoader(null));
+    LoadingCache<Object, Object> cache = CacheBuilder.newBuilder()
+        .maximumSize(0)
+        .removalListener(listener)
+        .build(constantLoader(null));
 
     try {
       cache.getUnchecked(new Object());
       fail();
-    } catch (InvalidCacheLoadException e) {
-      /* expected */
-    }
+    } catch (InvalidCacheLoadException e) { /* expected */}
 
     assertTrue(listener.isEmpty());
     checkEmpty(cache);
@@ -112,11 +106,10 @@ public class NullCacheTest extends TestCase {
 
   public void testGet_runtimeException() {
     final RuntimeException e = new RuntimeException();
-    LoadingCache<Object, Object> map =
-        CacheBuilder.newBuilder()
-            .maximumSize(0)
-            .removalListener(listener)
-            .build(exceptionLoader(e));
+    LoadingCache<Object, Object> map = CacheBuilder.newBuilder()
+        .maximumSize(0)
+        .removalListener(listener)
+        .build(exceptionLoader(e));
 
     try {
       map.getUnchecked(new Object());

@@ -23,7 +23,6 @@ import com.google.common.base.Equivalence;
 import com.google.common.collect.MapMaker.Dummy;
 import com.google.common.primitives.Ints;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.concurrent.GuardedBy;
 import com.google.j2objc.annotations.Weak;
 import com.google.j2objc.annotations.WeakOuter;
 import java.io.IOException;
@@ -47,8 +46,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.concurrent.locks.ReentrantLock;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.GuardedBy;
 
 /**
  * The concurrent hash map implementation built by {@link MapMaker}.
@@ -219,8 +218,8 @@ class MapMakerInternalMap<
    * Returns a fresh {@link MapMakerInternalMap} with {@link MapMaker.Dummy} values but otherwise as
    * specified by the given {@code builder}. The returned {@link MapMakerInternalMap} will be
    * optimized to saved memory. Since {@link MapMaker.Dummy} is a singleton, we don't need to store
-   * any values at all. Because of this optimization, {@code build.getValueStrength()} must be
-   * {@link Strength#STRONG}.
+   * any values at all. Because of this optimization, {@code build.getValueStrength()} must
+   * be {@link Strength#STRONG}.
    *
    * <p>This method is intended to only be used by the internal implementation of {@link Interners},
    * since a map of dummy values is the exact use case there.
@@ -320,10 +319,14 @@ class MapMakerInternalMap<
     /** Gets the next entry in the chain. */
     E getNext();
 
-    /** Gets the entry's hash. */
+    /**
+     * Gets the entry's hash.
+     */
     int getHash();
 
-    /** Gets the key for this entry. */
+    /**
+     * Gets the key for this entry.
+     */
     K getKey();
 
     /** Gets the value for the entry. */
@@ -340,7 +343,7 @@ class MapMakerInternalMap<
       implements InternalEntry<K, V, E> {
     final K key;
     final int hash;
-    final @Nullable E next;
+    final E next;
 
     AbstractStrongKeyEntry(K key, int hash, @Nullable E next) {
       this.key = key;
@@ -390,14 +393,15 @@ class MapMakerInternalMap<
   static final class StrongKeyStrongValueEntry<K, V>
       extends AbstractStrongKeyEntry<K, V, StrongKeyStrongValueEntry<K, V>>
       implements StrongValueEntry<K, V, StrongKeyStrongValueEntry<K, V>> {
-    private volatile @Nullable V value = null;
+    @Nullable private volatile V value = null;
 
     StrongKeyStrongValueEntry(K key, int hash, @Nullable StrongKeyStrongValueEntry<K, V> next) {
       super(key, hash, next);
     }
 
     @Override
-    public @Nullable V getValue() {
+    @Nullable
+    public V getValue() {
       return value;
     }
 
@@ -646,7 +650,7 @@ class MapMakerInternalMap<
   abstract static class AbstractWeakKeyEntry<K, V, E extends InternalEntry<K, V, E>>
       extends WeakReference<K> implements InternalEntry<K, V, E> {
     final int hash;
-    final @Nullable E next;
+    final E next;
 
     AbstractWeakKeyEntry(ReferenceQueue<K> queue, K key, int hash, @Nullable E next) {
       super(key, queue);
@@ -754,7 +758,7 @@ class MapMakerInternalMap<
   static final class WeakKeyStrongValueEntry<K, V>
       extends AbstractWeakKeyEntry<K, V, WeakKeyStrongValueEntry<K, V>>
       implements StrongValueEntry<K, V, WeakKeyStrongValueEntry<K, V>> {
-    private volatile @Nullable V value = null;
+    @Nullable private volatile V value = null;
 
     WeakKeyStrongValueEntry(
         ReferenceQueue<K> queue, K key, int hash, @Nullable WeakKeyStrongValueEntry<K, V> next) {
@@ -762,7 +766,8 @@ class MapMakerInternalMap<
     }
 
     @Override
-    public @Nullable V getValue() {
+    @Nullable
+    public V getValue() {
       return value;
     }
 
@@ -1044,8 +1049,8 @@ class MapMakerInternalMap<
   /**
    * Applies a supplemental hash function to a given hash code, which defends against poor quality
    * hash functions. This is critical when the concurrent hash map uses power-of-two length hash
-   * tables, that otherwise encounter collisions for hash codes that do not differ in lower or upper
-   * bits.
+   * tables, that otherwise encounter collisions for hash codes that do not differ in lower or
+   * upper bits.
    *
    * @param h hash code
    */
@@ -1181,8 +1186,8 @@ class MapMakerInternalMap<
     /**
      * Number of updates that alter the size of the table. This is used during bulk-read methods to
      * make sure they see a consistent snapshot: If modCounts change during a traversal of segments
-     * computing size or checking containsValue, then we might have an inconsistent view of state so
-     * (usually) must retry.
+     * computing size or checking containsValue, then we might have an inconsistent view of state
+     * so (usually) must retry.
      */
     int modCount;
 
@@ -1193,9 +1198,11 @@ class MapMakerInternalMap<
     int threshold;
 
     /** The per-segment table. */
-    @MonotonicNonNull volatile AtomicReferenceArray<E> table;
+    volatile AtomicReferenceArray<E> table;
 
-    /** The maximum size of this map. MapMaker.UNSET_INT if there is no maximum. */
+    /**
+     * The maximum size of this map. MapMaker.UNSET_INT if there is no maximum.
+     */
     final int maxSegmentSize;
 
     /**
@@ -1336,7 +1343,9 @@ class MapMakerInternalMap<
 
     // reference queues, for garbage collection cleanup
 
-    /** Cleanup collected entries when the lock is available. */
+    /**
+     * Cleanup collected entries when the lock is available.
+     */
     void tryDrainReferenceQueues() {
       if (tryLock()) {
         try {
@@ -1530,7 +1539,9 @@ class MapMakerInternalMap<
       }
     }
 
-    /** Expands the table if possible. */
+    /**
+     * Expands the table if possible.
+     */
     @GuardedBy("this")
     void expand() {
       AtomicReferenceArray<E> oldTable = table;
@@ -1971,8 +1982,8 @@ class MapMakerInternalMap<
     }
 
     /**
-     * Performs routine cleanup prior to executing a write. This should be called every time a write
-     * thread acquires the segment lock, immediately after acquiring the lock.
+     * Performs routine cleanup prior to executing a write. This should be called every time a
+     * write thread acquires the segment lock, immediately after acquiring the lock.
      */
     @GuardedBy("this")
     void preWriteCleanup() {
@@ -2477,7 +2488,7 @@ class MapMakerInternalMap<
     }
   }
 
-  @MonotonicNonNull transient Set<K> keySet;
+  transient Set<K> keySet;
 
   @Override
   public Set<K> keySet() {
@@ -2485,7 +2496,7 @@ class MapMakerInternalMap<
     return (ks != null) ? ks : (keySet = new KeySet());
   }
 
-  @MonotonicNonNull transient Collection<V> values;
+  transient Collection<V> values;
 
   @Override
   public Collection<V> values() {
@@ -2493,7 +2504,7 @@ class MapMakerInternalMap<
     return (vs != null) ? vs : (values = new Values());
   }
 
-  @MonotonicNonNull transient Set<Entry<K, V>> entrySet;
+  transient Set<Entry<K, V>> entrySet;
 
   @Override
   public Set<Entry<K, V>> entrySet() {
@@ -2507,11 +2518,11 @@ class MapMakerInternalMap<
 
     int nextSegmentIndex;
     int nextTableIndex;
-    @MonotonicNonNull Segment<K, V, E, S> currentSegment;
-    @MonotonicNonNull AtomicReferenceArray<E> currentTable;
-    @Nullable E nextEntry;
-    @Nullable WriteThroughEntry nextExternal;
-    @Nullable WriteThroughEntry lastReturned;
+    Segment<K, V, E, S> currentSegment;
+    AtomicReferenceArray<E> currentTable;
+    E nextEntry;
+    WriteThroughEntry nextExternal;
+    WriteThroughEntry lastReturned;
 
     HashIterator() {
       nextSegmentIndex = segments.length - 1;
@@ -2545,7 +2556,9 @@ class MapMakerInternalMap<
       }
     }
 
-    /** Finds the next entry in the current chain. Returns {@code true} if an entry was found. */
+    /**
+     * Finds the next entry in the current chain. Returns {@code true} if an entry was found.
+     */
     boolean nextInChain() {
       if (nextEntry != null) {
         for (nextEntry = nextEntry.getNext(); nextEntry != null; nextEntry = nextEntry.getNext()) {
@@ -2557,7 +2570,9 @@ class MapMakerInternalMap<
       return false;
     }
 
-    /** Finds the next entry in the current table. Returns {@code true} if an entry was found. */
+    /**
+     * Finds the next entry in the current table. Returns {@code true} if an entry was found.
+     */
     boolean nextInTable() {
       while (nextTableIndex >= 0) {
         if ((nextEntry = currentTable.get(nextTableIndex--)) != null) {
@@ -2628,8 +2643,8 @@ class MapMakerInternalMap<
   }
 
   /**
-   * Custom Entry class used by EntryIterator.next(), that relays setValue changes to the underlying
-   * map.
+   * Custom Entry class used by EntryIterator.next(), that relays setValue changes to the
+   * underlying map.
    */
   final class WriteThroughEntry extends AbstractMapEntry<K, V> {
     final K key; // non-null
@@ -2927,7 +2942,12 @@ class MapMakerInternalMap<
         int concurrencyLevel,
         ConcurrentMap<K, V> delegate) {
       super(
-          keyStrength, valueStrength, keyEquivalence, valueEquivalence, concurrencyLevel, delegate);
+          keyStrength,
+          valueStrength,
+          keyEquivalence,
+          valueEquivalence,
+          concurrencyLevel,
+          delegate);
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {

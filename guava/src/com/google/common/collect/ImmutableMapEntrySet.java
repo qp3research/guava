@@ -16,14 +16,17 @@
 
 package com.google.common.collect;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.j2objc.annotations.Weak;
 import java.io.Serializable;
 import java.util.Map.Entry;
 import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Consumer;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * {@code entrySet()} implementation for {@link ImmutableMap}.
@@ -35,13 +38,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 abstract class ImmutableMapEntrySet<K, V> extends ImmutableSet<Entry<K, V>> {
   static final class RegularEntrySet<K, V> extends ImmutableMapEntrySet<K, V> {
     @Weak private final transient ImmutableMap<K, V> map;
-    private final transient ImmutableList<Entry<K, V>> entries;
+    private final transient Entry<K, V>[] entries;
 
     RegularEntrySet(ImmutableMap<K, V> map, Entry<K, V>[] entries) {
-      this(map, ImmutableList.<Entry<K, V>>asImmutableList(entries));
-    }
-
-    RegularEntrySet(ImmutableMap<K, V> map, ImmutableList<Entry<K, V>> entries) {
       this.map = map;
       this.entries = entries;
     }
@@ -52,24 +51,21 @@ abstract class ImmutableMapEntrySet<K, V> extends ImmutableSet<Entry<K, V>> {
     }
 
     @Override
-    @GwtIncompatible("not used in GWT")
-    int copyIntoArray(Object[] dst, int offset) {
-      return entries.copyIntoArray(dst, offset);
-    }
-
-    @Override
     public UnmodifiableIterator<Entry<K, V>> iterator() {
-      return entries.iterator();
+      return Iterators.forArray(entries);
     }
 
     @Override
     public Spliterator<Entry<K, V>> spliterator() {
-      return entries.spliterator();
+      return Spliterators.spliterator(entries, ImmutableSet.SPLITERATOR_CHARACTERISTICS);
     }
 
     @Override
     public void forEach(Consumer<? super Entry<K, V>> action) {
-      entries.forEach(action);
+      checkNotNull(action);
+      for (Entry<K, V> entry : entries) {
+        action.accept(entry);
+      }
     }
 
     @Override

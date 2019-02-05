@@ -18,35 +18,27 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.collect.ImmutableMap.IteratorBasedImmutableMap;
-import com.google.errorprone.annotations.Immutable;
 import com.google.j2objc.annotations.WeakOuter;
 import java.util.Map;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
-/** A {@code RegularImmutableTable} optimized for dense data. */
+/**
+ * A {@code RegularImmutableTable} optimized for dense data.
+ */
 @GwtCompatible
-@Immutable(containerOf = {"R", "C", "V"})
+@Immutable
 final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> {
   private final ImmutableMap<R, Integer> rowKeyToIndex;
   private final ImmutableMap<C, Integer> columnKeyToIndex;
-  private final ImmutableMap<R, ImmutableMap<C, V>> rowMap;
-  private final ImmutableMap<C, ImmutableMap<R, V>> columnMap;
-
-  @SuppressWarnings("Immutable") // We don't modify this after construction.
+  private final ImmutableMap<R, Map<C, V>> rowMap;
+  private final ImmutableMap<C, Map<R, V>> columnMap;
   private final int[] rowCounts;
-
-  @SuppressWarnings("Immutable") // We don't modify this after construction.
   private final int[] columnCounts;
-
-  @SuppressWarnings("Immutable") // We don't modify this after construction.
   private final V[][] values;
-
   // For each cell in iteration order, the index of that cell's row key in the row key list.
-  @SuppressWarnings("Immutable") // We don't modify this after construction.
   private final int[] cellRowIndices;
-
   // For each cell in iteration order, the index of that cell's column key in the column key list.
-  @SuppressWarnings("Immutable") // We don't modify this after construction.
   private final int[] cellColumnIndices;
 
   DenseImmutableTable(
@@ -82,7 +74,9 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
     this.columnMap = new ColumnMap();
   }
 
-  /** An immutable map implementation backed by an indexed nullable array. */
+  /**
+   * An immutable map implementation backed by an indexed nullable array.
+   */
   private abstract static class ImmutableArrayMap<K, V> extends IteratorBasedImmutableMap<K, V> {
     private final int size;
 
@@ -101,7 +95,8 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
       return keyToIndex().keySet().asList().get(index);
     }
 
-    abstract @Nullable V getValue(int keyIndex);
+    @Nullable
+    abstract V getValue(int keyIndex);
 
     @Override
     ImmutableSet<K> createKeySet() {
@@ -188,7 +183,7 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
   }
 
   @WeakOuter
-  private final class RowMap extends ImmutableArrayMap<R, ImmutableMap<C, V>> {
+  private final class RowMap extends ImmutableArrayMap<R, Map<C, V>> {
     private RowMap() {
       super(rowCounts.length);
     }
@@ -199,7 +194,7 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
     }
 
     @Override
-    ImmutableMap<C, V> getValue(int keyIndex) {
+    Map<C, V> getValue(int keyIndex) {
       return new Row(keyIndex);
     }
 
@@ -210,7 +205,7 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
   }
 
   @WeakOuter
-  private final class ColumnMap extends ImmutableArrayMap<C, ImmutableMap<R, V>> {
+  private final class ColumnMap extends ImmutableArrayMap<C, Map<R, V>> {
     private ColumnMap() {
       super(columnCounts.length);
     }
@@ -221,7 +216,7 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
     }
 
     @Override
-    ImmutableMap<R, V> getValue(int keyIndex) {
+    Map<R, V> getValue(int keyIndex) {
       return new Column(keyIndex);
     }
 
@@ -233,16 +228,12 @@ final class DenseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> 
 
   @Override
   public ImmutableMap<C, Map<R, V>> columnMap() {
-    // Casts without copying.
-    ImmutableMap<C, ImmutableMap<R, V>> columnMap = this.columnMap;
-    return ImmutableMap.<C, Map<R, V>>copyOf(columnMap);
+    return columnMap;
   }
 
   @Override
   public ImmutableMap<R, Map<C, V>> rowMap() {
-    // Casts without copying.
-    ImmutableMap<R, ImmutableMap<C, V>> rowMap = this.rowMap;
-    return ImmutableMap.<R, Map<C, V>>copyOf(rowMap);
+    return rowMap;
   }
 
   @Override

@@ -42,8 +42,7 @@ public class GeneralRangeTest extends TestCase {
         try {
           GeneralRange.range(ORDERING, 4, lboundType, 2, uboundType);
           fail("Expected IAE");
-        } catch (IllegalArgumentException expected) {
-        }
+        } catch (IllegalArgumentException expected) {}
       }
     }
   }
@@ -53,8 +52,7 @@ public class GeneralRangeTest extends TestCase {
       try {
         GeneralRange.range(ORDERING, i, OPEN, i, OPEN);
         fail("Expected IAE");
-      } catch (IllegalArgumentException expected) {
-      }
+      } catch (IllegalArgumentException expected) {}
     }
   }
 
@@ -96,12 +94,10 @@ public class GeneralRangeTest extends TestCase {
     for (BoundType lBoundType : BoundType.values()) {
       GeneralRange<Integer> range = GeneralRange.downTo(ORDERING, 3, lBoundType);
       for (Integer i : IN_ORDER_VALUES) {
-        assertEquals(
-            ORDERING.compare(i, 3) > 0 || (ORDERING.compare(i, 3) == 0 && lBoundType == CLOSED),
-            range.contains(i));
-        assertEquals(
-            ORDERING.compare(i, 3) < 0 || (ORDERING.compare(i, 3) == 0 && lBoundType == OPEN),
-            range.tooLow(i));
+        assertEquals(ORDERING.compare(i, 3) > 0
+            || (ORDERING.compare(i, 3) == 0 && lBoundType == CLOSED), range.contains(i));
+        assertEquals(ORDERING.compare(i, 3) < 0
+            || (ORDERING.compare(i, 3) == 0 && lBoundType == OPEN), range.tooLow(i));
         assertFalse(range.tooHigh(i));
       }
     }
@@ -111,12 +107,10 @@ public class GeneralRangeTest extends TestCase {
     for (BoundType lBoundType : BoundType.values()) {
       GeneralRange<Integer> range = GeneralRange.upTo(ORDERING, 3, lBoundType);
       for (Integer i : IN_ORDER_VALUES) {
-        assertEquals(
-            ORDERING.compare(i, 3) < 0 || (ORDERING.compare(i, 3) == 0 && lBoundType == CLOSED),
-            range.contains(i));
-        assertEquals(
-            ORDERING.compare(i, 3) > 0 || (ORDERING.compare(i, 3) == 0 && lBoundType == OPEN),
-            range.tooHigh(i));
+        assertEquals(ORDERING.compare(i, 3) < 0
+            || (ORDERING.compare(i, 3) == 0 && lBoundType == CLOSED), range.contains(i));
+        assertEquals(ORDERING.compare(i, 3) > 0
+            || (ORDERING.compare(i, 3) == 0 && lBoundType == OPEN), range.tooHigh(i));
         assertFalse(range.tooLow(i));
       }
     }
@@ -136,41 +130,34 @@ public class GeneralRangeTest extends TestCase {
 
   public void testIntersectAgainstMatchingEndpointsRange() {
     GeneralRange<Integer> range = GeneralRange.range(ORDERING, 2, CLOSED, 4, OPEN);
-    assertEquals(
-        GeneralRange.range(ORDERING, 2, OPEN, 4, OPEN),
+    assertEquals(GeneralRange.range(ORDERING, 2, OPEN, 4, OPEN),
         range.intersect(GeneralRange.range(ORDERING, 2, OPEN, 4, CLOSED)));
   }
 
   public void testIntersectAgainstBiggerRange() {
     GeneralRange<Integer> range = GeneralRange.range(ORDERING, 2, CLOSED, 4, OPEN);
 
-    assertEquals(
-        GeneralRange.range(ORDERING, 2, CLOSED, 4, OPEN),
+    assertEquals(GeneralRange.range(ORDERING, 2, CLOSED, 4, OPEN),
         range.intersect(GeneralRange.range(ORDERING, null, OPEN, 5, CLOSED)));
 
-    assertEquals(
-        GeneralRange.range(ORDERING, 2, OPEN, 4, OPEN),
+    assertEquals(GeneralRange.range(ORDERING, 2, OPEN, 4, OPEN),
         range.intersect(GeneralRange.range(ORDERING, 2, OPEN, 5, CLOSED)));
 
-    assertEquals(
-        GeneralRange.range(ORDERING, 2, CLOSED, 4, OPEN),
+    assertEquals(GeneralRange.range(ORDERING, 2, CLOSED, 4, OPEN),
         range.intersect(GeneralRange.range(ORDERING, 1, OPEN, 4, OPEN)));
   }
 
   public void testIntersectAgainstSmallerRange() {
     GeneralRange<Integer> range = GeneralRange.range(ORDERING, 2, OPEN, 4, OPEN);
-    assertEquals(
-        GeneralRange.range(ORDERING, 3, CLOSED, 4, OPEN),
+    assertEquals(GeneralRange.range(ORDERING, 3, CLOSED, 4, OPEN),
         range.intersect(GeneralRange.range(ORDERING, 3, CLOSED, 4, CLOSED)));
   }
 
   public void testIntersectOverlappingRange() {
     GeneralRange<Integer> range = GeneralRange.range(ORDERING, 2, OPEN, 4, CLOSED);
-    assertEquals(
-        GeneralRange.range(ORDERING, 3, CLOSED, 4, CLOSED),
+    assertEquals(GeneralRange.range(ORDERING, 3, CLOSED, 4, CLOSED),
         range.intersect(GeneralRange.range(ORDERING, 3, CLOSED, 5, CLOSED)));
-    assertEquals(
-        GeneralRange.range(ORDERING, 2, OPEN, 3, OPEN),
+    assertEquals(GeneralRange.range(ORDERING, 2, OPEN, 3, OPEN),
         range.intersect(GeneralRange.range(ORDERING, 1, OPEN, 3, OPEN)));
   }
 
@@ -186,12 +173,10 @@ public class GeneralRangeTest extends TestCase {
 
   public void testFromRangeOneEnd() {
     for (BoundType endpointType : BoundType.values()) {
-      assertEquals(
-          GeneralRange.upTo(Ordering.natural(), 3, endpointType),
+      assertEquals(GeneralRange.upTo(Ordering.natural(), 3, endpointType),
           GeneralRange.from(Range.upTo(3, endpointType)));
 
-      assertEquals(
-          GeneralRange.downTo(Ordering.natural(), 3, endpointType),
+      assertEquals(GeneralRange.downTo(Ordering.natural(), 3, endpointType),
           GeneralRange.from(Range.downTo(3, endpointType)));
     }
   }
@@ -199,8 +184,7 @@ public class GeneralRangeTest extends TestCase {
   public void testFromRangeTwoEnds() {
     for (BoundType lowerType : BoundType.values()) {
       for (BoundType upperType : BoundType.values()) {
-        assertEquals(
-            GeneralRange.range(Ordering.natural(), 3, lowerType, 4, upperType),
+        assertEquals(GeneralRange.range(Ordering.natural(), 3, lowerType, 4, upperType),
             GeneralRange.from(Range.range(3, lowerType, 4, upperType)));
       }
     }
@@ -208,14 +192,11 @@ public class GeneralRangeTest extends TestCase {
 
   public void testReverse() {
     assertEquals(GeneralRange.all(ORDERING.reverse()), GeneralRange.all(ORDERING).reverse());
-    assertEquals(
-        GeneralRange.downTo(ORDERING.reverse(), 3, CLOSED),
+    assertEquals(GeneralRange.downTo(ORDERING.reverse(), 3, CLOSED),
         GeneralRange.upTo(ORDERING, 3, CLOSED).reverse());
-    assertEquals(
-        GeneralRange.upTo(ORDERING.reverse(), 3, OPEN),
+    assertEquals(GeneralRange.upTo(ORDERING.reverse(), 3, OPEN),
         GeneralRange.downTo(ORDERING, 3, OPEN).reverse());
-    assertEquals(
-        GeneralRange.range(ORDERING.reverse(), 5, OPEN, 3, CLOSED),
+    assertEquals(GeneralRange.range(ORDERING.reverse(), 5, OPEN, 3, CLOSED),
         GeneralRange.range(ORDERING, 3, CLOSED, 5, OPEN).reverse());
   }
 

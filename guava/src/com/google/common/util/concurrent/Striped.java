@@ -184,18 +184,6 @@ public abstract class Striped<L> {
   // Static factories
 
   /**
-   * Creates a {@code Striped<L>} with eagerly initialized, strongly referenced locks. Every lock
-   * is obtained from the passed supplier.
-   *
-   * @param stripes the minimum number of stripes (locks) required
-   * @param supplier a {@code Supplier<L>} object to obtain locks from
-   * @return a new {@code Striped<L>}
-   */
-  static <L> Striped<L> custom(int stripes, Supplier<L> supplier) {
-    return new CompactStriped<>(stripes, supplier);
-  }
-
-  /**
    * Creates a {@code Striped<Lock>} with eagerly initialized, strongly referenced locks. Every lock
    * is reentrant.
    *
@@ -203,12 +191,14 @@ public abstract class Striped<L> {
    * @return a new {@code Striped<Lock>}
    */
   public static Striped<Lock> lock(int stripes) {
-    return custom(stripes, new Supplier<Lock>() {
-      @Override
-      public Lock get() {
-        return new PaddedLock();
-      }
-    });
+    return new CompactStriped<>(
+        stripes,
+        new Supplier<Lock>() {
+          @Override
+          public Lock get() {
+            return new PaddedLock();
+          }
+        });
   }
 
   /**
@@ -244,7 +234,7 @@ public abstract class Striped<L> {
    * @return a new {@code Striped<Semaphore>}
    */
   public static Striped<Semaphore> semaphore(int stripes, final int permits) {
-    return custom(
+    return new CompactStriped<>(
         stripes,
         new Supplier<Semaphore>() {
           @Override
@@ -281,7 +271,7 @@ public abstract class Striped<L> {
    * @return a new {@code Striped<ReadWriteLock>}
    */
   public static Striped<ReadWriteLock> readWriteLock(int stripes) {
-    return custom(stripes, READ_WRITE_LOCK_SUPPLIER);
+    return new CompactStriped<>(stripes, READ_WRITE_LOCK_SUPPLIER);
   }
 
   /**

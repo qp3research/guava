@@ -23,11 +23,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
 /**
- * Tests may use this to intercept messages that are logged by the code under test. Example:
- *
+ * Tests may use this to intercept messages that are logged by the code under
+ * test.  Example:
  * <pre>
  *   TestLogHandler handler;
  *
@@ -58,9 +58,11 @@ public class TestLogHandler extends Handler {
   /** We will keep a private list of all logged records */
   private final List<LogRecord> list = new ArrayList<>();
 
-  /** Adds the most recently logged record to our list. */
+  /**
+   * Adds the most recently logged record to our list.
+   */
   @Override
-  public synchronized void publish(@NullableDecl LogRecord record) {
+  public synchronized void publish(@Nullable LogRecord record) {
     list.add(record);
   }
 
@@ -74,7 +76,9 @@ public class TestLogHandler extends Handler {
     list.clear();
   }
 
-  /** Returns a snapshot of the logged records. */
+  /**
+   * Returns a snapshot of the logged records.
+   */
   /*
    * TODO(cpovirk): consider higher-level APIs here (say, assertNoRecordsLogged(),
    * getOnlyRecordLogged(), getAndClearLogRecords()...)

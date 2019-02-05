@@ -24,8 +24,7 @@ import com.google.common.collect.testing.AbstractMapTester;
 import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.collect.testing.features.MapFeature;
 import java.util.Collection;
-import java.util.Map.Entry;
-import org.junit.Ignore;
+import java.util.Map;
 
 /**
  * Tests {@link java.util.Map#hashCode}.
@@ -34,11 +33,10 @@ import org.junit.Ignore;
  * @author Chris Povirk
  */
 @GwtCompatible
-@Ignore // Affects only Android test runner, which respects JUnit 4 annotations on JUnit 3 tests.
 public class MapHashCodeTester<K, V> extends AbstractMapTester<K, V> {
   public void testHashCode() {
     int expectedHashCode = 0;
-    for (Entry<K, V> entry : getSampleEntries()) {
+    for (Map.Entry<K, V> entry : getSampleEntries()) {
       expectedHashCode += hash(entry);
     }
     assertEquals(
@@ -50,24 +48,24 @@ public class MapHashCodeTester<K, V> extends AbstractMapTester<K, V> {
   @CollectionSize.Require(absent = CollectionSize.ZERO)
   @MapFeature.Require(ALLOWS_NULL_KEYS)
   public void testHashCode_containingNullKey() {
-    Entry<K, V> entryWithNull = entry(null, v3());
+    Map.Entry<K, V> entryWithNull = entry(null, v3());
     runEntryWithNullTest(entryWithNull);
   }
 
   @CollectionSize.Require(absent = CollectionSize.ZERO)
   @MapFeature.Require(ALLOWS_NULL_VALUES)
   public void testHashCode_containingNullValue() {
-    Entry<K, V> entryWithNull = entry(k3(), null);
+    Map.Entry<K, V> entryWithNull = entry(k3(), null);
     runEntryWithNullTest(entryWithNull);
   }
 
-  private void runEntryWithNullTest(Entry<K, V> entryWithNull) {
-    Collection<Entry<K, V>> entries = getSampleEntries(getNumEntries() - 1);
+  private void runEntryWithNullTest(Map.Entry<K, V> entryWithNull) {
+    Collection<Map.Entry<K, V>> entries = getSampleEntries(getNumEntries() - 1);
 
     entries.add(entryWithNull);
 
     int expectedHashCode = 0;
-    for (Entry<K, V> entry : entries) {
+    for (Map.Entry<K, V> entry : entries) {
       expectedHashCode += hash(entry);
     }
 
@@ -79,7 +77,7 @@ public class MapHashCodeTester<K, V> extends AbstractMapTester<K, V> {
         getMap().hashCode());
   }
 
-  private static int hash(Entry<?, ?> e) {
+  private static int hash(Map.Entry<?, ?> e) {
     return (e.getKey() == null ? 0 : e.getKey().hashCode())
         ^ (e.getValue() == null ? 0 : e.getValue().hashCode());
   }

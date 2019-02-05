@@ -36,4 +36,5 @@ public class RangeNonGwtTest extends TestCase {
     tester.testAllPublicInstanceMethods(Range.all());
     tester.testAllPublicInstanceMethods(Range.open(1, 3));
   }
+
 }

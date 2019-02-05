@@ -52,7 +52,9 @@ public class DoubleUtilsTest extends TestCase {
       if (b.doubleValue() != DoubleUtils.bigToDouble(b)) {
         failFormat(
             "Converting %s to double: expected doubleValue %s but got bigToDouble %s",
-            b, b.doubleValue(), DoubleUtils.bigToDouble(b));
+            b,
+            b.doubleValue(),
+            DoubleUtils.bigToDouble(b));
       }
     }
   }

@@ -81,7 +81,9 @@ public final class HashingInputStream extends FilterInputStream {
     return false;
   }
 
-  /** mark() is not supported for HashingInputStream */
+  /**
+   * mark() is not supported for HashingInputStream
+   */
   @Override
   public void mark(int readlimit) {}
 

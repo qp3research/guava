@@ -30,7 +30,9 @@ import java.lang.ref.Reference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import junit.framework.TestCase;
 
-/** @author Charles Fry */
+/**
+ * @author Charles Fry
+ */
 @SuppressWarnings("deprecation") // many tests of deprecated methods
 public class MapMakerInternalMapTest extends TestCase {
 
@@ -70,18 +72,17 @@ public class MapMakerInternalMapTest extends TestCase {
   }
 
   public void testSetKeyEquivalence() {
-    Equivalence<Object> testEquivalence =
-        new Equivalence<Object>() {
-          @Override
-          protected boolean doEquivalent(Object a, Object b) {
-            return false;
-          }
+    Equivalence<Object> testEquivalence = new Equivalence<Object>() {
+      @Override
+      protected boolean doEquivalent(Object a, Object b) {
+        return false;
+      }
 
-          @Override
-          protected int doHash(Object t) {
-            return 0;
-          }
-        };
+      @Override
+      protected int doHash(Object t) {
+        return 0;
+      }
+    };
 
     MapMakerInternalMap<Object, Object, ?, ?> map =
         makeMap(createMapMaker().keyEquivalence(testEquivalence));
@@ -956,7 +957,9 @@ public class MapMakerInternalMapTest extends TestCase {
   // utility methods
 
   private static Iterable<MapMaker> allWeakKeyStrengthMakers() {
-    return ImmutableList.of(createMapMaker().weakKeys(), createMapMaker().weakKeys().weakValues());
+    return ImmutableList.of(
+        createMapMaker().weakKeys(),
+        createMapMaker().weakKeys().weakValues());
   }
 
   private static Iterable<MapMaker> allWeakValueStrengthMakers() {

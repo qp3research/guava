@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import junit.framework.TestSuite;
@@ -48,7 +49,7 @@ import junit.framework.TestSuite;
 @GwtIncompatible
 public class BiMapTestSuiteBuilder<K, V>
     extends PerCollectionSizeTestSuiteBuilder<
-        BiMapTestSuiteBuilder<K, V>, TestBiMapGenerator<K, V>, BiMap<K, V>, Entry<K, V>> {
+        BiMapTestSuiteBuilder<K, V>, TestBiMapGenerator<K, V>, BiMap<K, V>, Map.Entry<K, V>> {
   public static <K, V> BiMapTestSuiteBuilder<K, V> using(TestBiMapGenerator<K, V> generator) {
     return new BiMapTestSuiteBuilder<K, V>().usingGenerator(generator);
   }

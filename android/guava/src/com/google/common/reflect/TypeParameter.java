@@ -19,17 +19,16 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.annotations.Beta;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
 /**
  * Captures a free type variable that can be used in {@link TypeToken#where}. For example:
  *
- * <pre>{@code
- * static <T> TypeToken<List<T>> listOf(Class<T> elementType) {
- *   return new TypeToken<List<T>>() {}
- *       .where(new TypeParameter<T>() {}, elementType);
- * }
- * }</pre>
+ * <pre>   {@code
+ *   static <T> TypeToken<List<T>> listOf(Class<T> elementType) {
+ *     return new TypeToken<List<T>>() {}
+ *         .where(new TypeParameter<T>() {}, elementType);
+ *   }}</pre>
  *
  * @author Ben Yu
  * @since 12.0
@@ -51,7 +50,7 @@ public abstract class TypeParameter<T> extends TypeCapture<T> {
   }
 
   @Override
-  public final boolean equals(@NullableDecl Object o) {
+  public final boolean equals(@Nullable Object o) {
     if (o instanceof TypeParameter) {
       TypeParameter<?> that = (TypeParameter<?>) o;
       return typeVariable.equals(that.typeVariable);

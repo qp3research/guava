@@ -48,11 +48,6 @@ public void testCeilingPowerOfTwoZero() throws Exception {
   testCase.testCeilingPowerOfTwoZero();
 }
 
-public void testCheckedMultiply() throws Exception {
-  com.google.common.math.LongMathTest testCase = new com.google.common.math.LongMathTest();
-  testCase.testCheckedMultiply();
-}
-
 public void testFloorPowerOfTwo() throws Exception {
   com.google.common.math.LongMathTest testCase = new com.google.common.math.LongMathTest();
   testCase.testFloorPowerOfTwo();
