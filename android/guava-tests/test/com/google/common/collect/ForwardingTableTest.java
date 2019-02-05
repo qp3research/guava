@@ -31,14 +31,11 @@ public class ForwardingTableTest extends TestCase {
   @SuppressWarnings("rawtypes")
   public void testForwarding() {
     new ForwardingWrapperTester()
-        .testForwarding(
-            Table.class,
-            new Function<Table, Table>() {
-              @Override
-              public Table apply(Table delegate) {
-                return wrap(delegate);
-              }
-            });
+        .testForwarding(Table.class, new Function<Table, Table>() {
+          @Override public Table apply(Table delegate) {
+            return wrap(delegate);
+          }
+        });
   }
 
   public void testEquals() {
@@ -52,8 +49,7 @@ public class ForwardingTableTest extends TestCase {
 
   private static <R, C, V> Table<R, C, V> wrap(final Table<R, C, V> delegate) {
     return new ForwardingTable<R, C, V>() {
-      @Override
-      protected Table<R, C, V> delegate() {
+      @Override protected Table<R, C, V> delegate() {
         return delegate;
       }
     };

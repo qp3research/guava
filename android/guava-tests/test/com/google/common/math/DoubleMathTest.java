@@ -84,9 +84,8 @@ public class DoubleMathTest extends TestCase {
     for (double d : INTEGRAL_DOUBLE_CANDIDATES) {
       for (RoundingMode mode : ALL_SAFE_ROUNDING_MODES) {
         BigDecimal expected = new BigDecimal(d).setScale(0, mode);
-        boolean isInBounds =
-            expected.compareTo(MAX_INT_AS_BIG_DECIMAL) <= 0
-                & expected.compareTo(MIN_INT_AS_BIG_DECIMAL) >= 0;
+        boolean isInBounds = expected.compareTo(MAX_INT_AS_BIG_DECIMAL) <= 0
+            & expected.compareTo(MIN_INT_AS_BIG_DECIMAL) >= 0;
 
         try {
           assertEquals(expected.intValue(), DoubleMath.roundToInt(d, mode));
@@ -103,9 +102,8 @@ public class DoubleMathTest extends TestCase {
     for (double d : FRACTIONAL_DOUBLE_CANDIDATES) {
       for (RoundingMode mode : ALL_SAFE_ROUNDING_MODES) {
         BigDecimal expected = new BigDecimal(d).setScale(0, mode);
-        boolean isInBounds =
-            expected.compareTo(MAX_INT_AS_BIG_DECIMAL) <= 0
-                & expected.compareTo(MIN_INT_AS_BIG_DECIMAL) >= 0;
+        boolean isInBounds = expected.compareTo(MAX_INT_AS_BIG_DECIMAL) <= 0
+            & expected.compareTo(MIN_INT_AS_BIG_DECIMAL) >= 0;
 
         try {
           assertEquals(
@@ -124,9 +122,8 @@ public class DoubleMathTest extends TestCase {
   public void testRoundExactIntegralDoubleToInt() {
     for (double d : INTEGRAL_DOUBLE_CANDIDATES) {
       BigDecimal expected = new BigDecimal(d).setScale(0, UNNECESSARY);
-      boolean isInBounds =
-          expected.compareTo(MAX_INT_AS_BIG_DECIMAL) <= 0
-              & expected.compareTo(MIN_INT_AS_BIG_DECIMAL) >= 0;
+      boolean isInBounds = expected.compareTo(MAX_INT_AS_BIG_DECIMAL) <= 0
+          & expected.compareTo(MIN_INT_AS_BIG_DECIMAL) >= 0;
 
       try {
         assertEquals(expected.intValue(), DoubleMath.roundToInt(d, UNNECESSARY));
@@ -143,8 +140,7 @@ public class DoubleMathTest extends TestCase {
       try {
         DoubleMath.roundToInt(d, UNNECESSARY);
         fail("Expected ArithmeticException");
-      } catch (ArithmeticException expected) {
-      }
+      } catch (ArithmeticException expected) {}
     }
   }
 
@@ -154,8 +150,7 @@ public class DoubleMathTest extends TestCase {
       try {
         DoubleMath.roundToInt(Double.NaN, mode);
         fail("Expected ArithmeticException");
-      } catch (ArithmeticException expected) {
-      }
+      } catch (ArithmeticException expected) {}
     }
   }
 
@@ -165,13 +160,11 @@ public class DoubleMathTest extends TestCase {
       try {
         DoubleMath.roundToInt(Double.POSITIVE_INFINITY, mode);
         fail("Expected ArithmeticException");
-      } catch (ArithmeticException expected) {
-      }
+      } catch (ArithmeticException expected) {}
       try {
         DoubleMath.roundToInt(Double.NEGATIVE_INFINITY, mode);
         fail("Expected ArithmeticException");
-      } catch (ArithmeticException expected) {
-      }
+      } catch (ArithmeticException expected) {}
     }
   }
 
@@ -180,9 +173,8 @@ public class DoubleMathTest extends TestCase {
     for (double d : INTEGRAL_DOUBLE_CANDIDATES) {
       for (RoundingMode mode : ALL_SAFE_ROUNDING_MODES) {
         BigDecimal expected = new BigDecimal(d).setScale(0, mode);
-        boolean isInBounds =
-            expected.compareTo(MAX_LONG_AS_BIG_DECIMAL) <= 0
-                & expected.compareTo(MIN_LONG_AS_BIG_DECIMAL) >= 0;
+        boolean isInBounds = expected.compareTo(MAX_LONG_AS_BIG_DECIMAL) <= 0
+            & expected.compareTo(MIN_LONG_AS_BIG_DECIMAL) >= 0;
 
         try {
           assertEquals(expected.longValue(), DoubleMath.roundToLong(d, mode));
@@ -199,9 +191,8 @@ public class DoubleMathTest extends TestCase {
     for (double d : FRACTIONAL_DOUBLE_CANDIDATES) {
       for (RoundingMode mode : ALL_SAFE_ROUNDING_MODES) {
         BigDecimal expected = new BigDecimal(d).setScale(0, mode);
-        boolean isInBounds =
-            expected.compareTo(MAX_LONG_AS_BIG_DECIMAL) <= 0
-                & expected.compareTo(MIN_LONG_AS_BIG_DECIMAL) >= 0;
+        boolean isInBounds = expected.compareTo(MAX_LONG_AS_BIG_DECIMAL) <= 0
+            & expected.compareTo(MIN_LONG_AS_BIG_DECIMAL) >= 0;
 
         try {
           assertEquals(expected.longValue(), DoubleMath.roundToLong(d, mode));
@@ -218,9 +209,8 @@ public class DoubleMathTest extends TestCase {
     for (double d : INTEGRAL_DOUBLE_CANDIDATES) {
       // every mode except UNNECESSARY
       BigDecimal expected = new BigDecimal(d).setScale(0, UNNECESSARY);
-      boolean isInBounds =
-          expected.compareTo(MAX_LONG_AS_BIG_DECIMAL) <= 0
-              & expected.compareTo(MIN_LONG_AS_BIG_DECIMAL) >= 0;
+      boolean isInBounds = expected.compareTo(MAX_LONG_AS_BIG_DECIMAL) <= 0
+          & expected.compareTo(MIN_LONG_AS_BIG_DECIMAL) >= 0;
 
       try {
         assertEquals(expected.longValue(), DoubleMath.roundToLong(d, UNNECESSARY));
@@ -237,8 +227,7 @@ public class DoubleMathTest extends TestCase {
       try {
         DoubleMath.roundToLong(d, UNNECESSARY);
         fail("Expected ArithmeticException");
-      } catch (ArithmeticException expected) {
-      }
+      } catch (ArithmeticException expected) {}
     }
   }
 
@@ -248,8 +237,7 @@ public class DoubleMathTest extends TestCase {
       try {
         DoubleMath.roundToLong(Double.NaN, mode);
         fail("Expected ArithmeticException");
-      } catch (ArithmeticException expected) {
-      }
+      } catch (ArithmeticException expected) {}
     }
   }
 
@@ -259,13 +247,11 @@ public class DoubleMathTest extends TestCase {
       try {
         DoubleMath.roundToLong(Double.POSITIVE_INFINITY, mode);
         fail("Expected ArithmeticException");
-      } catch (ArithmeticException expected) {
-      }
+      } catch (ArithmeticException expected) {}
       try {
         DoubleMath.roundToLong(Double.NEGATIVE_INFINITY, mode);
         fail("Expected ArithmeticException");
-      } catch (ArithmeticException expected) {
-      }
+      } catch (ArithmeticException expected) {}
     }
   }
 
@@ -303,8 +289,7 @@ public class DoubleMathTest extends TestCase {
       try {
         DoubleMath.roundToBigInteger(d, UNNECESSARY);
         fail("Expected ArithmeticException");
-      } catch (ArithmeticException expected) {
-      }
+      } catch (ArithmeticException expected) {}
     }
   }
 
@@ -314,8 +299,7 @@ public class DoubleMathTest extends TestCase {
       try {
         DoubleMath.roundToBigInteger(Double.NaN, mode);
         fail("Expected ArithmeticException");
-      } catch (ArithmeticException expected) {
-      }
+      } catch (ArithmeticException expected) {}
     }
   }
 
@@ -325,13 +309,11 @@ public class DoubleMathTest extends TestCase {
       try {
         DoubleMath.roundToBigInteger(Double.POSITIVE_INFINITY, mode);
         fail("Expected ArithmeticException");
-      } catch (ArithmeticException expected) {
-      }
+      } catch (ArithmeticException expected) {}
       try {
         DoubleMath.roundToBigInteger(Double.NEGATIVE_INFINITY, mode);
         fail("Expected ArithmeticException");
-      } catch (ArithmeticException expected) {
-      }
+      } catch (ArithmeticException expected) {}
     }
   }
 
@@ -426,8 +408,7 @@ public class DoubleMathTest extends TestCase {
         try {
           DoubleMath.log2(d, mode);
           fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException expected) {
-        }
+        } catch (IllegalArgumentException expected) {}
       }
     }
   }
@@ -439,8 +420,7 @@ public class DoubleMathTest extends TestCase {
         try {
           DoubleMath.log2(-d, mode);
           fail("Expected IllegalArgumentException");
-        } catch (IllegalArgumentException expected) {
-        }
+        } catch (IllegalArgumentException expected) {}
       }
     }
   }
@@ -455,11 +435,8 @@ public class DoubleMathTest extends TestCase {
   @GwtIncompatible // DoubleMath.isPowerOfTwo, DoubleMath.log2(double, RoundingMode), StrictMath
   public void testIsPowerOfTwo() {
     for (double x : ALL_DOUBLE_CANDIDATES) {
-      boolean expected =
-          x > 0
-              && !Double.isInfinite(x)
-              && !Double.isNaN(x)
-              && StrictMath.pow(2.0, DoubleMath.log2(x, FLOOR)) == x;
+      boolean expected = x > 0 && !Double.isInfinite(x) && !Double.isNaN(x)
+          && StrictMath.pow(2.0, DoubleMath.log2(x, FLOOR)) == x;
       assertEquals(expected, DoubleMath.isPowerOfTwo(x));
     }
   }
@@ -530,7 +507,8 @@ public class DoubleMathTest extends TestCase {
 
   @GwtIncompatible // DoubleMath.isMathematicalInteger
   public void testIsMathematicalIntegerNotFinite() {
-    for (double d : Arrays.asList(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NaN)) {
+    for (double d :
+        Arrays.asList(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NaN)) {
       assertFalse(DoubleMath.isMathematicalInteger(d));
     }
   }
@@ -554,8 +532,7 @@ public class DoubleMathTest extends TestCase {
       try {
         DoubleMath.factorial(n);
         fail("Expected IllegalArgumentException");
-      } catch (IllegalArgumentException expected) {
-      }
+      } catch (IllegalArgumentException expected) {}
     }
   }
 
@@ -566,20 +543,16 @@ public class DoubleMathTest extends TestCase {
       Iterables.concat(FINITE_TOLERANCE_CANDIDATES, ImmutableList.of(Double.POSITIVE_INFINITY));
 
   private static final List<Double> BAD_TOLERANCE_CANDIDATES =
-      Doubles.asList(
-          -Double.MIN_VALUE,
-          -Double.MIN_NORMAL,
-          -1,
-          -20,
-          Double.NaN,
-          Double.NEGATIVE_INFINITY,
-          -0.001);
+      Doubles.asList(-Double.MIN_VALUE, -Double.MIN_NORMAL, -1, -20, Double.NaN,
+          Double.NEGATIVE_INFINITY, -0.001);
 
   public void testFuzzyEqualsFinite() {
     for (double a : FINITE_DOUBLE_CANDIDATES) {
       for (double b : FINITE_DOUBLE_CANDIDATES) {
         for (double tolerance : FINITE_TOLERANCE_CANDIDATES) {
-          assertEquals(Math.abs(a - b) <= tolerance, DoubleMath.fuzzyEquals(a, b, tolerance));
+          assertEquals(
+              Math.abs(a - b) <= tolerance,
+              DoubleMath.fuzzyEquals(a, b, tolerance));
         }
       }
     }
@@ -633,8 +606,8 @@ public class DoubleMathTest extends TestCase {
     for (double zero : Doubles.asList(0.0, -0.0)) {
       for (double a : ALL_DOUBLE_CANDIDATES) {
         for (double b : ALL_DOUBLE_CANDIDATES) {
-          assertEquals(
-              a == b || (Double.isNaN(a) && Double.isNaN(b)), DoubleMath.fuzzyEquals(a, b, zero));
+          assertEquals(a == b || (Double.isNaN(a) && Double.isNaN(b)),
+              DoubleMath.fuzzyEquals(a, b, zero));
         }
       }
     }
@@ -803,8 +776,8 @@ public class DoubleMathTest extends TestCase {
 
   @GwtIncompatible // DoubleMath.mean
   public void testMean_longIterator() {
-    assertEquals(
-        -13.75, DoubleMath.mean(ImmutableList.of(11L, -22L, 44L, -88L).iterator()), 1.0e-10);
+    assertEquals(-13.75, DoubleMath.mean(ImmutableList.of(11L, -22L, 44L, -88L).iterator()),
+        1.0e-10);
     assertEquals(11, DoubleMath.mean(ImmutableList.of(11L).iterator()), 1.0e-10);
     try {
       DoubleMath.mean(ImmutableList.<Long>of().iterator());

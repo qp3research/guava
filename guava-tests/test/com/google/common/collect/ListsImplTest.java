@@ -32,11 +32,15 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-/** Tests the package level *impl methods directly using various types of lists. */
+/**
+ * Tests the package level *impl methods directly using various types of lists.
+ */
 @GwtCompatible(emulated = true)
 public class ListsImplTest extends TestCase {
 
-  /** Describes how a list is modifiable */
+  /**
+   * Describes how a list is modifiable
+   */
   public enum Modifiability {
     NONE, // immutable lists
     BY_ELEMENT, // elements can change (set), but not structure
@@ -45,7 +49,7 @@ public class ListsImplTest extends TestCase {
   }
 
   /** Handles the creation of lists needed for the tests */
-  public abstract static class ListExample {
+  public static abstract class ListExample {
 
     private final String name;
     private final Modifiability modifiability;
@@ -54,16 +58,21 @@ public class ListsImplTest extends TestCase {
       this.name = name;
       this.modifiability = modifiability;
     }
-
-    /** Gets the name of the example */
+    /**
+     * Gets the name of the example
+     */
     public String getName() {
       return name;
     }
 
-    /** Creates a new list with the given contents. */
+    /**
+     * Creates a new list with the given contents.
+     */
     public abstract <T> List<T> createList(Class<T> listType, Collection<? extends T> contents);
 
-    /** The modifiablity of this list example. */
+    /**
+     * The modifiablity of this list example.
+     */
     public Modifiability modifiability() {
       return modifiability;
     }
@@ -84,7 +93,7 @@ public class ListsImplTest extends TestCase {
   @GwtIncompatible // suite sub call
   private static TestSuite createExampleSuite(ListExample example) {
     TestSuite resultSuite = new TestSuite(ListsImplTest.class);
-    for (Enumeration<Test> testEnum = resultSuite.tests(); testEnum.hasMoreElements(); ) {
+    for (Enumeration<Test> testEnum = resultSuite.tests(); testEnum.hasMoreElements();) {
       ListsImplTest test = (ListsImplTest) testEnum.nextElement();
       test.example = example;
     }
@@ -117,7 +126,8 @@ public class ListsImplTest extends TestCase {
 
     assertThat(Lists.hashCodeImpl(base)).isEqualTo(Lists.hashCodeImpl(copy));
 
-    assertThat(Lists.hashCodeImpl(base)).isNotEqualTo(Lists.hashCodeImpl(outOfOrder));
+    assertThat(Lists.hashCodeImpl(base)).isNotEqualTo(Lists.hashCodeImpl
+        (outOfOrder));
     assertThat(Lists.hashCodeImpl(base)).isNotEqualTo(Lists.hashCodeImpl(diffValue));
     assertThat(Lists.hashCodeImpl(base)).isNotEqualTo(Lists.hashCodeImpl(diffLength));
     assertThat(Lists.hashCodeImpl(base)).isNotEqualTo(Lists.hashCodeImpl(empty));
@@ -148,30 +158,26 @@ public class ListsImplTest extends TestCase {
     }
     List<String> toTest = createList(String.class);
 
-    List<Iterable<String>> toAdd =
-        ImmutableList.of(
-            Collections.singleton("A"),
-            Collections.emptyList(),
-            ImmutableList.of("A", "B", "C"),
-            ImmutableList.of("D", "E"));
+    List<Iterable<String>> toAdd = ImmutableList.of(
+        Collections.singleton("A"),
+        Collections.emptyList(),
+        ImmutableList.of("A", "B", "C"),
+        ImmutableList.of("D", "E"));
     List<Integer> indexes = ImmutableList.of(0, 0, 1, 3);
-    List<List<String>> expected =
-        ImmutableList.of(
-            ImmutableList.of("A"),
-            ImmutableList.of("A"),
-            ImmutableList.of("A", "A", "B", "C"),
-            ImmutableList.of("A", "A", "D", "E", "B", "C"));
+    List<List<String>> expected = ImmutableList.of(
+        ImmutableList.of("A"),
+        ImmutableList.of("A"),
+        ImmutableList.of("A", "A", "B", "C"),
+        ImmutableList.of("A", "A", "D", "E", "B", "C"));
 
     String format = "Adding %s at %s";
     for (int i = 0; i < toAdd.size(); i++) {
       int index = indexes.get(i);
       Iterable<String> iterableToAdd = toAdd.get(i);
       boolean expectedChanged = iterableToAdd.iterator().hasNext();
-      assertThat(Lists.addAllImpl(toTest, index, iterableToAdd))
-          .named(format, iterableToAdd, index)
+      assertThat(Lists.addAllImpl(toTest, index, iterableToAdd)).named(format, iterableToAdd, index)
           .isEqualTo(expectedChanged);
-      assertThat(toTest)
-          .named(format, iterableToAdd, index)
+      assertThat(toTest).named(format, iterableToAdd, index)
           .containsExactlyElementsIn(expected.get(i));
     }
   }
@@ -216,7 +222,9 @@ public class ListsImplTest extends TestCase {
     int index = 0;
     for (Object obj : toTest) {
       String name = "toTest[" + index + "] (" + obj + ")";
-      assertThat(Lists.indexOfImpl(toTest, obj)).named(name).isEqualTo(expected[index]);
+      assertThat(Lists.indexOfImpl(toTest, obj))
+          .named(name)
+          .isEqualTo(expected[index]);
       index++;
     }
   }
@@ -225,7 +233,9 @@ public class ListsImplTest extends TestCase {
     int index = 0;
     for (Object obj : toTest) {
       String name = "toTest[" + index + "] (" + obj + ")";
-      assertThat(Lists.lastIndexOfImpl(toTest, obj)).named(name).isEqualTo(expected[index]);
+      assertThat(Lists.lastIndexOfImpl(toTest, obj))
+          .named(name)
+          .isEqualTo(expected[index]);
       index++;
     }
   }
@@ -269,7 +279,7 @@ public class ListsImplTest extends TestCase {
 
     @Override
     public <T> List<T> createList(Class<T> listType, Collection<? extends T> contents) {
-      @SuppressWarnings("unchecked") // safe by contract
+      @SuppressWarnings("unchecked")  // safe by contract
       T[] array = Iterables.toArray(contents, listType);
       return Arrays.asList(array);
     }

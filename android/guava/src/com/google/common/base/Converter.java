@@ -22,8 +22,7 @@ import com.google.errorprone.annotations.ForOverride;
 import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.io.Serializable;
 import java.util.Iterator;
-import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
 /**
  * A function from {@code A} to {@code B} with an associated <i>reverse</i> function from {@code B}
@@ -38,9 +37,9 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * example round-trip using {@link com.google.common.primitives.Doubles#stringConverter}:
  *
  * <ol>
- *   <li>{@code stringConverter().convert("1.00")} returns the {@code Double} value {@code 1.0}
- *   <li>{@code stringConverter().reverse().convert(1.0)} returns the string {@code "1.0"} --
- *       <i>not</i> the same string ({@code "1.00"}) we started with
+ * <li>{@code stringConverter().convert("1.00")} returns the {@code Double} value {@code 1.0}
+ * <li>{@code stringConverter().reverse().convert(1.0)} returns the string {@code "1.0"} --
+ *     <i>not</i> the same string ({@code "1.00"}) we started with
  * </ol>
  *
  * <p>Note that it should still be the case that the round-tripped and original objects are
@@ -61,30 +60,30 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * <p>Getting a converter:
  *
  * <ul>
- *   <li>Use a provided converter implementation, such as {@link Enums#stringConverter}, {@link
- *       com.google.common.primitives.Ints#stringConverter Ints.stringConverter} or the {@linkplain
- *       #reverse reverse} views of these.
- *   <li>Convert between specific preset values using {@link
- *       com.google.common.collect.Maps#asConverter Maps.asConverter}. For example, use this to
- *       create a "fake" converter for a unit test. It is unnecessary (and confusing) to <i>mock</i>
- *       the {@code Converter} type using a mocking framework.
- *   <li>Extend this class and implement its {@link #doForward} and {@link #doBackward} methods.
- *   <li><b>Java 8 users:</b> you may prefer to pass two lambda expressions or method references to
- *       the {@link #from from} factory method.
+ * <li>Use a provided converter implementation, such as {@link Enums#stringConverter}, {@link
+ *     com.google.common.primitives.Ints#stringConverter Ints.stringConverter} or the {@linkplain
+ *     #reverse reverse} views of these.
+ * <li>Convert between specific preset values using {@link
+ *     com.google.common.collect.Maps#asConverter Maps.asConverter}. For example, use this to create
+ *     a "fake" converter for a unit test. It is unnecessary (and confusing) to <i>mock</i> the
+ *     {@code Converter} type using a mocking framework.
+ * <li>Extend this class and implement its {@link #doForward} and {@link #doBackward} methods.
+ * <li><b>Java 8 users:</b> you may prefer to pass two lambda expressions or method references to
+ *     the {@link #from from} factory method.
  * </ul>
  *
  * <p>Using a converter:
  *
  * <ul>
- *   <li>Convert one instance in the "forward" direction using {@code converter.convert(a)}.
- *   <li>Convert multiple instances "forward" using {@code converter.convertAll(as)}.
- *   <li>Convert in the "backward" direction using {@code converter.reverse().convert(b)} or {@code
- *       converter.reverse().convertAll(bs)}.
- *   <li>Use {@code converter} or {@code converter.reverse()} anywhere a {@link
- *       java.util.function.Function} is accepted (for example {@link java.util.stream.Stream#map
- *       Stream.map}).
- *   <li><b>Do not</b> call {@link #doForward} or {@link #doBackward} directly; these exist only to
- *       be overridden.
+ * <li>Convert one instance in the "forward" direction using {@code converter.convert(a)}.
+ * <li>Convert multiple instances "forward" using {@code converter.convertAll(as)}.
+ * <li>Convert in the "backward" direction using {@code converter.reverse().convert(b)} or {@code
+ *     converter.reverse().convertAll(bs)}.
+ * <li>Use {@code converter} or {@code converter.reverse()} anywhere a {@link
+ *     java.util.function.Function} is accepted (for example {@link java.util.stream.Stream#map
+ *     Stream.map}).
+ * <li><b>Do not</b> call {@link #doForward} or {@link #doBackward} directly; these exist only to be
+ *     overridden.
  * </ul>
  *
  * <h3>Example</h3>
@@ -118,14 +117,17 @@ public abstract class Converter<A, B> implements Function<A, B> {
   private final boolean handleNullAutomatically;
 
   // We lazily cache the reverse view to avoid allocating on every call to reverse().
-  @LazyInit @MonotonicNonNullDecl private transient Converter<B, A> reverse;
+  @LazyInit
+  private transient Converter<B, A> reverse;
 
   /** Constructor for use by subclasses. */
   protected Converter() {
     this(true);
   }
 
-  /** Constructor used only by {@code LegacyConverter} to suspend automatic null-handling. */
+  /**
+   * Constructor used only by {@code LegacyConverter} to suspend automatic null-handling.
+   */
   Converter(boolean handleNullAutomatically) {
     this.handleNullAutomatically = handleNullAutomatically;
   }
@@ -164,14 +166,14 @@ public abstract class Converter<A, B> implements Function<A, B> {
    *
    * @return the converted value; is null <i>if and only if</i> {@code a} is null
    */
+  @Nullable
   @CanIgnoreReturnValue
-  @NullableDecl
-  public final B convert(@NullableDecl A a) {
+  public final B convert(@Nullable A a) {
     return correctedDoForward(a);
   }
 
-  @NullableDecl
-  B correctedDoForward(@NullableDecl A a) {
+  @Nullable
+  B correctedDoForward(@Nullable A a) {
     if (handleNullAutomatically) {
       // TODO(kevinb): we shouldn't be checking for a null result at runtime. Assert?
       return a == null ? null : checkNotNull(doForward(a));
@@ -180,8 +182,8 @@ public abstract class Converter<A, B> implements Function<A, B> {
     }
   }
 
-  @NullableDecl
-  A correctedDoBackward(@NullableDecl B b) {
+  @Nullable
+  A correctedDoBackward(@Nullable B b) {
     if (handleNullAutomatically) {
       // TODO(kevinb): we shouldn't be checking for a null result at runtime. Assert?
       return b == null ? null : checkNotNull(doBackward(b));
@@ -266,14 +268,14 @@ public abstract class Converter<A, B> implements Function<A, B> {
     }
 
     @Override
-    @NullableDecl
-    A correctedDoForward(@NullableDecl B b) {
+    @Nullable
+    A correctedDoForward(@Nullable B b) {
       return original.correctedDoBackward(b);
     }
 
     @Override
-    @NullableDecl
-    B correctedDoBackward(@NullableDecl A a) {
+    @Nullable
+    B correctedDoBackward(@Nullable A a) {
       return original.correctedDoForward(a);
     }
 
@@ -283,7 +285,7 @@ public abstract class Converter<A, B> implements Function<A, B> {
     }
 
     @Override
-    public boolean equals(@NullableDecl Object object) {
+    public boolean equals(@Nullable Object object) {
       if (object instanceof ReverseConverter) {
         ReverseConverter<?, ?> that = (ReverseConverter<?, ?>) object;
         return this.original.equals(that.original);
@@ -315,7 +317,9 @@ public abstract class Converter<A, B> implements Function<A, B> {
     return doAndThen(secondConverter);
   }
 
-  /** Package-private non-final implementation of andThen() so only we can override it. */
+  /**
+   * Package-private non-final implementation of andThen() so only we can override it.
+   */
   <C> Converter<A, C> doAndThen(Converter<B, C> secondConverter) {
     return new ConverterComposition<>(this, checkNotNull(secondConverter));
   }
@@ -348,19 +352,19 @@ public abstract class Converter<A, B> implements Function<A, B> {
     }
 
     @Override
-    @NullableDecl
-    C correctedDoForward(@NullableDecl A a) {
+    @Nullable
+    C correctedDoForward(@Nullable A a) {
       return second.correctedDoForward(first.correctedDoForward(a));
     }
 
     @Override
-    @NullableDecl
-    A correctedDoBackward(@NullableDecl C c) {
+    @Nullable
+    A correctedDoBackward(@Nullable C c) {
       return first.correctedDoBackward(second.correctedDoBackward(c));
     }
 
     @Override
-    public boolean equals(@NullableDecl Object object) {
+    public boolean equals(@Nullable Object object) {
       if (object instanceof ConverterComposition) {
         ConverterComposition<?, ?, ?> that = (ConverterComposition<?, ?, ?>) object;
         return this.first.equals(that.first) && this.second.equals(that.second);
@@ -386,9 +390,9 @@ public abstract class Converter<A, B> implements Function<A, B> {
    */
   @Deprecated
   @Override
+  @Nullable
   @CanIgnoreReturnValue
-  @NullableDecl
-  public final B apply(@NullableDecl A a) {
+  public final B apply(@Nullable A a) {
     return convert(a);
   }
 
@@ -404,7 +408,7 @@ public abstract class Converter<A, B> implements Function<A, B> {
    * interchangeable.
    */
   @Override
-  public boolean equals(@NullableDecl Object object) {
+  public boolean equals(@Nullable Object object) {
     return super.equals(object);
   }
 
@@ -453,7 +457,7 @@ public abstract class Converter<A, B> implements Function<A, B> {
     }
 
     @Override
-    public boolean equals(@NullableDecl Object object) {
+    public boolean equals(@Nullable Object object) {
       if (object instanceof FunctionBasedConverter) {
         FunctionBasedConverter<?, ?> that = (FunctionBasedConverter<?, ?>) object;
         return this.forwardFunction.equals(that.forwardFunction)
@@ -473,7 +477,9 @@ public abstract class Converter<A, B> implements Function<A, B> {
     }
   }
 
-  /** Returns a serializable converter that always converts or reverses an object to itself. */
+  /**
+   * Returns a serializable converter that always converts or reverses an object to itself.
+   */
   @SuppressWarnings("unchecked") // implementation is "fully variant"
   public static <T> Converter<T, T> identity() {
     return (IdentityConverter<T>) IdentityConverter.INSTANCE;

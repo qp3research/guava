@@ -53,14 +53,13 @@ public class EquivalenceTest extends TestCase {
   private enum LengthFunction implements Function<String, Integer> {
     INSTANCE;
 
-    @Override
-    public Integer apply(String input) {
+    @Override public Integer apply(String input) {
       return input.length();
     }
   }
 
-  private static final Equivalence<String> LENGTH_EQUIVALENCE =
-      Equivalence.equals().onResultOf(LengthFunction.INSTANCE);
+  private static final Equivalence<String> LENGTH_EQUIVALENCE = Equivalence.equals()
+      .onResultOf(LengthFunction.INSTANCE);
 
   public void testWrap() {
     new EqualsTester()
@@ -68,8 +67,12 @@ public class EquivalenceTest extends TestCase {
             LENGTH_EQUIVALENCE.wrap("hello"),
             LENGTH_EQUIVALENCE.wrap("hello"),
             LENGTH_EQUIVALENCE.wrap("world"))
-        .addEqualityGroup(LENGTH_EQUIVALENCE.wrap("hi"), LENGTH_EQUIVALENCE.wrap("yo"))
-        .addEqualityGroup(LENGTH_EQUIVALENCE.wrap(null), LENGTH_EQUIVALENCE.wrap(null))
+        .addEqualityGroup(
+            LENGTH_EQUIVALENCE.wrap("hi"),
+            LENGTH_EQUIVALENCE.wrap("yo"))
+        .addEqualityGroup(
+            LENGTH_EQUIVALENCE.wrap(null),
+            LENGTH_EQUIVALENCE.wrap(null))
         .addEqualityGroup(Equivalence.equals().wrap("hello"))
         .addEqualityGroup(Equivalence.equals().wrap(null))
         .testEquals();
@@ -95,8 +98,7 @@ public class EquivalenceTest extends TestCase {
       this.value = value;
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
       return "value = " + value;
     }
   }
@@ -134,7 +136,6 @@ public class EquivalenceTest extends TestCase {
         .addEqualityGroup(Equivalence.identity().equivalentTo("1"))
         .testEquals();
   }
-
   public void testEqualsEquivalent() {
     EquivalenceTester.of(Equivalence.equals())
         .addEquivalenceGroup(new Integer(42), 42)

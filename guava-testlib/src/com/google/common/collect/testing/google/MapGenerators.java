@@ -41,7 +41,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Generators of different types of map and related collections, such as keys, entries and values.
+ * Generators of different types of map and related collections, such as
+ * keys, entries and values.
  *
  * @author Hayward Chan
  */

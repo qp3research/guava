@@ -19,7 +19,7 @@ package com.google.common.graph;
 import com.google.common.annotations.Beta;
 import java.util.Optional;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * An interface for <a
@@ -57,11 +57,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * <h3>Building a {@code ValueGraph}</h3>
  *
  * <p>The implementation classes that {@code common.graph} provides are not public, by design. To
- * create an instance of one of the built-in implementations of {@code ValueGraph}, use the {@link
- * ValueGraphBuilder} class:
+ * create an instance of one of the built-in implementations of {@code ValueGraph}, use the
+ * {@link ValueGraphBuilder} class:
  *
  * <pre>{@code
- * MutableValueGraph<Integer, Double> graph = ValueGraphBuilder.directed().build();
+ *   MutableValueGraph<Integer, Double> graph = ValueGraphBuilder.directed().build();
  * }</pre>
  *
  * <p>{@link ValueGraphBuilder#build()} returns an instance of {@link MutableValueGraph}, which is a
@@ -74,7 +74,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * ImmutableValueGraph#copyOf(ValueGraph)}:
  *
  * <pre>{@code
- * ImmutableValueGraph<Integer, Double> immutableGraph = ImmutableValueGraph.copyOf(graph);
+ *   ImmutableValueGraph<Integer, Double> immutableGraph = ImmutableValueGraph.copyOf(graph);
  * }</pre>
  *
  * <p>Instances of {@link ImmutableValueGraph} do not implement {@link MutableValueGraph}
@@ -112,11 +112,11 @@ public interface ValueGraph<N, V> extends BaseGraph<N> {
   // ValueGraph-level accessors
   //
 
-  /** Returns all nodes in this graph, in the order specified by {@link #nodeOrder()}. */
+  /** {@inheritDoc} */
   @Override
   Set<N> nodes();
 
-  /** Returns all edges in this graph. */
+  /** {@inheritDoc} */
   @Override
   Set<EndpointPair<N>> edges();
 
@@ -130,23 +130,15 @@ public interface ValueGraph<N, V> extends BaseGraph<N> {
   // ValueGraph properties
   //
 
-  /**
-   * Returns true if the edges in this graph are directed. Directed edges connect a {@link
-   * EndpointPair#source() source node} to a {@link EndpointPair#target() target node}, while
-   * undirected edges connect a pair of nodes to each other.
-   */
+  /** {@inheritDoc} */
   @Override
   boolean isDirected();
 
-  /**
-   * Returns true if this graph allows self-loops (edges that connect a node to itself). Attempting
-   * to add a self-loop to a graph that does not allow them will throw an {@link
-   * IllegalArgumentException}.
-   */
+  /** {@inheritDoc} */
   @Override
   boolean allowsSelfLoops();
 
-  /** Returns the order of iteration for the elements of {@link #nodes()}. */
+  /** {@inheritDoc} */
   @Override
   ElementOrder<N> nodeOrder();
 
@@ -154,94 +146,31 @@ public interface ValueGraph<N, V> extends BaseGraph<N> {
   // Element-level accessors
   //
 
-  /**
-   * Returns the nodes which have an incident edge in common with {@code node} in this graph.
-   *
-   * @throws IllegalArgumentException if {@code node} is not an element of this graph
-   */
+  /** {@inheritDoc} */
   @Override
   Set<N> adjacentNodes(N node);
 
-  /**
-   * Returns all nodes in this graph adjacent to {@code node} which can be reached by traversing
-   * {@code node}'s incoming edges <i>against</i> the direction (if any) of the edge.
-   *
-   * <p>In an undirected graph, this is equivalent to {@link #adjacentNodes(Object)}.
-   *
-   * @throws IllegalArgumentException if {@code node} is not an element of this graph
-   */
+  /** {@inheritDoc} */
   @Override
   Set<N> predecessors(N node);
 
-  /**
-   * Returns all nodes in this graph adjacent to {@code node} which can be reached by traversing
-   * {@code node}'s outgoing edges in the direction (if any) of the edge.
-   *
-   * <p>In an undirected graph, this is equivalent to {@link #adjacentNodes(Object)}.
-   *
-   * <p>This is <i>not</i> the same as "all nodes reachable from {@code node} by following outgoing
-   * edges". For that functionality, see {@link Graphs#reachableNodes(Graph, Object)}.
-   *
-   * @throws IllegalArgumentException if {@code node} is not an element of this graph
-   */
+  /** {@inheritDoc} */
   @Override
   Set<N> successors(N node);
 
-  /**
-   * Returns the edges in this graph whose endpoints include {@code node}.
-   *
-   * @throws IllegalArgumentException if {@code node} is not an element of this graph
-   * @since 24.0
-   */
-  @Override
-  Set<EndpointPair<N>> incidentEdges(N node);
-
-  /**
-   * Returns the count of {@code node}'s incident edges, counting self-loops twice (equivalently,
-   * the number of times an edge touches {@code node}).
-   *
-   * <p>For directed graphs, this is equal to {@code inDegree(node) + outDegree(node)}.
-   *
-   * <p>For undirected graphs, this is equal to {@code incidentEdges(node).size()} + (number of
-   * self-loops incident to {@code node}).
-   *
-   * <p>If the count is greater than {@code Integer.MAX_VALUE}, returns {@code Integer.MAX_VALUE}.
-   *
-   * @throws IllegalArgumentException if {@code node} is not an element of this graph
-   */
+  /** {@inheritDoc} */
   @Override
   int degree(N node);
 
-  /**
-   * Returns the count of {@code node}'s incoming edges (equal to {@code predecessors(node).size()})
-   * in a directed graph. In an undirected graph, returns the {@link #degree(Object)}.
-   *
-   * <p>If the count is greater than {@code Integer.MAX_VALUE}, returns {@code Integer.MAX_VALUE}.
-   *
-   * @throws IllegalArgumentException if {@code node} is not an element of this graph
-   */
+  /** {@inheritDoc} */
   @Override
   int inDegree(N node);
 
-  /**
-   * Returns the count of {@code node}'s outgoing edges (equal to {@code successors(node).size()})
-   * in a directed graph. In an undirected graph, returns the {@link #degree(Object)}.
-   *
-   * <p>If the count is greater than {@code Integer.MAX_VALUE}, returns {@code Integer.MAX_VALUE}.
-   *
-   * @throws IllegalArgumentException if {@code node} is not an element of this graph
-   */
+  /** {@inheritDoc} */
   @Override
   int outDegree(N node);
 
-  /**
-   * Returns true if there is an edge directly connecting {@code nodeU} to {@code nodeV}. This is
-   * equivalent to {@code nodes().contains(nodeU) && successors(nodeU).contains(nodeV)}.
-   *
-   * <p>In an undirected graph, this is equal to {@code hasEdgeConnecting(nodeV, nodeU)}.
-   *
-   * @since 23.0
-   */
+  /** {@inheritDoc} */
   @Override
   boolean hasEdgeConnecting(N nodeU, N nodeV);
 
@@ -281,10 +210,10 @@ public interface ValueGraph<N, V> extends BaseGraph<N> {
    * <p>Thus, two value graphs A and B are equal if <b>all</b> of the following are true:
    *
    * <ul>
-   *   <li>A and B have equal {@link #isDirected() directedness}.
-   *   <li>A and B have equal {@link #nodes() node sets}.
-   *   <li>A and B have equal {@link #edges() edge sets}.
-   *   <li>The {@link #edgeValue(Object, Object) value} of a given edge is the same in both A and B.
+   * <li>A and B have equal {@link #isDirected() directedness}.
+   * <li>A and B have equal {@link #nodes() node sets}.
+   * <li>A and B have equal {@link #edges() edge sets}.
+   * <li>The {@link #edgeValue(Object, Object) value} of a given edge is the same in both A and B.
    * </ul>
    *
    * <p>Graph properties besides {@link #isDirected() directedness} do <b>not</b> affect equality.

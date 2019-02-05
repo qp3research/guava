@@ -95,10 +95,6 @@
       <classifier>gwt</classifier>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.checkerframework</groupId>
-      <artifactId>checker-qual</artifactId>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

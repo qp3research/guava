@@ -43,8 +43,9 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * Generates a test suite covering the {@link Map} implementations in the {@link java.util} package.
- * Can be subclassed to specify tests that should be suppressed.
+ * Generates a test suite covering the {@link Map} implementations in the
+ * {@link java.util} package. Can be subclassed to specify tests that should
+ * be suppressed.
  *
  * @author Kevin Bourrillion
  */
@@ -158,13 +159,13 @@ public class TestsForMapsInJavaUtil {
 
   public Test testsForCheckedMap() {
     return MapTestSuiteBuilder.using(
-            new TestStringMapGenerator() {
-              @Override
-              protected Map<String, String> create(Entry<String, String>[] entries) {
-                Map<String, String> map = populate(new HashMap<String, String>(), entries);
-                return Collections.checkedMap(map, String.class, String.class);
-              }
-            })
+        new TestStringMapGenerator() {
+          @Override
+          protected Map<String, String> create(Entry<String, String>[] entries) {
+            Map<String, String> map = populate(new HashMap<String, String>(), entries);
+            return Collections.checkedMap(map, String.class, String.class);
+          }
+        })
         .named("checkedMap/HashMap")
         .withFeatures(
             MapFeature.GENERAL_PURPOSE,
@@ -183,13 +184,13 @@ public class TestsForMapsInJavaUtil {
 
   public Test testsForCheckedNavigableMap() {
     return SortedMapTestSuiteBuilder.using(
-            new TestStringSortedMapGenerator() {
-              @Override
-              protected NavigableMap<String, String> create(Entry<String, String>[] entries) {
-                NavigableMap<String, String> map = populate(new TreeMap<String, String>(), entries);
-                return Collections.checkedNavigableMap(map, String.class, String.class);
-              }
-            })
+        new TestStringSortedMapGenerator() {
+          @Override
+          protected NavigableMap<String, String> create(Entry<String, String>[] entries) {
+            NavigableMap<String, String> map = populate(new TreeMap<String, String>(), entries);
+            return Collections.checkedNavigableMap(map, String.class, String.class);
+          }
+        })
         .named("checkedNavigableMap/TreeMap, natural")
         .withFeatures(
             MapFeature.GENERAL_PURPOSE,
@@ -207,13 +208,13 @@ public class TestsForMapsInJavaUtil {
 
   public Test testsForCheckedSortedMap() {
     return SortedMapTestSuiteBuilder.using(
-            new TestStringSortedMapGenerator() {
-              @Override
-              protected SortedMap<String, String> create(Entry<String, String>[] entries) {
-                SortedMap<String, String> map = populate(new TreeMap<String, String>(), entries);
-                return Collections.checkedSortedMap(map, String.class, String.class);
-              }
-            })
+        new TestStringSortedMapGenerator() {
+          @Override
+          protected SortedMap<String, String> create(Entry<String, String>[] entries) {
+            SortedMap<String, String> map = populate(new TreeMap<String, String>(), entries);
+            return Collections.checkedSortedMap(map, String.class, String.class);
+          }
+        })
         .named("checkedSortedMap/TreeMap, natural")
         .withFeatures(
             MapFeature.GENERAL_PURPOSE,
@@ -245,30 +246,32 @@ public class TestsForMapsInJavaUtil {
 
   public Test testsForEmptyNavigableMap() {
     return MapTestSuiteBuilder.using(
-            new TestStringSortedMapGenerator() {
-              @Override
-              protected NavigableMap<String, String> create(Entry<String, String>[] entries) {
-                return Collections.emptyNavigableMap();
-              }
-            })
+        new TestStringSortedMapGenerator() {
+          @Override
+          protected NavigableMap<String, String> create(Entry<String, String>[] entries) {
+            return Collections.emptyNavigableMap();
+          }
+        })
         .named("emptyNavigableMap")
         .withFeatures(CollectionFeature.SERIALIZABLE, CollectionSize.ZERO)
         .suppressing(suppressForEmptyNavigableMap())
         .createTestSuite();
+
   }
 
   public Test testsForEmptySortedMap() {
     return MapTestSuiteBuilder.using(
-            new TestStringSortedMapGenerator() {
-              @Override
-              protected SortedMap<String, String> create(Entry<String, String>[] entries) {
-                return Collections.emptySortedMap();
-              }
-            })
+        new TestStringSortedMapGenerator() {
+          @Override
+          protected SortedMap<String, String> create(Entry<String, String>[] entries) {
+            return Collections.emptySortedMap();
+          }
+        })
         .named("emptySortedMap")
         .withFeatures(CollectionFeature.SERIALIZABLE, CollectionSize.ZERO)
         .suppressing(suppressForEmptySortedMap())
         .createTestSuite();
+
   }
 
   public Test testsForSingletonMap() {
@@ -313,26 +316,27 @@ public class TestsForMapsInJavaUtil {
   }
 
   public Test testsForHashtable() {
-    return MapTestSuiteBuilder.using(
-            new TestStringMapGenerator() {
-              @Override
-              protected Map<String, String> create(Entry<String, String>[] entries) {
-                return populate(new Hashtable<String, String>(), entries);
-              }
-            })
-        .withFeatures(
-            MapFeature.GENERAL_PURPOSE,
-            MapFeature.FAILS_FAST_ON_CONCURRENT_MODIFICATION,
-            MapFeature.RESTRICTS_KEYS,
-            MapFeature.SUPPORTS_REMOVE,
-            CollectionFeature.FAILS_FAST_ON_CONCURRENT_MODIFICATION,
-            CollectionFeature.SERIALIZABLE,
-            CollectionFeature.SUPPORTS_ITERATOR_REMOVE,
-            CollectionFeature.SUPPORTS_REMOVE,
-            CollectionSize.ANY)
-        .named("Hashtable")
-        .suppressing(suppressForHashtable())
-        .createTestSuite();
+      return MapTestSuiteBuilder.using(
+          new TestStringMapGenerator() {
+            @Override
+            protected Map<String, String> create(Entry<String, String>[] entries) {
+              return populate(new Hashtable<String, String>(), entries);
+            }
+          })
+          .withFeatures(
+              MapFeature.GENERAL_PURPOSE,
+              MapFeature.FAILS_FAST_ON_CONCURRENT_MODIFICATION,
+              MapFeature.RESTRICTS_KEYS,
+              MapFeature.SUPPORTS_REMOVE,
+              CollectionFeature.FAILS_FAST_ON_CONCURRENT_MODIFICATION,
+              CollectionFeature.SERIALIZABLE,
+              CollectionFeature.SUPPORTS_ITERATOR_REMOVE,
+              CollectionFeature.SUPPORTS_REMOVE,
+              CollectionSize.ANY
+          )
+          .named("Hashtable")
+          .suppressing(suppressForHashtable())
+          .createTestSuite();
   }
 
   public Test testsForLinkedHashMap() {
@@ -359,8 +363,8 @@ public class TestsForMapsInJavaUtil {
   }
 
   /**
-   * Tests regular NavigableMap behavior of synchronizedNavigableMap(treeMap); does not test the
-   * fact that it's synchronized.
+   * Tests regular NavigableMap behavior of synchronizedNavigableMap(treeMap);
+   * does not test the fact that it's synchronized.
    */
   public Test testsForSynchronizedNavigableMap() {
     return NavigableMapTestSuiteBuilder.using(
@@ -435,12 +439,12 @@ public class TestsForMapsInJavaUtil {
 
   public Test testsForUnmodifiableMap() {
     return MapTestSuiteBuilder.using(
-            new TestStringMapGenerator() {
-              @Override
-              protected Map<String, String> create(Entry<String, String>[] entries) {
-                return Collections.unmodifiableMap(toHashMap(entries));
-              }
-            })
+        new TestStringMapGenerator() {
+          @Override
+          protected Map<String, String> create(Entry<String, String>[] entries) {
+            return Collections.unmodifiableMap(toHashMap(entries));
+          }
+        })
         .named("unmodifiableMap/HashMap")
         .withFeatures(
             MapFeature.ALLOWS_NULL_KEYS,
@@ -454,12 +458,12 @@ public class TestsForMapsInJavaUtil {
 
   public Test testsForUnmodifiableNavigableMap() {
     return MapTestSuiteBuilder.using(
-            new TestStringSortedMapGenerator() {
-              @Override
-              protected NavigableMap<String, String> create(Entry<String, String>[] entries) {
-                return Collections.unmodifiableNavigableMap(populate(new TreeMap<>(), entries));
-              }
-            })
+        new TestStringSortedMapGenerator() {
+          @Override
+          protected NavigableMap<String, String> create(Entry<String, String>[] entries) {
+            return Collections.unmodifiableNavigableMap(populate(new TreeMap<>(), entries));
+          }
+        })
         .named("unmodifiableNavigableMap/TreeMap, natural")
         .withFeatures(
             MapFeature.ALLOWS_NULL_VALUES,
@@ -472,13 +476,13 @@ public class TestsForMapsInJavaUtil {
 
   public Test testsForUnmodifiableSortedMap() {
     return MapTestSuiteBuilder.using(
-            new TestStringSortedMapGenerator() {
-              @Override
-              protected SortedMap<String, String> create(Entry<String, String>[] entries) {
-                SortedMap<String, String> map = populate(new TreeMap<String, String>(), entries);
-                return Collections.unmodifiableSortedMap(map);
-              }
-            })
+        new TestStringSortedMapGenerator() {
+          @Override
+          protected SortedMap<String, String> create(Entry<String, String>[] entries) {
+            SortedMap<String, String> map = populate(new TreeMap<String, String>(), entries);
+            return Collections.unmodifiableSortedMap(map);
+          }
+        })
         .named("unmodifiableSortedMap/TreeMap, natural")
         .withFeatures(
             MapFeature.ALLOWS_NULL_VALUES,

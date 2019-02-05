@@ -22,7 +22,6 @@ import com.google.common.annotations.GwtCompatible;
 import com.google.common.collect.testing.features.CollectionFeature;
 import java.util.Arrays;
 import java.util.Collections;
-import org.junit.Ignore;
 
 /**
  * Tests for {@code Multiset.add}.
@@ -30,7 +29,6 @@ import org.junit.Ignore;
  * @author Jared Levy
  */
 @GwtCompatible
-@Ignore // Affects only Android test runner, which respects JUnit 4 annotations on JUnit 3 tests.
 public class MultisetAddTester<E> extends AbstractMultisetTester<E> {
   @CollectionFeature.Require(absent = SUPPORTS_ADD)
   public void testAddUnsupported() {

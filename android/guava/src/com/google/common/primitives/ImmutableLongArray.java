@@ -20,7 +20,6 @@ import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.CheckReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
 import java.util.AbstractList;
@@ -28,7 +27,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.RandomAccess;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nullable;
 
 /**
  * An immutable array of {@code long} values, with an API resembling {@link List}.
@@ -120,17 +120,10 @@ public final class ImmutableLongArray implements Serializable {
 
   // TODO(kevinb): go up to 11?
 
-  /**
-   * Returns an immutable array containing the given values, in order.
-   *
-   * <p>The array {@code rest} must not be longer than {@code Integer.MAX_VALUE - 1}.
-   */
+  /** Returns an immutable array containing the given values, in order. */
   // Use (first, rest) so that `of(someLongArray)` won't compile (they should use copyOf), which is
   // okay since we have to copy the just-created array anyway.
   public static ImmutableLongArray of(long first, long... rest) {
-    checkArgument(
-        rest.length <= Integer.MAX_VALUE - 1,
-        "the total number of elements must fit in an int");
     long[] array = new long[rest.length + 1];
     array[0] = first;
     System.arraycopy(rest, 0, array, 1, rest.length);
@@ -457,7 +450,7 @@ public final class ImmutableLongArray implements Serializable {
     }
 
     @Override
-    public boolean equals(@NullableDecl Object object) {
+    public boolean equals(@Nullable Object object) {
       if (object instanceof AsList) {
         AsList that = (AsList) object;
         return this.parent.equals(that.parent);
@@ -497,7 +490,7 @@ public final class ImmutableLongArray implements Serializable {
    * values as this one, in the same order.
    */
   @Override
-  public boolean equals(@NullableDecl Object object) {
+  public boolean equals(@Nullable Object object) {
     if (object == this) {
       return true;
     }

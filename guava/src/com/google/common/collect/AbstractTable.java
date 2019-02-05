@@ -25,8 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Spliterator;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Skeletal, implementation-agnostic implementation of the {@link Table} interface.
@@ -108,7 +107,7 @@ abstract class AbstractTable<R, C, V> implements Table<R, C, V> {
     }
   }
 
-  private transient @MonotonicNonNull Set<Cell<R, C, V>> cellSet;
+  private transient Set<Cell<R, C, V>> cellSet;
 
   @Override
   public Set<Cell<R, C, V>> cellSet() {
@@ -121,7 +120,7 @@ abstract class AbstractTable<R, C, V> implements Table<R, C, V> {
   }
 
   abstract Iterator<Table.Cell<R, C, V>> cellIterator();
-
+  
   abstract Spliterator<Table.Cell<R, C, V>> cellSpliterator();
 
   @WeakOuter
@@ -171,7 +170,7 @@ abstract class AbstractTable<R, C, V> implements Table<R, C, V> {
     }
   }
 
-  private transient @MonotonicNonNull Collection<V> values;
+  private transient Collection<V> values;
 
   @Override
   public Collection<V> values() {
@@ -191,7 +190,7 @@ abstract class AbstractTable<R, C, V> implements Table<R, C, V> {
       }
     };
   }
-
+  
   Spliterator<V> valuesSpliterator() {
     return CollectSpliterators.map(cellSpliterator(), Table.Cell::getValue);
   }
@@ -202,7 +201,7 @@ abstract class AbstractTable<R, C, V> implements Table<R, C, V> {
     public Iterator<V> iterator() {
       return valuesIterator();
     }
-
+    
     @Override
     public Spliterator<V> spliterator() {
       return valuesSpliterator();
@@ -234,7 +233,9 @@ abstract class AbstractTable<R, C, V> implements Table<R, C, V> {
     return cellSet().hashCode();
   }
 
-  /** Returns the string representation {@code rowMap().toString()}. */
+  /**
+   * Returns the string representation {@code rowMap().toString()}.
+   */
   @Override
   public String toString() {
     return rowMap().toString();

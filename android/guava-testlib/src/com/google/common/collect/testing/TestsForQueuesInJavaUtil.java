@@ -35,8 +35,9 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * Generates a test suite covering the {@link Queue} implementations in the {@link java.util}
- * package. Can be subclassed to specify tests that should be suppressed.
+ * Generates a test suite covering the {@link Queue} implementations in the
+ * {@link java.util} package. Can be subclassed to specify tests that should
+ * be suppressed.
  *
  * @author Jared Levy
  */

@@ -33,8 +33,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import javax.annotation.Nullable;
 import junit.framework.TestCase;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Tests for {@code BaseEncoding}.
@@ -54,14 +54,12 @@ public class BaseEncodingTest extends TestCase {
     try {
       base64().withSeparator("=", 3);
       fail("Expected IllegalArgumentException");
-    } catch (IllegalArgumentException expected) {
-    }
+    } catch (IllegalArgumentException expected) {}
 
     try {
       base64().withPadChar('#').withSeparator("!#!", 3);
       fail("Expected IllegalArgumentException");
-    } catch (IllegalArgumentException expected) {
-    }
+    } catch (IllegalArgumentException expected) {}
   }
 
   public void testAtMostOneSeparator() {
@@ -69,8 +67,7 @@ public class BaseEncodingTest extends TestCase {
     try {
       separated.withSeparator("$", 4);
       fail("Expected UnsupportedOperationException");
-    } catch (UnsupportedOperationException expected) {
-    }
+    } catch (UnsupportedOperationException expected) {}
   }
 
   public void testBase64() {
@@ -356,9 +353,7 @@ public class BaseEncodingTest extends TestCase {
     // test separators work
     for (int sepLength = 3; sepLength <= 5; sepLength++) {
       for (String separator : ImmutableList.of(",", "\n", ";;", "")) {
-        testEncoding(
-            encoding.withSeparator(separator, sepLength),
-            decoded,
+        testEncoding(encoding.withSeparator(separator, sepLength), decoded,
             Joiner.on(separator).join(Splitter.fixedLength(sepLength).split(encoded)));
       }
     }
@@ -388,7 +383,7 @@ public class BaseEncodingTest extends TestCase {
   }
 
   private static void assertFailsToDecode(
-      BaseEncoding encoding, String cannotDecode, @NullableDecl String expectedMessage) {
+      BaseEncoding encoding, String cannotDecode, @Nullable String expectedMessage) {
     assertFalse(encoding.canDecode(cannotDecode));
     try {
       encoding.decode(cannotDecode);
@@ -424,9 +419,7 @@ public class BaseEncodingTest extends TestCase {
     // test separators work
     for (int sepLength = 3; sepLength <= 5; sepLength++) {
       for (String separator : ImmutableList.of(",", "\n", ";;", "")) {
-        testStreamingEncoding(
-            encoding.withSeparator(separator, sepLength),
-            decoded,
+        testStreamingEncoding(encoding.withSeparator(separator, sepLength), decoded,
             Joiner.on(separator).join(Splitter.fixedLength(sepLength).split(encoded)));
       }
     }

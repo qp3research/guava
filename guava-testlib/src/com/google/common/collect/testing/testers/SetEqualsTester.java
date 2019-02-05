@@ -25,7 +25,6 @@ import com.google.common.collect.testing.features.CollectionFeature;
 import com.google.common.collect.testing.features.CollectionSize;
 import java.util.Collection;
 import java.util.Set;
-import org.junit.Ignore;
 
 /**
  * Tests {@link java.util.Set#equals}.
@@ -33,7 +32,6 @@ import org.junit.Ignore;
  * @author George van den Driessche
  */
 @GwtCompatible
-@Ignore // Affects only Android test runner, which respects JUnit 4 annotations on JUnit 3 tests.
 public class SetEqualsTester<E> extends AbstractSetTester<E> {
   public void testEquals_otherSetWithSameElements() {
     assertTrue(

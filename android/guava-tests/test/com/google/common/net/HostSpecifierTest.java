@@ -25,10 +25,11 @@ import java.text.ParseException;
 import junit.framework.TestCase;
 
 /**
- * {@link TestCase} for {@link HostSpecifier}. This is a relatively cursory test, as HostSpecifier
- * is a thin wrapper around {@link InetAddresses} and {@link InternetDomainName}; the unit tests for
- * those classes explore numerous corner cases. The intent here is to confirm that everything is
- * wired up properly.
+ * {@link TestCase} for {@link HostSpecifier}.  This is a relatively
+ * cursory test, as HostSpecifier is a thin wrapper around
+ * {@link InetAddresses} and {@link InternetDomainName}; the unit tests for
+ * those classes explore numerous corner cases.  The intent here is to
+ * confirm that everything is wired up properly.
  *
  * @author Craig Berry
  */
@@ -73,7 +74,8 @@ public final class HostSpecifierTest extends TestCase {
   public void testEquality() {
     new EqualsTester()
         .addEqualityGroup(spec("1.2.3.4"), spec("1.2.3.4"))
-        .addEqualityGroup(spec("2001:db8::1"), spec("2001:db8::1"), spec("[2001:db8::1]"))
+        .addEqualityGroup(
+            spec("2001:db8::1"), spec("2001:db8::1"), spec("[2001:db8::1]"))
         .addEqualityGroup(spec("2001:db8::2"))
         .addEqualityGroup(spec("google.com"), spec("google.com"))
         .addEqualityGroup(spec("www.google.com"))
@@ -92,7 +94,7 @@ public final class HostSpecifierTest extends TestCase {
   }
 
   private void assertGood(String spec) throws ParseException {
-    HostSpecifier.fromValid(spec); // Throws exception if not working correctly
+    HostSpecifier.fromValid(spec);  // Throws exception if not working correctly
     HostSpecifier.from(spec);
     assertTrue(HostSpecifier.isValid(spec));
   }
@@ -113,4 +115,5 @@ public final class HostSpecifierTest extends TestCase {
 
     assertFalse(HostSpecifier.isValid(spec));
   }
+
 }

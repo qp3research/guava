@@ -24,8 +24,9 @@ import com.google.j2objc.annotations.Weak;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
 /**
  * Implementation for {@link FilteredMultimap#values()}.
@@ -46,7 +47,7 @@ final class FilteredMultimapValues<K, V> extends AbstractCollection<V> {
   }
 
   @Override
-  public boolean contains(@NullableDecl Object o) {
+  public boolean contains(@Nullable Object o) {
     return multimap.containsValue(o);
   }
 
@@ -56,11 +57,12 @@ final class FilteredMultimapValues<K, V> extends AbstractCollection<V> {
   }
 
   @Override
-  public boolean remove(@NullableDecl Object o) {
+  public boolean remove(@Nullable Object o) {
     Predicate<? super Entry<K, V>> entryPredicate = multimap.entryPredicate();
     for (Iterator<Entry<K, V>> unfilteredItr = multimap.unfiltered().entries().iterator();
-        unfilteredItr.hasNext(); ) {
-      Entry<K, V> entry = unfilteredItr.next();
+        unfilteredItr.hasNext();
+        ) {
+      Map.Entry<K, V> entry = unfilteredItr.next();
       if (entryPredicate.apply(entry) && Objects.equal(entry.getValue(), o)) {
         unfilteredItr.remove();
         return true;

@@ -22,9 +22,9 @@ import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
-import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An immutable representation of a host and port.
@@ -41,15 +41,14 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * </pre>
  *
  * <p>Here are some examples of recognized formats:
- *
  * <ul>
- *   <li>example.com
- *   <li>example.com:80
- *   <li>192.0.2.1
- *   <li>192.0.2.1:80
- *   <li>[2001:db8::1] - {@link #getHost()} omits brackets
- *   <li>[2001:db8::1]:80 - {@link #getHost()} omits brackets
- *   <li>2001:db8::1 - Use {@link #requireBracketsForIPv6()} to prohibit this
+ * <li>example.com
+ * <li>example.com:80
+ * <li>192.0.2.1
+ * <li>192.0.2.1:80
+ * <li>[2001:db8::1] - {@link #getHost()} omits brackets
+ * <li>[2001:db8::1]:80 - {@link #getHost()} omits brackets
+ * <li>2001:db8::1 - Use {@link #requireBracketsForIPv6()} to prohibit this
  * </ul>
  *
  * <p>Note that this is not an exhaustive list, because these methods are only concerned with
@@ -111,7 +110,9 @@ public final class HostAndPort implements Serializable {
     return port;
   }
 
-  /** Returns the current port number, with a default if no port is defined. */
+  /**
+   * Returns the current port number, with a default if no port is defined.
+   */
   public int getPortOrDefault(int defaultPort) {
     return hasPort() ? port : defaultPort;
   }
@@ -155,8 +156,8 @@ public final class HostAndPort implements Serializable {
   /**
    * Split a freeform string into a host and port, without strict validation.
    *
-   * <p>Note that the host-only formats will leave the port field undefined. You can use {@link
-   * #withDefaultPort(int)} to patch in a default value.
+   * Note that the host-only formats will leave the port field undefined. You can use
+   * {@link #withDefaultPort(int)} to patch in a default value.
    *
    * @param hostPortString the input string to parse.
    * @return if parsing was successful, a populated HostAndPort object.
@@ -243,7 +244,7 @@ public final class HostAndPort implements Serializable {
   /**
    * Provide a default port if the parsed string contained only a host.
    *
-   * <p>You can chain this after {@link #fromString(String)} to include a port in case the port was
+   * You can chain this after {@link #fromString(String)} to include a port in case the port was
    * omitted from the input string. If a port was already provided, then this method is a no-op.
    *
    * @param defaultPort a port number, from [0..65535]
@@ -277,7 +278,7 @@ public final class HostAndPort implements Serializable {
   }
 
   @Override
-  public boolean equals(@NullableDecl Object other) {
+  public boolean equals(@Nullable Object other) {
     if (this == other) {
       return true;
     }

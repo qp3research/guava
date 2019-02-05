@@ -20,9 +20,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import java.util.List;
 
-/** Parser for a map of reversed domain names stored as a serialized radix tree. */
+/**
+ * Parser for a map of reversed domain names stored as a serialized radix tree.
+ */
 @GwtCompatible
 final class TrieParser {
+
   private static final Joiner PREFIX_JOINER = Joiner.on("");
 
   /**
@@ -34,7 +37,9 @@ final class TrieParser {
     int encodedLen = encoded.length();
     int idx = 0;
     while (idx < encodedLen) {
-      idx += doParseTrieToBuilder(Lists.<CharSequence>newLinkedList(), encoded, idx, builder);
+      idx +=
+          doParseTrieToBuilder(
+              Lists.<CharSequence>newLinkedList(), encoded.subSequence(idx, encodedLen), builder);
     }
     return builder.build();
   }
@@ -45,18 +50,16 @@ final class TrieParser {
    * @param stack The prefixes that precede the characters represented by this node. Each entry of
    *     the stack is in reverse order.
    * @param encoded The serialized trie.
-   * @param start An index in the encoded serialized trie to begin reading characters from.
    * @param builder A map builder to which all entries will be added.
    * @return The number of characters consumed from {@code encoded}.
    */
   private static int doParseTrieToBuilder(
       List<CharSequence> stack,
       CharSequence encoded,
-      int start,
       ImmutableMap.Builder<String, PublicSuffixType> builder) {
 
     int encodedLen = encoded.length();
-    int idx = start;
+    int idx = 0;
     char c = '\0';
 
     // Read all of the characters for this node.
@@ -67,7 +70,7 @@ final class TrieParser {
       }
     }
 
-    stack.add(0, reverse(encoded.subSequence(start, idx)));
+    stack.add(0, reverse(encoded.subSequence(0, idx)));
 
     if (c == '!' || c == '?' || c == ':' || c == ',') {
       // '!' represents an interior node that represents a REGISTRY entry in the map.
@@ -84,7 +87,7 @@ final class TrieParser {
     if (c != '?' && c != ',') {
       while (idx < encodedLen) {
         // Read all the children
-        idx += doParseTrieToBuilder(stack, encoded, idx, builder);
+        idx += doParseTrieToBuilder(stack, encoded.subSequence(idx, encodedLen), builder);
         if (encoded.charAt(idx) == '?' || encoded.charAt(idx) == ',') {
           // An extra '?' or ',' after a child node indicates the end of all children of this node.
           idx++;
@@ -93,7 +96,7 @@ final class TrieParser {
       }
     }
     stack.remove(0);
-    return idx - start;
+    return idx;
   }
 
   private static CharSequence reverse(CharSequence s) {

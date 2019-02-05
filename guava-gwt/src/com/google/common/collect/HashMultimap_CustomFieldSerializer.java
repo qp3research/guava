@@ -24,6 +24,7 @@ import com.google.gwt.user.client.rpc.SerializationStreamWriter;
  * This class implements the GWT serialization of {@link HashMultimap}.
  *
  * @author Jord Sonneveld
+ *
  */
 public class HashMultimap_CustomFieldSerializer {
 

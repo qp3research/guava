@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /** Emulation for AbstractFuture in GWT. */
 public abstract class AbstractFuture<V> extends FluentFuture<V> {
@@ -234,8 +234,9 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
    */
   @Nullable
   String pendingToString() {
-    if (state == State.DELEGATED) {
-      return "setFuture=[" + delegate + "]";
+    Object localValue = value;
+    if (localValue instanceof AbstractFuture.SetFuture) {
+      return "setFuture=[" + ((AbstractFuture.SetFuture) localValue).delegate + "]";
     }
     return null;
   }
@@ -333,10 +334,8 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
       try {
         executor.execute(command);
       } catch (RuntimeException e) {
-        log.log(
-            Level.SEVERE,
-            "RuntimeException while executing runnable " + command + " with executor " + executor,
-            e);
+        log.log(Level.SEVERE, "RuntimeException while executing runnable "
+            + command + " with executor " + executor, e);
       }
     }
   }
