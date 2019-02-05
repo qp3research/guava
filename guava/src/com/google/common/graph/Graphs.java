@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Static utility methods for {@link Graph}, {@link ValueGraph}, and {@link Network} instances.
@@ -99,10 +99,7 @@ public final class Graphs {
    * cycle in the graph.
    */
   private static <N> boolean subgraphHasCycle(
-      Graph<N> graph,
-      Map<Object, NodeVisitState> visitedNodes,
-      N node,
-      @NullableDecl N previousNode) {
+      Graph<N> graph, Map<Object, NodeVisitState> visitedNodes, N node, @Nullable N previousNode) {
     NodeVisitState state = visitedNodes.get(node);
     if (state == NodeVisitState.COMPLETE) {
       return false;
@@ -129,7 +126,7 @@ public final class Graphs {
    * from B to A).
    */
   private static boolean canTraverseWithoutReusingEdge(
-      Graph<?> graph, Object nextNode, @NullableDecl Object previousNode) {
+      Graph<?> graph, Object nextNode, @Nullable Object previousNode) {
     if (graph.isDirected() || !Objects.equal(previousNode, nextNode)) {
       return true;
     }
@@ -210,38 +207,6 @@ public final class Graphs {
     return Collections.unmodifiableSet(visitedNodes);
   }
 
-  /**
-   * @deprecated Use {@link Graph#equals(Object)} instead. This method will be removed in January
-   *     2018.
-   */
-  // TODO(user): Delete this method.
-  @Deprecated
-  public static boolean equivalent(@NullableDecl Graph<?> graphA, @NullableDecl Graph<?> graphB) {
-    return Objects.equal(graphA, graphB);
-  }
-
-  /**
-   * @deprecated Use {@link ValueGraph#equals(Object)} instead. This method will be removed in
-   *     January 2018.
-   */
-  // TODO(user): Delete this method.
-  @Deprecated
-  public static boolean equivalent(
-      @NullableDecl ValueGraph<?, ?> graphA, @NullableDecl ValueGraph<?, ?> graphB) {
-    return Objects.equal(graphA, graphB);
-  }
-
-  /**
-   * @deprecated Use {@link Network#equals(Object)} instead. This method will be removed in January
-   *     2018.
-   */
-  // TODO(user): Delete this method.
-  @Deprecated
-  public static boolean equivalent(
-      @NullableDecl Network<?, ?> networkA, @NullableDecl Network<?, ?> networkB) {
-    return Objects.equal(networkA, networkB);
-  }
-
   // Graph mutation methods
 
   // Graph view methods
@@ -260,6 +225,38 @@ public final class Graphs {
     }
 
     return new TransposedGraph<N>(graph);
+  }
+
+  /**
+   * Returns a view of {@code graph} with the direction (if any) of every edge reversed. All other
+   * properties remain intact, and further updates to {@code graph} will be reflected in the view.
+   */
+  public static <N, V> ValueGraph<N, V> transpose(ValueGraph<N, V> graph) {
+    if (!graph.isDirected()) {
+      return graph; // the transpose of an undirected graph is an identical graph
+    }
+
+    if (graph instanceof TransposedValueGraph) {
+      return ((TransposedValueGraph<N, V>) graph).graph;
+    }
+
+    return new TransposedValueGraph<>(graph);
+  }
+
+  /**
+   * Returns a view of {@code network} with the direction (if any) of every edge reversed. All other
+   * properties remain intact, and further updates to {@code network} will be reflected in the view.
+   */
+  public static <N, E> Network<N, E> transpose(Network<N, E> network) {
+    if (!network.isDirected()) {
+      return network; // the transpose of an undirected network is an identical network
+    }
+
+    if (network instanceof TransposedNetwork) {
+      return ((TransposedNetwork<N, E>) network).network;
+    }
+
+    return new TransposedNetwork<>(network);
   }
 
   // NOTE: this should work as long as the delegate graph's implementation of edges() (like that of
@@ -300,22 +297,6 @@ public final class Graphs {
     public boolean hasEdgeConnecting(N nodeU, N nodeV) {
       return delegate().hasEdgeConnecting(nodeV, nodeU); // transpose
     }
-  }
-
-  /**
-   * Returns a view of {@code graph} with the direction (if any) of every edge reversed. All other
-   * properties remain intact, and further updates to {@code graph} will be reflected in the view.
-   */
-  public static <N, V> ValueGraph<N, V> transpose(ValueGraph<N, V> graph) {
-    if (!graph.isDirected()) {
-      return graph; // the transpose of an undirected graph is an identical graph
-    }
-
-    if (graph instanceof TransposedValueGraph) {
-      return ((TransposedValueGraph<N, V>) graph).graph;
-    }
-
-    return new TransposedValueGraph<>(graph);
   }
 
   // NOTE: this should work as long as the delegate graph's implementation of edges() (like that of
@@ -363,26 +344,9 @@ public final class Graphs {
     }
 
     @Override
-    @NullableDecl
-    public V edgeValueOrDefault(N nodeU, N nodeV, @NullableDecl V defaultValue) {
+    public @Nullable V edgeValueOrDefault(N nodeU, N nodeV, @Nullable V defaultValue) {
       return delegate().edgeValueOrDefault(nodeV, nodeU, defaultValue); // transpose
     }
-  }
-
-  /**
-   * Returns a view of {@code network} with the direction (if any) of every edge reversed. All other
-   * properties remain intact, and further updates to {@code network} will be reflected in the view.
-   */
-  public static <N, E> Network<N, E> transpose(Network<N, E> network) {
-    if (!network.isDirected()) {
-      return network; // the transpose of an undirected network is an identical network
-    }
-
-    if (network instanceof TransposedNetwork) {
-      return ((TransposedNetwork<N, E>) network).network;
-    }
-
-    return new TransposedNetwork<>(network);
   }
 
   private static class TransposedNetwork<N, E> extends ForwardingNetwork<N, E> {
@@ -587,14 +551,14 @@ public final class Graphs {
   }
 
   @CanIgnoreReturnValue
-  static int checkPositive(int value) {
-    checkArgument(value > 0, "Not true that %s is positive.", value);
+  static long checkNonNegative(long value) {
+    checkArgument(value >= 0, "Not true that %s is non-negative.", value);
     return value;
   }
 
   @CanIgnoreReturnValue
-  static long checkNonNegative(long value) {
-    checkArgument(value >= 0, "Not true that %s is non-negative.", value);
+  static int checkPositive(int value) {
+    checkArgument(value > 0, "Not true that %s is positive.", value);
     return value;
   }
 

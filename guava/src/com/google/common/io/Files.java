@@ -39,7 +39,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -152,7 +151,7 @@ public final class Files {
       Closer closer = Closer.create();
       try {
         FileInputStream in = closer.register(openStream());
-        return readFile(in, in.getChannel().size());
+        return ByteStreams.toByteArray(in, in.getChannel().size());
       } catch (Throwable e) {
         throw closer.rethrow(e);
       } finally {
@@ -164,29 +163,6 @@ public final class Files {
     public String toString() {
       return "Files.asByteSource(" + file + ")";
     }
-  }
-
-  /**
-   * Reads a file of the given expected size from the given input stream, if it will fit into a byte
-   * array. This method handles the case where the file size changes between when the size is read
-   * and when the contents are read from the stream.
-   */
-  static byte[] readFile(InputStream in, long expectedSize) throws IOException {
-    if (expectedSize > Integer.MAX_VALUE) {
-      throw new OutOfMemoryError(
-          "file is too large to fit in a byte array: " + expectedSize + " bytes");
-    }
-
-    // some special files may return size 0 but have content, so read
-    // the file normally in that case guessing at the buffer size to use.  Note, there is no point
-    // in calling the 'toByteArray' overload that doesn't take a size because that calls
-    // InputStream.available(), but our caller has already done that.  So instead just guess that
-    // the file is 4K bytes long and rely on the fallback in toByteArray to expand the buffer if
-    // needed.
-    // This also works around an app-engine bug where FileInputStream.available() consistently
-    // throws an IOException for certain files, even though FileInputStream.getChannel().size() does
-    // not!
-    return ByteStreams.toByteArray(in, expectedSize == 0 ? 4096 : (int) expectedSize);
   }
 
   /**
@@ -290,6 +266,22 @@ public final class Files {
   }
 
   /**
+   * Writes a character sequence (such as a string) to a file using the given character set.
+   *
+   * @param from the character sequence to write
+   * @param to the destination file
+   * @param charset the charset used to encode the output stream; see {@link StandardCharsets} for
+   *     helpful predefined constants
+   * @throws IOException if an I/O error occurs
+   * @deprecated Prefer {@code asCharSink(to, charset).write(from)}. This method is scheduled to be
+   *     removed in January 2019.
+   */
+  @Deprecated
+  public static void write(CharSequence from, File to, Charset charset) throws IOException {
+    asCharSink(to, charset).write(from);
+  }
+
+  /**
    * Copies all bytes from a file to an output stream.
    *
    * <p><b>{@link java.nio.file.Path} equivalent:</b> {@link
@@ -328,19 +320,19 @@ public final class Files {
   }
 
   /**
-   * Writes a character sequence (such as a string) to a file using the given character set.
+   * Copies all characters from a file to an appendable object, using the given character set.
    *
-   * @param from the character sequence to write
-   * @param to the destination file
-   * @param charset the charset used to encode the output stream; see {@link StandardCharsets} for
+   * @param from the source file
+   * @param charset the charset used to decode the input stream; see {@link StandardCharsets} for
    *     helpful predefined constants
+   * @param to the appendable object
    * @throws IOException if an I/O error occurs
-   * @deprecated Prefer {@code asCharSink(to, charset).write(from)}. This method is scheduled to be
-   *     removed in January 2019.
+   * @deprecated Prefer {@code asCharSource(from, charset).copyTo(to)}. This method is scheduled to
+   *     be removed in January 2019.
    */
   @Deprecated
-  public static void write(CharSequence from, File to, Charset charset) throws IOException {
-    asCharSink(to, charset).write(from);
+  public static void copy(File from, Charset charset, Appendable to) throws IOException {
+    asCharSource(from, charset).copyTo(to);
   }
 
   /**
@@ -357,22 +349,6 @@ public final class Files {
   @Deprecated
   public static void append(CharSequence from, File to, Charset charset) throws IOException {
     asCharSink(to, charset, FileWriteMode.APPEND).write(from);
-  }
-
-  /**
-   * Copies all characters from a file to an appendable object, using the given character set.
-   *
-   * @param from the source file
-   * @param charset the charset used to decode the input stream; see {@link StandardCharsets} for
-   *     helpful predefined constants
-   * @param to the appendable object
-   * @throws IOException if an I/O error occurs
-   * @deprecated Prefer {@code asCharSource(from, charset).copyTo(to)}. This method is scheduled to
-   *     be removed in January 2019.
-   */
-  @Deprecated
-  public static void copy(File from, Charset charset, Appendable to) throws IOException {
-    asCharSource(from, charset).copyTo(to);
   }
 
   /**
@@ -826,11 +802,10 @@ public final class Files {
    *
    * @since 15.0
    * @deprecated The returned {@link TreeTraverser} type is deprecated. Use the replacement method
-   *     {@link #fileTraverser()} instead with the same semantics as this method. This method is
-   *     scheduled to be removed in April 2018.
+   *     {@link #fileTraverser()} instead with the same semantics as this method.
    */
   @Deprecated
-  public static TreeTraverser<File> fileTreeTraverser() {
+  static TreeTraverser<File> fileTreeTraverser() {
     return FILE_TREE_TRAVERSER;
   }
 

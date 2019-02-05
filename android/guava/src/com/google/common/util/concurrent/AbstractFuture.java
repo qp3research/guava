@@ -25,7 +25,6 @@ import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.base.Ascii;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.DoNotMock;
 import com.google.errorprone.annotations.ForOverride;
 import com.google.j2objc.annotations.ReflectionSupport;
 import java.security.AccessController;
@@ -64,7 +63,6 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 1.0
  */
 @SuppressWarnings("ShortCircuitBoolean") // we use non-short circuiting comparisons intentionally
-@DoNotMock("Use Futures.immediate*Future or SettableFuture")
 @GwtCompatible(emulated = true)
 @ReflectionSupport(value = ReflectionSupport.Level.FULL)
 public abstract class AbstractFuture<V> extends FluentFuture<V> {
@@ -984,7 +982,7 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
   protected String pendingToString() {
     Object localValue = value;
     if (localValue instanceof SetFuture) {
-      return "setFuture=[" + ((SetFuture) localValue).future + "]";
+      return "setFuture=[" + userObjectToString(((SetFuture) localValue).future) + "]";
     } else if (this instanceof ScheduledFuture) {
       return "remaining delay=["
           + ((ScheduledFuture) this).getDelay(TimeUnit.MILLISECONDS)
@@ -996,7 +994,7 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
   private void addDoneString(StringBuilder builder) {
     try {
       V value = getDone(this);
-      builder.append("SUCCESS, result=[").append(value).append("]");
+      builder.append("SUCCESS, result=[").append(userObjectToString(value)).append("]");
     } catch (ExecutionException e) {
       builder.append("FAILURE, cause=[").append(e.getCause()).append("]");
     } catch (CancellationException e) {
@@ -1004,6 +1002,18 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
     } catch (RuntimeException e) {
       builder.append("UNKNOWN, cause=[").append(e.getClass()).append(" thrown from get()]");
     }
+  }
+
+  /** Helper for printing user supplied objects into our toString method. */
+  private String userObjectToString(Object o) {
+    // This is some basic recursion detection for when people create cycles via set/setFuture
+    // This is however only partial protection though since it only detects self loops.  We could
+    // detect arbitrary cycles using a thread local or possibly by catching StackOverflowExceptions
+    // but this should be a good enough solution (it is also what jdk collections do in these cases)
+    if (o == this) {
+      return "this future";
+    }
+    return String.valueOf(o);
   }
 
   /**

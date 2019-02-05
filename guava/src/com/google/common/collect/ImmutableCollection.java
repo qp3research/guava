@@ -17,14 +17,11 @@
 package com.google.common.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.CollectPreconditions.checkNonnegative;
-import static com.google.common.collect.ObjectArrays.checkElementsNotNull;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Serializable;
 import java.util.AbstractCollection;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -32,7 +29,7 @@ import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Predicate;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A {@link Collection} whose contents will never change, and which offers a few additional
@@ -210,7 +207,7 @@ public abstract class ImmutableCollection<E> extends AbstractCollection<E> imple
   }
 
   @Override
-  public abstract boolean contains(@NullableDecl Object object);
+  public abstract boolean contains(@Nullable Object object);
 
   /**
    * Guaranteed to throw an exception and leave the collection unmodified.
@@ -447,77 +444,5 @@ public abstract class ImmutableCollection<E> extends AbstractCollection<E> imple
      * ImmutableCollection} from this method.
      */
     public abstract ImmutableCollection<E> build();
-  }
-
-  abstract static class ArrayBasedBuilder<E> extends ImmutableCollection.Builder<E> {
-    Object[] contents;
-    int size;
-    boolean forceCopy;
-
-    ArrayBasedBuilder(int initialCapacity) {
-      checkNonnegative(initialCapacity, "initialCapacity");
-      this.contents = new Object[initialCapacity];
-      this.size = 0;
-    }
-
-    /*
-     * Expand the absolute capacity of the builder so it can accept at least the specified number of
-     * elements without being resized. Also, if we've already built a collection backed by the
-     * current array, create a new array.
-     */
-    private void getReadyToExpandTo(int minCapacity) {
-      if (contents.length < minCapacity) {
-        this.contents =
-            Arrays.copyOf(this.contents, expandedCapacity(contents.length, minCapacity));
-        forceCopy = false;
-      } else if (forceCopy) {
-        this.contents = contents.clone();
-        forceCopy = false;
-      }
-    }
-
-    @CanIgnoreReturnValue
-    @Override
-    public ArrayBasedBuilder<E> add(E element) {
-      checkNotNull(element);
-      getReadyToExpandTo(size + 1);
-      contents[size++] = element;
-      return this;
-    }
-
-    @CanIgnoreReturnValue
-    @Override
-    public Builder<E> add(E... elements) {
-      checkElementsNotNull(elements);
-      getReadyToExpandTo(size + elements.length);
-      System.arraycopy(elements, 0, contents, size, elements.length);
-      size += elements.length;
-      return this;
-    }
-
-    @CanIgnoreReturnValue
-    @Override
-    public Builder<E> addAll(Iterable<? extends E> elements) {
-      if (elements instanceof Collection) {
-        Collection<?> collection = (Collection<?>) elements;
-        getReadyToExpandTo(size + collection.size());
-        if (collection instanceof ImmutableCollection) {
-          ImmutableCollection<?> immutableCollection = (ImmutableCollection<?>) collection;
-          size = immutableCollection.copyIntoArray(contents, size);
-          return this;
-        }
-      }
-      super.addAll(elements);
-      return this;
-    }
-
-    @CanIgnoreReturnValue
-    ArrayBasedBuilder<E> combine(ArrayBasedBuilder<E> builder) {
-      checkNotNull(builder);
-      getReadyToExpandTo(size + builder.size);
-      System.arraycopy(builder.contents, 0, this.contents, size, builder.size);
-      size += builder.size;
-      return this;
-    }
   }
 }
