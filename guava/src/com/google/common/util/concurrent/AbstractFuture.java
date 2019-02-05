@@ -25,7 +25,6 @@ import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.base.Ascii;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.DoNotMock;
 import com.google.errorprone.annotations.ForOverride;
 import com.google.j2objc.annotations.ReflectionSupport;
 import java.security.AccessController;
@@ -42,7 +41,7 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.concurrent.locks.LockSupport;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An abstract implementation of {@link ListenableFuture}, intended for advanced users only. More
@@ -64,7 +63,6 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 1.0
  */
 @SuppressWarnings("ShortCircuitBoolean") // we use non-short circuiting comparisons intentionally
-@DoNotMock("Use Futures.immediate*Future or SettableFuture")
 @GwtCompatible(emulated = true)
 @ReflectionSupport(value = ReflectionSupport.Level.FULL)
 public abstract class AbstractFuture<V> extends FluentFuture<V> {
@@ -172,8 +170,8 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
   private static final class Waiter {
     static final Waiter TOMBSTONE = new Waiter(false /* ignored param */);
 
-    @NullableDecl volatile Thread thread;
-    @NullableDecl volatile Waiter next;
+    volatile @Nullable Thread thread;
+    volatile @Nullable Waiter next;
 
     /**
      * Constructor for the TOMBSTONE, avoids use of ATOMIC_HELPER in case this class is loaded
@@ -188,7 +186,7 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
 
     // non-volatile write to the next field. Should be made visible by subsequent CAS on waiters
     // field.
-    void setNext(@NullableDecl Waiter next) {
+    void setNext(Waiter next) {
       ATOMIC_HELPER.putNext(this, next);
     }
 
@@ -250,9 +248,9 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
     final Executor executor;
 
     // writes to next are made visible by subsequent CAS's on the listeners field
-    @NullableDecl Listener next;
+    @Nullable Listener next;
 
-    Listener(@NullableDecl Runnable task, @NullableDecl Executor executor) {
+    Listener(Runnable task, Executor executor) {
       this.task = task;
       this.executor = executor;
     }
@@ -295,9 +293,9 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
     }
 
     final boolean wasInterrupted;
-    @NullableDecl final Throwable cause;
+    final @Nullable Throwable cause;
 
-    Cancellation(boolean wasInterrupted, @NullableDecl Throwable cause) {
+    Cancellation(boolean wasInterrupted, @Nullable Throwable cause) {
       this.wasInterrupted = wasInterrupted;
       this.cause = cause;
     }
@@ -343,13 +341,13 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
    *       argument.
    * </ul>
    */
-  @NullableDecl private volatile Object value;
+  private volatile @Nullable Object value;
 
   /** All listeners. */
-  @NullableDecl private volatile Listener listeners;
+  private volatile @Nullable Listener listeners;
 
   /** All waiting threads. */
-  @NullableDecl private volatile Waiter waiters;
+  private volatile @Nullable Waiter waiters;
 
   /** Constructor for use by subclasses. */
   protected AbstractFuture() {}
@@ -685,7 +683,7 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
    * @return true if the attempt was accepted, completing the {@code Future}
    */
   @CanIgnoreReturnValue
-  protected boolean set(@NullableDecl V value) {
+  protected boolean set(@Nullable V value) {
     Object valueToSet = value == null ? NULL : value;
     if (ATOMIC_HELPER.casValue(this, null, valueToSet)) {
       complete(this);
@@ -902,7 +900,7 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
    * If this future has been cancelled (and possibly interrupted), cancels (and possibly interrupts)
    * the given future (if available).
    */
-  final void maybePropagateCancellationTo(@NullableDecl Future<?> related) {
+  final void maybePropagateCancellationTo(@Nullable Future<?> related) {
     if (related != null & isCancelled()) {
       related.cancel(wasInterrupted());
     }
@@ -923,7 +921,7 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
    * Clears the {@link #listeners} list and prepends its contents to {@code onto}, least recently
    * added first.
    */
-  private Listener clearListeners(@NullableDecl Listener onto) {
+  private Listener clearListeners(Listener onto) {
     // We need to
     // 1. atomically swap the listeners with TOMBSTONE, this is because addListener uses that to
     //    to synchronize with us
@@ -980,11 +978,10 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
    * @return null if an explanation cannot be provided because the future is done.
    * @since 23.0
    */
-  @NullableDecl
-  protected String pendingToString() {
+  protected @Nullable String pendingToString() {
     Object localValue = value;
     if (localValue instanceof SetFuture) {
-      return "setFuture=[" + ((SetFuture) localValue).future + "]";
+      return "setFuture=[" + userObjectToString(((SetFuture) localValue).future) + "]";
     } else if (this instanceof ScheduledFuture) {
       return "remaining delay=["
           + ((ScheduledFuture) this).getDelay(TimeUnit.MILLISECONDS)
@@ -996,7 +993,7 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
   private void addDoneString(StringBuilder builder) {
     try {
       V value = getDone(this);
-      builder.append("SUCCESS, result=[").append(value).append("]");
+      builder.append("SUCCESS, result=[").append(userObjectToString(value)).append("]");
     } catch (ExecutionException e) {
       builder.append("FAILURE, cause=[").append(e.getCause()).append("]");
     } catch (CancellationException e) {
@@ -1004,6 +1001,18 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
     } catch (RuntimeException e) {
       builder.append("UNKNOWN, cause=[").append(e.getClass()).append(" thrown from get()]");
     }
+  }
+
+  /** Helper for printing user supplied objects into our toString method. */
+  private String userObjectToString(Object o) {
+    // This is some basic recursion detection for when people create cycles via set/setFuture
+    // This is however only partial protection though since it only detects self loops.  We could
+    // detect arbitrary cycles using a thread local or possibly by catching StackOverflowExceptions
+    // but this should be a good enough solution (it is also what jdk collections do in these cases)
+    if (o == this) {
+      return "this future";
+    }
+    return String.valueOf(o);
   }
 
   /**
@@ -1029,7 +1038,7 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
     abstract void putThread(Waiter waiter, Thread newValue);
 
     /** Non volatile write of the waiter to the {@link Waiter#next} field. */
-    abstract void putNext(Waiter waiter, @NullableDecl Waiter newValue);
+    abstract void putNext(Waiter waiter, Waiter newValue);
 
     /** Performs a CAS operation on the {@link #waiters} field. */
     abstract boolean casWaiters(AbstractFuture<?> future, Waiter expect, Waiter update);
@@ -1101,25 +1110,25 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
     }
 
     @Override
-    void putNext(Waiter waiter, @NullableDecl Waiter newValue) {
+    void putNext(Waiter waiter, Waiter newValue) {
       UNSAFE.putObject(waiter, WAITER_NEXT_OFFSET, newValue);
     }
 
     /** Performs a CAS operation on the {@link #waiters} field. */
     @Override
-    boolean casWaiters(AbstractFuture<?> future, @NullableDecl Waiter expect, @NullableDecl Waiter update) {
+    boolean casWaiters(AbstractFuture<?> future, Waiter expect, Waiter update) {
       return UNSAFE.compareAndSwapObject(future, WAITERS_OFFSET, expect, update);
     }
 
     /** Performs a CAS operation on the {@link #listeners} field. */
     @Override
-    boolean casListeners(AbstractFuture<?> future, @NullableDecl Listener expect, Listener update) {
+    boolean casListeners(AbstractFuture<?> future, Listener expect, Listener update) {
       return UNSAFE.compareAndSwapObject(future, LISTENERS_OFFSET, expect, update);
     }
 
     /** Performs a CAS operation on the {@link #value} field. */
     @Override
-    boolean casValue(AbstractFuture<?> future, @NullableDecl Object expect, Object update) {
+    boolean casValue(AbstractFuture<?> future, Object expect, Object update) {
       return UNSAFE.compareAndSwapObject(future, VALUE_OFFSET, expect, update);
     }
   }
@@ -1151,7 +1160,7 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
     }
 
     @Override
-    void putNext(Waiter waiter, @NullableDecl Waiter newValue) {
+    void putNext(Waiter waiter, Waiter newValue) {
       waiterNextUpdater.lazySet(waiter, newValue);
     }
 
@@ -1184,7 +1193,7 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
     }
 
     @Override
-    void putNext(Waiter waiter, @NullableDecl Waiter newValue) {
+    void putNext(Waiter waiter, Waiter newValue) {
       waiter.next = newValue;
     }
 
@@ -1223,7 +1232,7 @@ public abstract class AbstractFuture<V> extends FluentFuture<V> {
   }
 
   private static CancellationException cancellationExceptionWithCause(
-      @NullableDecl String message, @NullableDecl Throwable cause) {
+      @Nullable String message, @Nullable Throwable cause) {
     CancellationException exception = new CancellationException(message);
     exception.initCause(cause);
     return exception;

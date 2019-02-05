@@ -16,6 +16,7 @@
 
 package com.google.common.collect;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
@@ -55,6 +56,12 @@ public class SynchronizedDequeTest extends TestCase {
     public E remove() {
       assertTrue(Thread.holdsLock(mutex));
       return delegate.remove();
+    }
+
+    @Override
+    public boolean remove(Object object) {
+      assertTrue(Thread.holdsLock(mutex));
+      return delegate.remove(object);
     }
 
     @Override
@@ -104,12 +111,6 @@ public class SynchronizedDequeTest extends TestCase {
     public boolean add(E element) {
       assertTrue(Thread.holdsLock(mutex));
       return delegate.add(element);
-    }
-
-    @Override
-    public boolean remove(Object object) {
-      assertTrue(Thread.holdsLock(mutex));
-      return delegate.remove(object);
     }
 
     @Override
@@ -264,7 +265,7 @@ public class SynchronizedDequeTest extends TestCase {
     create().clear();
     create().contains("foo");
     create().containsAll(ImmutableList.of("foo"));
-    create().equals(ImmutableList.of("foo"));
+    create().equals(new ArrayDeque<>(ImmutableList.of("foo")));
     create().hashCode();
     create().isEmpty();
     create().iterator();
