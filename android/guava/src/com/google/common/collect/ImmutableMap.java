@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
@@ -167,9 +168,14 @@ public abstract class ImmutableMap<K, V> implements Map<K, V>, Serializable {
   static void checkNoConflict(
       boolean safe, String conflictDescription, Entry<?, ?> entry1, Entry<?, ?> entry2) {
     if (!safe) {
-      throw new IllegalArgumentException(
-          "Multiple entries with same " + conflictDescription + ": " + entry1 + " and " + entry2);
+      throw conflictException(conflictDescription, entry1, entry2);
     }
+  }
+
+  static IllegalArgumentException conflictException(
+      String conflictDescription, Object entry1, Object entry2) {
+    return new IllegalArgumentException(
+        "Multiple entries with same " + conflictDescription + ": " + entry1 + " and " + entry2);
   }
 
   /**
@@ -202,7 +208,7 @@ public abstract class ImmutableMap<K, V> implements Map<K, V>, Serializable {
    * @since 2.0
    */
   public static class Builder<K, V> {
-    Comparator<? super V> valueComparator;
+    @MonotonicNonNullDecl Comparator<? super V> valueComparator;
     Object[] alternatingKeysAndValues;
     int size;
     boolean entriesUsed;

@@ -40,6 +40,7 @@ import java.util.RandomAccess;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
@@ -420,8 +421,8 @@ final class Synchronized {
 
   private static class SynchronizedMultiset<E> extends SynchronizedCollection<E>
       implements Multiset<E> {
-    transient Set<E> elementSet;
-    transient Set<Entry<E>> entrySet;
+    @MonotonicNonNullDecl transient Set<E> elementSet;
+    @MonotonicNonNullDecl transient Set<Entry<E>> entrySet;
 
     SynchronizedMultiset(Multiset<E> delegate, @NullableDecl Object mutex) {
       super(delegate, mutex);
@@ -516,11 +517,11 @@ final class Synchronized {
 
   private static class SynchronizedMultimap<K, V> extends SynchronizedObject
       implements Multimap<K, V> {
-    transient Set<K> keySet;
-    transient Collection<V> valuesCollection;
-    transient Collection<Entry<K, V>> entries;
-    transient Map<K, Collection<V>> asMap;
-    transient Multiset<K> keys;
+    @MonotonicNonNullDecl transient Set<K> keySet;
+    @MonotonicNonNullDecl transient Collection<V> valuesCollection;
+    @MonotonicNonNullDecl transient Collection<Entry<K, V>> entries;
+    @MonotonicNonNullDecl transient Map<K, Collection<V>> asMap;
+    @MonotonicNonNullDecl transient Multiset<K> keys;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -746,7 +747,7 @@ final class Synchronized {
 
   private static class SynchronizedSetMultimap<K, V> extends SynchronizedMultimap<K, V>
       implements SetMultimap<K, V> {
-    transient Set<Entry<K, V>> entrySet;
+    @MonotonicNonNullDecl transient Set<Entry<K, V>> entrySet;
 
     SynchronizedSetMultimap(SetMultimap<K, V> delegate, @NullableDecl Object mutex) {
       super(delegate, mutex);
@@ -961,9 +962,9 @@ final class Synchronized {
   }
 
   private static class SynchronizedMap<K, V> extends SynchronizedObject implements Map<K, V> {
-    transient Set<K> keySet;
-    transient Collection<V> values;
-    transient Set<Entry<K, V>> entrySet;
+    @MonotonicNonNullDecl transient Set<K> keySet;
+    @MonotonicNonNullDecl transient Collection<V> values;
+    @MonotonicNonNullDecl transient Set<Entry<K, V>> entrySet;
 
     SynchronizedMap(Map<K, V> delegate, @NullableDecl Object mutex) {
       super(delegate, mutex);
@@ -1159,8 +1160,8 @@ final class Synchronized {
   @VisibleForTesting
   static class SynchronizedBiMap<K, V> extends SynchronizedMap<K, V>
       implements BiMap<K, V>, Serializable {
-    private transient Set<V> valueSet;
-    @RetainedWith private transient BiMap<V, K> inverse;
+    @MonotonicNonNullDecl private transient Set<V> valueSet;
+    @MonotonicNonNullDecl @RetainedWith private transient BiMap<V, K> inverse;
 
     private SynchronizedBiMap(
         BiMap<K, V> delegate, @NullableDecl Object mutex, @NullableDecl BiMap<V, K> inverse) {
@@ -1204,8 +1205,8 @@ final class Synchronized {
   }
 
   private static class SynchronizedAsMap<K, V> extends SynchronizedMap<K, Collection<V>> {
-    transient Set<Entry<K, Collection<V>>> asMapEntrySet;
-    transient Collection<Collection<V>> asMapValues;
+    @MonotonicNonNullDecl transient Set<Entry<K, Collection<V>>> asMapEntrySet;
+    @MonotonicNonNullDecl transient Collection<Collection<V>> asMapValues;
 
     SynchronizedAsMap(Map<K, Collection<V>> delegate, @NullableDecl Object mutex) {
       super(delegate, mutex);
@@ -1292,7 +1293,7 @@ final class Synchronized {
       return delegate().descendingIterator(); // manually synchronized
     }
 
-    transient NavigableSet<E> descendingSet;
+    @MonotonicNonNullDecl transient NavigableSet<E> descendingSet;
 
     @Override
     public NavigableSet<E> descendingSet() {
@@ -1318,6 +1319,11 @@ final class Synchronized {
       synchronized (mutex) {
         return Synchronized.navigableSet(delegate().headSet(toElement, inclusive), mutex);
       }
+    }
+
+    @Override
+    public SortedSet<E> headSet(E toElement) {
+      return headSet(toElement, false);
     }
 
     @Override
@@ -1358,20 +1364,15 @@ final class Synchronized {
     }
 
     @Override
+    public SortedSet<E> subSet(E fromElement, E toElement) {
+      return subSet(fromElement, true, toElement, false);
+    }
+
+    @Override
     public NavigableSet<E> tailSet(E fromElement, boolean inclusive) {
       synchronized (mutex) {
         return Synchronized.navigableSet(delegate().tailSet(fromElement, inclusive), mutex);
       }
-    }
-
-    @Override
-    public SortedSet<E> headSet(E toElement) {
-      return headSet(toElement, false);
-    }
-
-    @Override
-    public SortedSet<E> subSet(E fromElement, E toElement) {
-      return subSet(fromElement, true, toElement, false);
     }
 
     @Override
@@ -1432,7 +1433,7 @@ final class Synchronized {
       }
     }
 
-    transient NavigableSet<K> descendingKeySet;
+    @MonotonicNonNullDecl transient NavigableSet<K> descendingKeySet;
 
     @Override
     public NavigableSet<K> descendingKeySet() {
@@ -1444,7 +1445,7 @@ final class Synchronized {
       }
     }
 
-    transient NavigableMap<K, V> descendingMap;
+    @MonotonicNonNullDecl transient NavigableMap<K, V> descendingMap;
 
     @Override
     public NavigableMap<K, V> descendingMap() {
@@ -1482,6 +1483,11 @@ final class Synchronized {
       synchronized (mutex) {
         return navigableMap(delegate().headMap(toKey, inclusive), mutex);
       }
+    }
+
+    @Override
+    public SortedMap<K, V> headMap(K toKey) {
+      return headMap(toKey, false);
     }
 
     @Override
@@ -1524,7 +1530,7 @@ final class Synchronized {
       return navigableKeySet();
     }
 
-    transient NavigableSet<K> navigableKeySet;
+    @MonotonicNonNullDecl transient NavigableSet<K> navigableKeySet;
 
     @Override
     public NavigableSet<K> navigableKeySet() {
@@ -1559,20 +1565,15 @@ final class Synchronized {
     }
 
     @Override
+    public SortedMap<K, V> subMap(K fromKey, K toKey) {
+      return subMap(fromKey, true, toKey, false);
+    }
+
+    @Override
     public NavigableMap<K, V> tailMap(K fromKey, boolean inclusive) {
       synchronized (mutex) {
         return navigableMap(delegate().tailMap(fromKey, inclusive), mutex);
       }
-    }
-
-    @Override
-    public SortedMap<K, V> headMap(K toKey) {
-      return headMap(toKey, false);
-    }
-
-    @Override
-    public SortedMap<K, V> subMap(K fromKey, K toKey) {
-      return subMap(fromKey, true, toKey, false);
     }
 
     @Override
