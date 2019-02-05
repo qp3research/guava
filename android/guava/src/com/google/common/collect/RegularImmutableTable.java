@@ -42,7 +42,7 @@ abstract class RegularImmutableTable<R, C, V> extends ImmutableTable<R, C, V> {
   }
 
   @WeakOuter
-  private final class CellSet extends ImmutableSet.Indexed<Cell<R, C, V>> {
+  private final class CellSet extends IndexedImmutableSet<Cell<R, C, V>> {
     @Override
     public int size() {
       return RegularImmutableTable.this.size();
@@ -132,7 +132,7 @@ abstract class RegularImmutableTable<R, C, V> extends ImmutableTable<R, C, V> {
     return forCellsInternal(cells, null, null);
   }
 
-  private static final <R, C, V> RegularImmutableTable<R, C, V> forCellsInternal(
+  private static <R, C, V> RegularImmutableTable<R, C, V> forCellsInternal(
       Iterable<Cell<R, C, V>> cells,
       @NullableDecl Comparator<? super R> rowComparator,
       @NullableDecl Comparator<? super C> columnComparator) {
