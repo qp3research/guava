@@ -24,21 +24,23 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Implementation of {@link Multimap} using hash tables.
  *
- * <p>The multimap does not store duplicate key-value pairs. Adding a new key-value pair equal to an
- * existing key-value pair has no effect.
+ * <p>The multimap does not store duplicate key-value pairs. Adding a new
+ * key-value pair equal to an existing key-value pair has no effect.
  *
- * <p>Keys and values may be null. All optional multimap methods are supported, and all returned
- * views are modifiable.
+ * <p>Keys and values may be null. All optional multimap methods are supported,
+ * and all returned views are modifiable.
  *
- * <p>This class is not threadsafe when any concurrent operations update the multimap. Concurrent
- * read operations will work correctly. To allow concurrent update operations, wrap your multimap
- * with a call to {@link Multimaps#synchronizedSetMultimap}.
+ * <p>This class is not threadsafe when any concurrent operations update the
+ * multimap. Concurrent read operations will work correctly. To allow concurrent
+ * update operations, wrap your multimap with a call to {@link
+ * Multimaps#synchronizedSetMultimap}.
  *
  * @author Jared Levy
  * @since 2.0
@@ -90,17 +92,17 @@ public final class HashMultimap<K, V> extends HashMultimapGwtSerializationDepend
   }
 
   private HashMultimap() {
-    this(12, DEFAULT_VALUES_PER_KEY);
+    super(new HashMap<K, Collection<V>>());
   }
 
   private HashMultimap(int expectedKeys, int expectedValuesPerKey) {
-    super(Platform.<K, Collection<V>>newHashMapWithExpectedSize(expectedKeys));
+    super(Maps.<K, Collection<V>>newHashMapWithExpectedSize(expectedKeys));
     Preconditions.checkArgument(expectedValuesPerKey >= 0);
     this.expectedValuesPerKey = expectedValuesPerKey;
   }
 
   private HashMultimap(Multimap<? extends K, ? extends V> multimap) {
-    super(Platform.<K, Collection<V>>newHashMapWithExpectedSize(multimap.keySet().size()));
+    super(Maps.<K, Collection<V>>newHashMapWithExpectedSize(multimap.keySet().size()));
     putAll(multimap);
   }
 
@@ -113,12 +115,13 @@ public final class HashMultimap<K, V> extends HashMultimapGwtSerializationDepend
    */
   @Override
   Set<V> createCollection() {
-    return Platform.<V>newHashSetWithExpectedSize(expectedValuesPerKey);
+    return Sets.<V>newHashSetWithExpectedSize(expectedValuesPerKey);
   }
 
   /**
-   * @serialData expectedValuesPerKey, number of distinct keys, and then for each distinct key: the
-   *     key, number of values for that key, and the key's values
+   * @serialData expectedValuesPerKey, number of distinct keys, and then for
+   *     each distinct key: the key, number of values for that key, and the
+   *     key's values
    */
   @GwtIncompatible // java.io.ObjectOutputStream
   private void writeObject(ObjectOutputStream stream) throws IOException {
@@ -131,7 +134,7 @@ public final class HashMultimap<K, V> extends HashMultimapGwtSerializationDepend
     stream.defaultReadObject();
     expectedValuesPerKey = DEFAULT_VALUES_PER_KEY;
     int distinctKeys = Serialization.readCount(stream);
-    Map<K, Collection<V>> map = Platform.newHashMapWithExpectedSize(12);
+    Map<K, Collection<V>> map = Maps.newHashMap();
     setMap(map);
     Serialization.populateMultimap(this, stream, distinctKeys);
   }

@@ -24,7 +24,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.UnsignedInts;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Serializable;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * An immutable hash code of arbitrary bit length.
@@ -37,7 +37,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public abstract class HashCode {
   HashCode() {}
 
-  /** Returns the number of bits in this hash code; a positive multiple of 8. */
+  /**
+   * Returns the number of bits in this hash code; a positive multiple of 8.
+   */
   public abstract int bits();
 
   /**
@@ -131,7 +133,12 @@ public abstract class HashCode {
 
     @Override
     public byte[] asBytes() {
-      return new byte[] {(byte) hash, (byte) (hash >> 8), (byte) (hash >> 16), (byte) (hash >> 24)};
+      return new byte[] {
+        (byte) hash,
+        (byte) (hash >> 8),
+        (byte) (hash >> 16),
+        (byte) (hash >> 24)
+      };
     }
 
     @Override
@@ -379,8 +386,8 @@ public abstract class HashCode {
 
   /**
    * Returns a "Java hash code" for this {@code HashCode} instance; this is well-defined (so, for
-   * example, you can safely put {@code HashCode} instances into a {@code HashSet}) but is otherwise
-   * probably not what you want to use.
+   * example, you can safely put {@code HashCode} instances into a {@code
+   * HashSet}) but is otherwise probably not what you want to use.
    */
   @Override
   public final int hashCode() {

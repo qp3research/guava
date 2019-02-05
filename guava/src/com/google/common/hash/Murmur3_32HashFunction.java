@@ -34,12 +34,11 @@ import com.google.common.primitives.Chars;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * See MurmurHash3_x86_32 in <a
@@ -50,7 +49,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @author Dimitris Andreou
  * @author Kurt Alfred Kluever
  */
-@Immutable
 final class Murmur3_32HashFunction extends AbstractHashFunction implements Serializable {
   static final HashFunction MURMUR3_32 = new Murmur3_32HashFunction(0);
 
@@ -208,7 +206,7 @@ final class Murmur3_32HashFunction extends AbstractHashFunction implements Seria
       return hashBytes(input.toString().getBytes(charset));
     }
   }
-
+  
   @Override
   public HashCode hashBytes(byte[] input, int off, int len) {
     checkPositionIndexes(off, off + len, input.length);

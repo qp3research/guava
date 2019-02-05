@@ -22,7 +22,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Implementation helper for {@link TestMapGenerator} for use with maps of strings.
+ * Implementation helper for {@link TestMapGenerator} for use with maps of
+ * strings.
  *
  * @author Chris Povirk
  * @author Jared Levy
@@ -32,7 +33,7 @@ import java.util.Map.Entry;
 public abstract class TestStringMapGenerator implements TestMapGenerator<String, String> {
 
   @Override
-  public SampleElements<Entry<String, String>> samples() {
+  public SampleElements<Map.Entry<String, String>> samples() {
     return new SampleElements<>(
         Helpers.mapEntry("one", "January"),
         Helpers.mapEntry("two", "February"),

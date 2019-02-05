@@ -42,7 +42,10 @@ class CollectionBenchmarkSampleData {
   }
 
   CollectionBenchmarkSampleData(
-      boolean isUserTypeFast, SpecialRandom random, double hitRate, int size) {
+      boolean isUserTypeFast,
+      SpecialRandom random,
+      double hitRate,
+      int size) {
     this.isUserTypeFast = isUserTypeFast;
     this.random = checkNotNull(random);
     this.hitRate = hitRate;
@@ -100,33 +103,28 @@ class CollectionBenchmarkSampleData {
 
   private Element newElement() {
     int value = random.nextInt();
-    return isUserTypeFast ? new Element(value) : new SlowElement(value);
+    return isUserTypeFast
+        ? new Element(value)
+        : new SlowElement(value);
   }
 
   static class Element implements Comparable<Element> {
     final int hash;
-
     Element(int hash) {
       this.hash = hash;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-      return this == obj || (obj instanceof Element && ((Element) obj).hash == hash);
+    @Override public boolean equals(Object obj) {
+      return this == obj
+          || (obj instanceof Element && ((Element) obj).hash == hash);
     }
-
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
       return hash;
     }
-
     @Override
     public int compareTo(Element that) {
       return Ints.compare(hash, that.hash);
     }
-
-    @Override
-    public String toString() {
+    @Override public String toString() {
       return String.valueOf(hash);
     }
   }
@@ -135,23 +133,16 @@ class CollectionBenchmarkSampleData {
     SlowElement(int hash) {
       super(hash);
     }
-
-    @Override
-    public boolean equals(Object obj) {
+    @Override public boolean equals(Object obj) {
       return slowItDown() != 1 && super.equals(obj);
     }
-
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
       return slowItDown() + hash;
     }
-
-    @Override
-    public int compareTo(Element e) {
+    @Override public int compareTo(Element e) {
       int x = slowItDown();
       return x + super.compareTo(e) - x; // silly attempt to prevent opt
     }
-
     static int slowItDown() {
       int result = 0;
       for (int i = 1; i <= 1000; i++) {

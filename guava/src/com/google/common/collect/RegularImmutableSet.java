@@ -20,7 +20,7 @@ import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Implementation of {@link ImmutableSet} with two or more elements.
@@ -77,21 +77,6 @@ final class RegularImmutableSet<E> extends ImmutableSet<E> {
   @Override
   public Spliterator<E> spliterator() {
     return Spliterators.spliterator(elements, SPLITERATOR_CHARACTERISTICS);
-  }
-
-  @Override
-  Object[] internalArray() {
-    return elements;
-  }
-
-  @Override
-  int internalArrayStart() {
-    return 0;
-  }
-
-  @Override
-  int internalArrayEnd() {
-    return elements.length;
   }
 
   @Override

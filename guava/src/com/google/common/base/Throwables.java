@@ -32,7 +32,7 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Static utility methods pertaining to instances of {@link Throwable}.
@@ -448,30 +448,32 @@ public final class Throwables {
 
   /** Access to some fancy internal JVM internals. */
   @GwtIncompatible // java.lang.reflect
-  private static final @Nullable Object jla = getJLA();
+  @Nullable
+  private static final Object jla = getJLA();
 
   /**
    * The "getStackTraceElementMethod" method, only available on some JDKs so we use reflection to
    * find it when available. When this is null, use the slow way.
    */
   @GwtIncompatible // java.lang.reflect
-  private static final @Nullable Method getStackTraceElementMethod =
-      (jla == null) ? null : getGetMethod();
+  @Nullable
+  private static final Method getStackTraceElementMethod = (jla == null) ? null : getGetMethod();
 
   /**
    * The "getStackTraceDepth" method, only available on some JDKs so we use reflection to find it
    * when available. When this is null, use the slow way.
    */
   @GwtIncompatible // java.lang.reflect
-  private static final @Nullable Method getStackTraceDepthMethod =
-      (jla == null) ? null : getSizeMethod();
+  @Nullable
+  private static final Method getStackTraceDepthMethod = (jla == null) ? null : getSizeMethod();
 
   /**
-   * Returns the JavaLangAccess class that is present in all Sun JDKs. It is not allowed in
+   * Returns the JavaLangAccess class that is present in all Sun JDKs. It is not whitelisted for
    * AppEngine, and not present in non-Sun JDKs.
    */
   @GwtIncompatible // java.lang.reflect
-  private static @Nullable Object getJLA() {
+  @Nullable
+  private static Object getJLA() {
     try {
       /*
        * We load sun.misc.* classes using reflection since Android doesn't support these classes and
@@ -484,7 +486,7 @@ public final class Throwables {
       throw death;
     } catch (Throwable t) {
       /*
-       * This is not one of AppEngine's allowed classes, so even in Sun JDKs, this can fail with
+       * This is not one of AppEngine's whitelisted classes, so even in Sun JDKs, this can fail with
        * a NoClassDefFoundError. Other apps might deny access to sun.misc packages.
        */
       return null;
@@ -496,7 +498,8 @@ public final class Throwables {
    * method cannot be found (it is only to be found in fairly recent JDKs).
    */
   @GwtIncompatible // java.lang.reflect
-  private static @Nullable Method getGetMethod() {
+  @Nullable
+  private static Method getGetMethod() {
     return getJlaMethod("getStackTraceElement", Throwable.class, int.class);
   }
 
@@ -510,7 +513,8 @@ public final class Throwables {
    * UnsupportedOperationException</a>.
    */
   @GwtIncompatible // java.lang.reflect
-  private static @Nullable Method getSizeMethod() {
+  @Nullable
+  private static Method getSizeMethod() {
     try {
       Method getStackTraceDepth = getJlaMethod("getStackTraceDepth", Throwable.class);
       if (getStackTraceDepth == null) {
@@ -524,8 +528,8 @@ public final class Throwables {
   }
 
   @GwtIncompatible // java.lang.reflect
-  private static @Nullable Method getJlaMethod(String name, Class<?>... parameterTypes)
-      throws ThreadDeath {
+  @Nullable
+  private static Method getJlaMethod(String name, Class<?>... parameterTypes) throws ThreadDeath {
     try {
       return Class.forName(JAVA_LANG_ACCESS_CLASSNAME, false, null).getMethod(name, parameterTypes);
     } catch (ThreadDeath death) {

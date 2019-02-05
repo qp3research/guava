@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Funnels for common types. All implementations are serializable.
@@ -31,7 +31,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class Funnels {
   private Funnels() {}
 
-  /** Returns a funnel that extracts the bytes from a {@code byte} array. */
+  /**
+   * Returns a funnel that extracts the bytes from a {@code byte} array.
+   */
   public static Funnel<byte[]> byteArrayFunnel() {
     return ByteArrayFunnel.INSTANCE;
   }
@@ -51,8 +53,8 @@ public final class Funnels {
 
   /**
    * Returns a funnel that extracts the characters from a {@code CharSequence}, a character at a
-   * time, without performing any encoding. If you need to use a specific encoding, use {@link
-   * Funnels#stringFunnel(Charset)} instead.
+   * time, without performing any encoding. If you need to use a specific encoding, use
+   * {@link Funnels#stringFunnel(Charset)} instead.
    *
    * @since 15.0 (since 11.0 as {@code Funnels.stringFunnel()}.
    */

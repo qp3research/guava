@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Ignore;
 
 /**
  * Tests for {@link Multimap#replaceValues(Object, Iterable)}.
@@ -41,7 +40,6 @@ import org.junit.Ignore;
  * @author Louis Wasserman
  */
 @GwtCompatible
-@Ignore // Affects only Android test runner, which respects JUnit 4 annotations on JUnit 3 tests.
 public class MultimapReplaceValuesTester<K, V>
     extends AbstractMultimapTester<K, V, Multimap<K, V>> {
 

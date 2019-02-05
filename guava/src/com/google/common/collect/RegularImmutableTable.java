@@ -14,7 +14,6 @@
 
 package com.google.common.collect;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.annotations.GwtCompatible;
@@ -24,10 +23,11 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
- * An implementation of {@link ImmutableTable} holding an arbitrary number of cells.
+ * An implementation of {@link ImmutableTable} holding an arbitrary number of
+ * cells.
  *
  * @author Gregory Kick
  */
@@ -43,7 +43,7 @@ abstract class RegularImmutableTable<R, C, V> extends ImmutableTable<R, C, V> {
   }
 
   @WeakOuter
-  private final class CellSet extends IndexedImmutableSet<Cell<R, C, V>> {
+  private final class CellSet extends ImmutableSet.Indexed<Cell<R, C, V>> {
     @Override
     public int size() {
       return RegularImmutableTable.this.size();
@@ -97,8 +97,8 @@ abstract class RegularImmutableTable<R, C, V> extends ImmutableTable<R, C, V> {
 
   static <R, C, V> RegularImmutableTable<R, C, V> forCells(
       List<Cell<R, C, V>> cells,
-      final @Nullable Comparator<? super R> rowComparator,
-      final @Nullable Comparator<? super C> columnComparator) {
+      @Nullable final Comparator<? super R> rowComparator,
+      @Nullable final Comparator<? super C> columnComparator) {
     checkNotNull(cells);
     if (rowComparator != null || columnComparator != null) {
       /*
@@ -133,7 +133,7 @@ abstract class RegularImmutableTable<R, C, V> extends ImmutableTable<R, C, V> {
     return forCellsInternal(cells, null, null);
   }
 
-  private static <R, C, V> RegularImmutableTable<R, C, V> forCellsInternal(
+  private static final <R, C, V> RegularImmutableTable<R, C, V> forCellsInternal(
       Iterable<Cell<R, C, V>> cells,
       @Nullable Comparator<? super R> rowComparator,
       @Nullable Comparator<? super C> columnComparator) {
@@ -167,20 +167,5 @@ abstract class RegularImmutableTable<R, C, V> extends ImmutableTable<R, C, V> {
     return (cellList.size() > (((long) rowSpace.size() * columnSpace.size()) / 2))
         ? new DenseImmutableTable<R, C, V>(cellList, rowSpace, columnSpace)
         : new SparseImmutableTable<R, C, V>(cellList, rowSpace, columnSpace);
-  }
-
-  /** @throws IllegalArgumentException if {@code existingValue} is not null. */
-  /*
-   * We could have declared this method 'static' but the additional compile-time checks achieved by
-   * referencing the type variables seem worthwhile.
-   */
-  final void checkNoDuplicate(R rowKey, C columnKey, V existingValue, V newValue) {
-    checkArgument(
-        existingValue == null,
-        "Duplicate key: (row=%s, column=%s), values: [%s, %s].",
-        rowKey,
-        columnKey,
-        newValue,
-        existingValue);
   }
 }

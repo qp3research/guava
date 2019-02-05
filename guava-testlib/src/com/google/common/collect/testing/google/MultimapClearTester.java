@@ -28,7 +28,6 @@ import com.google.common.collect.testing.features.MapFeature;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.junit.Ignore;
 
 /**
  * Tests for {@link Multimap#clear()}.
@@ -36,7 +35,6 @@ import org.junit.Ignore;
  * @author Louis Wasserman
  */
 @GwtCompatible
-@Ignore // Affects only Android test runner, which respects JUnit 4 annotations on JUnit 3 tests.
 public class MultimapClearTester<K, V> extends AbstractMultimapTester<K, V, Multimap<K, V>> {
   @CollectionSize.Require(absent = ZERO)
   @MapFeature.Require(absent = SUPPORTS_REMOVE)

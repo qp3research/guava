@@ -22,7 +22,9 @@ import com.google.caliper.Param;
 import com.google.caliper.api.SkipThisScenarioException;
 import java.util.Random;
 
-/** A benchmark that tries invoking {@code Set.contains} on many different sets. */
+/**
+ * A benchmark that tries invoking {@code Set.contains} on many different sets.
+ */
 public class MultipleSetContainsBenchmark {
 
   @Param({"0.0", "0.1", "0.7", "1.0"})
@@ -42,8 +44,7 @@ public class MultipleSetContainsBenchmark {
 
   private final Object[] queries = new Object[0x1000];
 
-  @BeforeExperiment
-  void setUp() {
+  @BeforeExperiment void setUp() {
     if (emptySetProportion + singletonSetProportion > 1.01) {
       throw new SkipThisScenarioException();
     }
@@ -67,8 +68,7 @@ public class MultipleSetContainsBenchmark {
     }
   }
 
-  @Benchmark
-  public boolean contains(int reps) {
+  @Benchmark public boolean contains(int reps) {
     ImmutableSet<Object>[] sets = this.sets;
     Object[] queries = this.queries;
     boolean result = false;
@@ -78,4 +78,5 @@ public class MultipleSetContainsBenchmark {
     }
     return result;
   }
+
 }

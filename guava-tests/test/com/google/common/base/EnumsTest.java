@@ -170,8 +170,7 @@ public class EnumsTest extends TestCase {
   private @interface ExampleAnnotation {}
 
   private enum AnEnum {
-    @ExampleAnnotation
-    FOO,
+    @ExampleAnnotation FOO,
     BAR
   }
 

@@ -87,7 +87,8 @@ public class CacheLoaderTest extends TestCase {
     assertEquals(1, loadAllCount.get());
 
     QueuingExecutor executor = new QueuingExecutor();
-    CacheLoader<Object, Object> asyncReloader = CacheLoader.asyncReloading(baseLoader, executor);
+    CacheLoader<Object, Object> asyncReloader =
+        CacheLoader.asyncReloading(baseLoader, executor);
 
     asyncReloader.load(new Object());
     @SuppressWarnings("unused") // go/futurereturn-lsc

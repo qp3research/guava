@@ -75,8 +75,7 @@ public class MutableTypeToInstanceMapTest extends TestCase {
 
   private TypeToInstanceMap<Object> map;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Override protected void setUp() throws Exception {
     map = new MutableTypeToInstanceMap<>();
   }
 
@@ -84,16 +83,14 @@ public class MutableTypeToInstanceMapTest extends TestCase {
     try {
       map.put(TypeToken.of(Integer.class), new Integer(5));
       fail();
-    } catch (UnsupportedOperationException expected) {
-    }
+    } catch (UnsupportedOperationException expected) {}
   }
 
   public void testPutAllThrows() {
     try {
       map.putAll(ImmutableMap.of(TypeToken.of(Integer.class), new Integer(5)));
       fail();
-    } catch (UnsupportedOperationException expected) {
-    }
+    } catch (UnsupportedOperationException expected) {}
   }
 
   public void testEntrySetMutationThrows() {
@@ -103,8 +100,7 @@ public class MutableTypeToInstanceMapTest extends TestCase {
     try {
       map.entrySet().iterator().next().setValue(1);
       fail();
-    } catch (UnsupportedOperationException expected) {
-    }
+    } catch (UnsupportedOperationException expected) {}
   }
 
   public void testEntrySetToArrayMutationThrows() {
@@ -116,8 +112,7 @@ public class MutableTypeToInstanceMapTest extends TestCase {
     try {
       entry.setValue(1);
       fail();
-    } catch (UnsupportedOperationException expected) {
-    }
+    } catch (UnsupportedOperationException expected) {}
   }
 
   public void testEntrySetToTypedArrayMutationThrows() {
@@ -129,8 +124,7 @@ public class MutableTypeToInstanceMapTest extends TestCase {
     try {
       entry.setValue(1);
       fail();
-    } catch (UnsupportedOperationException expected) {
-    }
+    } catch (UnsupportedOperationException expected) {}
   }
 
   public void testPutAndGetInstance() {
@@ -211,16 +205,14 @@ public class MutableTypeToInstanceMapTest extends TestCase {
     try {
       map.getInstance(this.<Number>anyIterableType());
       fail();
-    } catch (IllegalArgumentException expected) {
-    }
+    } catch (IllegalArgumentException expected) {}
   }
 
   public void testPutInstance_withTypeVariable() {
     try {
       map.putInstance(this.<Integer>anyIterableType(), ImmutableList.of(1));
       fail();
-    } catch (IllegalArgumentException expected) {
-    }
+    } catch (IllegalArgumentException expected) {}
   }
 
   private <T> TypeToken<Iterable<T>> anyIterableType() {

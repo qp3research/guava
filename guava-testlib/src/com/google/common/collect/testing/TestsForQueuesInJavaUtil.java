@@ -36,8 +36,9 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * Generates a test suite covering the {@link Queue} implementations in the {@link java.util}
- * package. Can be subclassed to specify tests that should be suppressed.
+ * Generates a test suite covering the {@link Queue} implementations in the
+ * {@link java.util} package. Can be subclassed to specify tests that should
+ * be suppressed.
  *
  * @author Jared Levy
  */
@@ -104,13 +105,13 @@ public class TestsForQueuesInJavaUtil {
 
   public Test testsForCheckedQueue() {
     return QueueTestSuiteBuilder.using(
-            new TestStringQueueGenerator() {
-              @Override
-              public Queue<String> create(String[] elements) {
-                Queue<String> queue = new LinkedList<>(MinimalCollection.of(elements));
-                return Collections.checkedQueue(queue, String.class);
-              }
-            })
+        new TestStringQueueGenerator() {
+          @Override
+          public Queue<String> create(String[] elements) {
+            Queue<String> queue = new LinkedList<>(MinimalCollection.of(elements));
+            return Collections.checkedQueue(queue, String.class);
+          }
+        })
         .named("checkedQueue/LinkedList")
         .withFeatures(
             CollectionFeature.GENERAL_PURPOSE,

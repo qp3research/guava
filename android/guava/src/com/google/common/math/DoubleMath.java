@@ -21,7 +21,7 @@ import static com.google.common.math.DoubleUtils.getSignificand;
 import static com.google.common.math.DoubleUtils.isFinite;
 import static com.google.common.math.DoubleUtils.isNormal;
 import static com.google.common.math.DoubleUtils.scaleNormalize;
-import static com.google.common.math.MathPreconditions.checkInRangeForRoundingInputs;
+import static com.google.common.math.MathPreconditions.checkInRange;
 import static com.google.common.math.MathPreconditions.checkNonNegative;
 import static com.google.common.math.MathPreconditions.checkRoundingUnnecessary;
 import static java.lang.Math.abs;
@@ -119,19 +119,18 @@ public final class DoubleMath {
    *
    * @throws ArithmeticException if
    *     <ul>
-   *       <li>{@code x} is infinite or NaN
-   *       <li>{@code x}, after being rounded to a mathematical integer using the specified rounding
-   *           mode, is either less than {@code Integer.MIN_VALUE} or greater than {@code
-   *           Integer.MAX_VALUE}
-   *       <li>{@code x} is not a mathematical integer and {@code mode} is {@link
-   *           RoundingMode#UNNECESSARY}
+   *     <li>{@code x} is infinite or NaN
+   *     <li>{@code x}, after being rounded to a mathematical integer using the specified rounding
+   *         mode, is either less than {@code Integer.MIN_VALUE} or greater than {@code
+   *         Integer.MAX_VALUE}
+   *     <li>{@code x} is not a mathematical integer and {@code mode} is
+   *         {@link RoundingMode#UNNECESSARY}
    *     </ul>
    */
   @GwtIncompatible // #roundIntermediate
   public static int roundToInt(double x, RoundingMode mode) {
     double z = roundIntermediate(x, mode);
-    checkInRangeForRoundingInputs(
-        z > MIN_INT_AS_DOUBLE - 1.0 & z < MAX_INT_AS_DOUBLE + 1.0, x, mode);
+    checkInRange(z > MIN_INT_AS_DOUBLE - 1.0 & z < MAX_INT_AS_DOUBLE + 1.0);
     return (int) z;
   }
 
@@ -144,19 +143,18 @@ public final class DoubleMath {
    *
    * @throws ArithmeticException if
    *     <ul>
-   *       <li>{@code x} is infinite or NaN
-   *       <li>{@code x}, after being rounded to a mathematical integer using the specified rounding
-   *           mode, is either less than {@code Long.MIN_VALUE} or greater than {@code
-   *           Long.MAX_VALUE}
-   *       <li>{@code x} is not a mathematical integer and {@code mode} is {@link
-   *           RoundingMode#UNNECESSARY}
+   *     <li>{@code x} is infinite or NaN
+   *     <li>{@code x}, after being rounded to a mathematical integer using the specified rounding
+   *         mode, is either less than {@code Long.MIN_VALUE} or greater than {@code
+   *         Long.MAX_VALUE}
+   *     <li>{@code x} is not a mathematical integer and {@code mode} is
+   *         {@link RoundingMode#UNNECESSARY}
    *     </ul>
    */
   @GwtIncompatible // #roundIntermediate
   public static long roundToLong(double x, RoundingMode mode) {
     double z = roundIntermediate(x, mode);
-    checkInRangeForRoundingInputs(
-        MIN_LONG_AS_DOUBLE - z < 1.0 & z < MAX_LONG_AS_DOUBLE_PLUS_ONE, x, mode);
+    checkInRange(MIN_LONG_AS_DOUBLE - z < 1.0 & z < MAX_LONG_AS_DOUBLE_PLUS_ONE);
     return (long) z;
   }
 
@@ -173,9 +171,9 @@ public final class DoubleMath {
    *
    * @throws ArithmeticException if
    *     <ul>
-   *       <li>{@code x} is infinite or NaN
-   *       <li>{@code x} is not a mathematical integer and {@code mode} is {@link
-   *           RoundingMode#UNNECESSARY}
+   *     <li>{@code x} is infinite or NaN
+   *     <li>{@code x} is not a mathematical integer and {@code mode} is
+   *         {@link RoundingMode#UNNECESSARY}
    *     </ul>
    */
   // #roundIntermediate, java.lang.Math.getExponent, com.google.common.math.DoubleUtils
@@ -208,21 +206,22 @@ public final class DoubleMath {
    * Returns the base 2 logarithm of a double value.
    *
    * <p>Special cases:
-   *
    * <ul>
-   *   <li>If {@code x} is NaN or less than zero, the result is NaN.
-   *   <li>If {@code x} is positive infinity, the result is positive infinity.
-   *   <li>If {@code x} is positive or negative zero, the result is negative infinity.
+   * <li>If {@code x} is NaN or less than zero, the result is NaN.
+   * <li>If {@code x} is positive infinity, the result is positive infinity.
+   * <li>If {@code x} is positive or negative zero, the result is negative infinity.
    * </ul>
    *
    * <p>The computed result is within 1 ulp of the exact result.
    *
-   * <p>If the result of this method will be immediately rounded to an {@code int}, {@link
-   * #log2(double, RoundingMode)} is faster.
+   * <p>If the result of this method will be immediately rounded to an {@code int},
+   * {@link #log2(double, RoundingMode)} is faster.
    */
   public static double log2(double x) {
     return log(x) / LN_2; // surprisingly within 1 ulp according to tests
   }
+
+  private static final double LN_2 = log(2);
 
   /**
    * Returns the base 2 logarithm of a double value, rounded with the specified rounding mode to an
@@ -274,8 +273,6 @@ public final class DoubleMath {
     return increment ? exponent + 1 : exponent;
   }
 
-  private static final double LN_2 = log(2);
-
   /**
    * Returns {@code true} if {@code x} represents a mathematical integer.
    *
@@ -291,8 +288,8 @@ public final class DoubleMath {
 
   /**
    * Returns {@code n!}, that is, the product of the first {@code n} positive integers, {@code 1} if
-   * {@code n == 0}, or {@code n!}, or {@link Double#POSITIVE_INFINITY} if {@code n! >
-   * Double.MAX_VALUE}.
+   * {@code n == 0}, or {@code n!}, or {@link Double#POSITIVE_INFINITY} if
+   * {@code n! > Double.MAX_VALUE}.
    *
    * <p>The result is within 1 ulp of the true value.
    *
@@ -367,12 +364,13 @@ public final class DoubleMath {
   /**
    * Compares {@code a} and {@code b} "fuzzily," with a tolerance for nearly-equal values.
    *
-   * <p>This method is equivalent to {@code fuzzyEquals(a, b, tolerance) ? 0 : Double.compare(a,
-   * b)}. In particular, like {@link Double#compare(double, double)}, it treats all NaN values as
-   * equal and greater than all other values (including {@link Double#POSITIVE_INFINITY}).
+   * <p>This method is equivalent to
+   * {@code fuzzyEquals(a, b, tolerance) ? 0 : Double.compare(a, b)}. In particular, like
+   * {@link Double#compare(double, double)}, it treats all NaN values as equal and greater than all
+   * other values (including {@link Double#POSITIVE_INFINITY}).
    *
-   * <p>This is <em>not</em> a total ordering and is <em>not</em> suitable for use in {@link
-   * Comparable#compareTo} implementations. In particular, it is not transitive.
+   * <p>This is <em>not</em> a total ordering and is <em>not</em> suitable for use in
+   * {@link Comparable#compareTo} implementations. In particular, it is not transitive.
    *
    * @throws IllegalArgumentException if {@code tolerance} is {@code < 0} or NaN
    * @since 13.0

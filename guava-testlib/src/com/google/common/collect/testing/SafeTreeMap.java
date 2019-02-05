@@ -30,8 +30,9 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * A wrapper around {@code TreeMap} that aggressively checks to see if keys are mutually comparable.
- * This implementation passes the navigable map test suites.
+ * A wrapper around {@code TreeMap} that aggressively checks to see if keys are
+ * mutually comparable. This implementation passes the navigable map test
+ * suites.
  *
  * @author Louis Wasserman
  */

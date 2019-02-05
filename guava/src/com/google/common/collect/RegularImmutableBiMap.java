@@ -25,14 +25,13 @@ import static com.google.common.collect.RegularImmutableMap.checkNoConflictInKey
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMapEntry.NonTerminalImmutableBiMapEntry;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.concurrent.LazyInit;
 import com.google.j2objc.annotations.RetainedWith;
 import com.google.j2objc.annotations.WeakOuter;
 import java.io.Serializable;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Bimap with zero or more mappings.
@@ -50,15 +49,16 @@ class RegularImmutableBiMap<K, V> extends ImmutableBiMap<K, V> {
 
   private final transient ImmutableMapEntry<K, V>[] keyTable;
   private final transient ImmutableMapEntry<K, V>[] valueTable;
-  @VisibleForTesting final transient Entry<K, V>[] entries;
+  @VisibleForTesting
+  final transient Entry<K, V>[] entries;
   private final transient int mask;
   private final transient int hashCode;
 
-  static <K, V> ImmutableBiMap<K, V> fromEntries(Entry<K, V>... entries) {
+  static <K, V> RegularImmutableBiMap<K, V> fromEntries(Entry<K, V>... entries) {
     return fromEntryArray(entries.length, entries);
   }
 
-  static <K, V> ImmutableBiMap<K, V> fromEntryArray(int n, Entry<K, V>[] entryArray) {
+  static <K, V> RegularImmutableBiMap<K, V> fromEntryArray(int n, Entry<K, V>[] entryArray) {
     checkPositionIndex(n, entryArray.length);
     int tableSize = Hashing.closedTableSize(n, MAX_LOAD_FACTOR);
     int mask = tableSize - 1;
@@ -84,18 +84,25 @@ class RegularImmutableBiMap<K, V> extends ImmutableBiMap<K, V> {
       int valueBucket = Hashing.smear(valueHash) & mask;
 
       ImmutableMapEntry<K, V> nextInKeyBucket = keyTable[keyBucket];
-      int keyBucketLength = checkNoConflictInKeyBucket(key, entry, nextInKeyBucket);
+      checkNoConflictInKeyBucket(key, entry, nextInKeyBucket);
       ImmutableMapEntry<K, V> nextInValueBucket = valueTable[valueBucket];
-      int valueBucketLength = checkNoConflictInValueBucket(value, entry, nextInValueBucket);
-      if (keyBucketLength > RegularImmutableMap.MAX_HASH_BUCKET_LENGTH
-          || valueBucketLength > RegularImmutableMap.MAX_HASH_BUCKET_LENGTH) {
-        return JdkBackedImmutableBiMap.create(n, entryArray);
+      checkNoConflictInValueBucket(value, entry, nextInValueBucket);
+      ImmutableMapEntry<K, V> newEntry;
+      if (nextInValueBucket == null && nextInKeyBucket == null) {
+        /*
+         * TODO(lowasser): consider using a NonTerminalImmutableMapEntry when nextInKeyBucket is
+         * nonnull but nextInValueBucket is null.  This may save a few bytes on some platforms, but
+         * 2-morphic call sites are often optimized much better than 3-morphic, so it'd require
+         * benchmarking.
+         */
+        boolean reusable =
+            entry instanceof ImmutableMapEntry && ((ImmutableMapEntry<K, V>) entry).isReusable();
+        newEntry =
+            reusable ? (ImmutableMapEntry<K, V>) entry : new ImmutableMapEntry<K, V>(key, value);
+      } else {
+        newEntry =
+            new NonTerminalImmutableBiMapEntry<>(key, value, nextInKeyBucket, nextInValueBucket);
       }
-      ImmutableMapEntry<K, V> newEntry =
-          (nextInValueBucket == null && nextInKeyBucket == null)
-              ? RegularImmutableMap.makeImmutable(entry, key, value)
-              : new NonTerminalImmutableBiMapEntry<>(
-                  key, value, nextInKeyBucket, nextInValueBucket);
       keyTable[keyBucket] = newEntry;
       valueTable[valueBucket] = newEntry;
       entries[i] = newEntry;
@@ -119,23 +126,16 @@ class RegularImmutableBiMap<K, V> extends ImmutableBiMap<K, V> {
 
   // checkNoConflictInKeyBucket is static imported from RegularImmutableMap
 
-  /**
-   * @return number of entries in this bucket
-   * @throws IllegalArgumentException if another entry in the bucket has the same key
-   */
-  @CanIgnoreReturnValue
-  private static int checkNoConflictInValueBucket(
+  private static void checkNoConflictInValueBucket(
       Object value, Entry<?, ?> entry, @Nullable ImmutableMapEntry<?, ?> valueBucketHead) {
-    int bucketSize = 0;
     for (; valueBucketHead != null; valueBucketHead = valueBucketHead.getNextInValueBucket()) {
       checkNoConflict(!value.equals(valueBucketHead.getValue()), "value", entry, valueBucketHead);
-      bucketSize++;
     }
-    return bucketSize;
   }
 
   @Override
-  public @Nullable V get(@Nullable Object key) {
+  @Nullable
+  public V get(@Nullable Object key) {
     return (keyTable == null) ? null : RegularImmutableMap.get(key, keyTable, mask);
   }
 
@@ -179,7 +179,9 @@ class RegularImmutableBiMap<K, V> extends ImmutableBiMap<K, V> {
     return entries.length;
   }
 
-  @LazyInit @RetainedWith private transient ImmutableBiMap<V, K> inverse;
+  @LazyInit
+  @RetainedWith
+  private transient ImmutableBiMap<V, K> inverse;
 
   @Override
   public ImmutableBiMap<V, K> inverse() {

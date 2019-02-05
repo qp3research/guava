@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 The Guava Authors
+ * Copyright (C) 2015 The Guava Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package com.google.common.primitives;
+package java.lang.reflect;
 
-import com.google.common.annotations.GwtCompatible;
+/**
+ * GWT emulation of UndeclaredThrowableException.
+ */
+public class UndeclaredThrowableException extends RuntimeException {
+  public UndeclaredThrowableException(Throwable undeclaredThrowable) {
+    super(undeclaredThrowable);
+  }
 
-@GwtCompatible(emulated = true)
-class TestPlatform {
-  static int reduceIterationsIfGwt(int iterations) {
-    return iterations;
+  public UndeclaredThrowableException(Throwable undeclaredThrowable, String message) {
+    super(message, undeclaredThrowable);
+  }
+
+  public Throwable getUndeclaredThrowable() {
+    return getCause();
   }
 }

@@ -18,7 +18,7 @@ package com.google.common.graph;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * An interface for representing and manipulating an origin node's adjacent nodes and edge values in

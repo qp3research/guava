@@ -23,15 +23,15 @@ import com.google.common.annotations.GwtCompatible;
  */
 @GwtCompatible
 abstract class CommonMatcher {
-  public abstract boolean matches();
+  abstract boolean matches();
 
-  public abstract boolean find();
+  abstract boolean find();
 
-  public abstract boolean find(int index);
+  abstract boolean find(int index);
 
-  public abstract String replaceAll(String replacement);
+  abstract String replaceAll(String replacement);
 
-  public abstract int end();
+  abstract int end();
 
-  public abstract int start();
+  abstract int start();
 }

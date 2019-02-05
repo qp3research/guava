@@ -39,9 +39,8 @@ import java.util.concurrent.TimeoutException;
  *     untouched. Guava users who want a {@code CheckedFuture} can fork the classes for their own
  *     use, possibly specializing them to the particular exception type they use. We recommend that
  *     most people use {@code ListenableFuture} and perform any exception wrapping themselves. This
- *     class is scheduled for removal from Guava in January 2019.
+ *     class is scheduled for removal from Guava in February 2018.
  */
-// TODO(b/72241575): Remove by 2019-01
 @Beta
 @Deprecated
 @GwtIncompatible
@@ -76,7 +75,7 @@ public abstract class ForwardingCheckedFuture<V, X extends Exception>
    *     untouched. Guava users who want a {@code CheckedFuture} can fork the classes for their own
    *     use, possibly specializing them to the particular exception type they use. We recommend
    *     that most people use {@code ListenableFuture} and perform any exception wrapping
-   *     themselves. This class is scheduled for removal from Guava in October 2018.
+   *     themselves. This class is scheduled for removal from Guava in February 2018.
    */
   @Beta
   @Deprecated

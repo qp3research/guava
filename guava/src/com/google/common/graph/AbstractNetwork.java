@@ -16,9 +16,6 @@
 
 package com.google.common.graph;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.graph.GraphConstants.ENDPOINTS_MISMATCH;
 import static com.google.common.graph.GraphConstants.MULTIPLE_EDGES_CONNECTING;
 import static java.util.Collections.unmodifiableSet;
 
@@ -35,7 +32,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * This class provides a skeletal implementation of {@link Network}. It is recommended to extend
@@ -95,7 +92,7 @@ public abstract class AbstractNetwork<N, E> implements Network<N, E> {
               return false;
             }
             EndpointPair<?> endpointPair = (EndpointPair<?>) obj;
-            return isOrderingCompatible(endpointPair)
+            return isDirected() == endpointPair.isOrdered()
                 && nodes().contains(endpointPair.nodeU())
                 && successors((N) endpointPair.nodeU()).contains(endpointPair.nodeV());
           }
@@ -172,12 +169,6 @@ public abstract class AbstractNetwork<N, E> implements Network<N, E> {
         : unmodifiableSet(Sets.filter(inEdgesV, connectedPredicate(nodeV, nodeU)));
   }
 
-  @Override
-  public Set<E> edgesConnecting(EndpointPair<N> endpoints) {
-    validateEndpoints(endpoints);
-    return edgesConnecting(endpoints.nodeU(), endpoints.nodeV());
-  }
-
   private Predicate<E> connectedPredicate(final N nodePresent, final N nodeToCheck) {
     return new Predicate<E>() {
       @Override
@@ -189,59 +180,26 @@ public abstract class AbstractNetwork<N, E> implements Network<N, E> {
 
   @Override
   public Optional<E> edgeConnecting(N nodeU, N nodeV) {
-    return Optional.ofNullable(edgeConnectingOrNull(nodeU, nodeV));
-  }
-
-  @Override
-  public Optional<E> edgeConnecting(EndpointPair<N> endpoints) {
-    validateEndpoints(endpoints);
-    return edgeConnecting(endpoints.nodeU(), endpoints.nodeV());
-  }
-
-  @Override
-  public @Nullable E edgeConnectingOrNull(N nodeU, N nodeV) {
     Set<E> edgesConnecting = edgesConnecting(nodeU, nodeV);
     switch (edgesConnecting.size()) {
       case 0:
-        return null;
+        return Optional.empty();
       case 1:
-        return edgesConnecting.iterator().next();
+        return Optional.of(edgesConnecting.iterator().next());
       default:
         throw new IllegalArgumentException(String.format(MULTIPLE_EDGES_CONNECTING, nodeU, nodeV));
     }
   }
 
   @Override
-  public @Nullable E edgeConnectingOrNull(EndpointPair<N> endpoints) {
-    validateEndpoints(endpoints);
-    return edgeConnectingOrNull(endpoints.nodeU(), endpoints.nodeV());
+  @Nullable
+  public E edgeConnectingOrNull(N nodeU, N nodeV) {
+    return edgeConnecting(nodeU, nodeV).orElse(null);
   }
 
   @Override
   public boolean hasEdgeConnecting(N nodeU, N nodeV) {
     return !edgesConnecting(nodeU, nodeV).isEmpty();
-  }
-
-  @Override
-  public boolean hasEdgeConnecting(EndpointPair<N> endpoints) {
-    checkNotNull(endpoints);
-    if (!isOrderingCompatible(endpoints)) {
-      return false;
-    }
-    return !edgesConnecting(endpoints.nodeU(), endpoints.nodeV()).isEmpty();
-  }
-
-  /**
-   * Throws an IllegalArgumentException if the ordering of {@code endpoints} is not compatible
-   * with the directionality of this graph.
-   */
-  protected final void validateEndpoints(EndpointPair<?> endpoints) {
-    checkNotNull(endpoints);
-    checkArgument(isOrderingCompatible(endpoints), ENDPOINTS_MISMATCH);
-  }
-
-  protected final boolean isOrderingCompatible(EndpointPair<?> endpoints) {
-    return endpoints.isOrdered() || !this.isDirected();
   }
 
   @Override

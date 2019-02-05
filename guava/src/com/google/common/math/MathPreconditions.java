@@ -17,8 +17,7 @@ package com.google.common.math;
 import com.google.common.annotations.GwtCompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.math.BigInteger;
-import java.math.RoundingMode;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * A collection of preconditions for math functions.
@@ -83,22 +82,15 @@ final class MathPreconditions {
     }
   }
 
-  static void checkInRangeForRoundingInputs(boolean condition, double input, RoundingMode mode) {
+  static void checkInRange(boolean condition) {
     if (!condition) {
-      throw new ArithmeticException(
-          "rounded value is out of range for input " + input + " and rounding mode " + mode);
+      throw new ArithmeticException("not in range");
     }
   }
 
-  static void checkNoOverflow(boolean condition, String methodName, int a, int b) {
+  static void checkNoOverflow(boolean condition) {
     if (!condition) {
-      throw new ArithmeticException("overflow: " + methodName + "(" + a + ", " + b + ")");
-    }
-  }
-
-  static void checkNoOverflow(boolean condition, String methodName, long a, long b) {
-    if (!condition) {
-      throw new ArithmeticException("overflow: " + methodName + "(" + a + ", " + b + ")");
+      throw new ArithmeticException("overflow");
     }
   }
 

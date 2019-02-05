@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Static utility methods for {@link Graph}, {@link ValueGraph}, and {@link Network} instances.
@@ -207,6 +207,37 @@ public final class Graphs {
     return Collections.unmodifiableSet(visitedNodes);
   }
 
+  /**
+   * @deprecated Use {@link Graph#equals(Object)} instead. This method will be removed in late 2017.
+   */
+  // TODO(user): Delete this method.
+  @Deprecated
+  public static boolean equivalent(@Nullable Graph<?> graphA, @Nullable Graph<?> graphB) {
+    return Objects.equal(graphA, graphB);
+  }
+
+  /**
+   * @deprecated Use {@link ValueGraph#equals(Object)} instead. This method will be removed in late
+   * 2017.
+   */
+  // TODO(user): Delete this method.
+  @Deprecated
+  public static boolean equivalent(
+      @Nullable ValueGraph<?, ?> graphA, @Nullable ValueGraph<?, ?> graphB) {
+    return Objects.equal(graphA, graphB);
+  }
+
+  /**
+   * @deprecated Use {@link Network#equals(Object)} instead. This method will be removed in late
+   * 2017.
+   */
+  // TODO(user): Delete this method.
+  @Deprecated
+  public static boolean equivalent(
+      @Nullable Network<?, ?> networkA, @Nullable Network<?, ?> networkB) {
+    return Objects.equal(networkA, networkB);
+  }
+
   // Graph mutation methods
 
   // Graph view methods
@@ -225,45 +256,6 @@ public final class Graphs {
     }
 
     return new TransposedGraph<N>(graph);
-  }
-
-  /**
-   * Returns a view of {@code graph} with the direction (if any) of every edge reversed. All other
-   * properties remain intact, and further updates to {@code graph} will be reflected in the view.
-   */
-  public static <N, V> ValueGraph<N, V> transpose(ValueGraph<N, V> graph) {
-    if (!graph.isDirected()) {
-      return graph; // the transpose of an undirected graph is an identical graph
-    }
-
-    if (graph instanceof TransposedValueGraph) {
-      return ((TransposedValueGraph<N, V>) graph).graph;
-    }
-
-    return new TransposedValueGraph<>(graph);
-  }
-
-  /**
-   * Returns a view of {@code network} with the direction (if any) of every edge reversed. All other
-   * properties remain intact, and further updates to {@code network} will be reflected in the view.
-   */
-  public static <N, E> Network<N, E> transpose(Network<N, E> network) {
-    if (!network.isDirected()) {
-      return network; // the transpose of an undirected network is an identical network
-    }
-
-    if (network instanceof TransposedNetwork) {
-      return ((TransposedNetwork<N, E>) network).network;
-    }
-
-    return new TransposedNetwork<>(network);
-  }
-
-  static <N> EndpointPair<N> transpose(EndpointPair<N> endpoints) {
-    if (endpoints.isOrdered()) {
-      return EndpointPair.ordered(endpoints.target(), endpoints.source());
-    }
-    return endpoints;
   }
 
   // NOTE: this should work as long as the delegate graph's implementation of edges() (like that of
@@ -292,23 +284,34 @@ public final class Graphs {
 
     @Override
     public int inDegree(N node) {
-      return delegate().outDegree(node); // transpose
+      return delegate().outDegree(node);  // transpose
     }
 
     @Override
     public int outDegree(N node) {
-      return delegate().inDegree(node); // transpose
+      return delegate().inDegree(node);  // transpose
     }
 
     @Override
     public boolean hasEdgeConnecting(N nodeU, N nodeV) {
       return delegate().hasEdgeConnecting(nodeV, nodeU); // transpose
     }
+  }
 
-    @Override
-    public boolean hasEdgeConnecting(EndpointPair<N> endpoints) {
-      return delegate().hasEdgeConnecting(transpose(endpoints));
+  /**
+   * Returns a view of {@code graph} with the direction (if any) of every edge reversed. All other
+   * properties remain intact, and further updates to {@code graph} will be reflected in the view.
+   */
+  public static <N, V> ValueGraph<N, V> transpose(ValueGraph<N, V> graph) {
+    if (!graph.isDirected()) {
+      return graph; // the transpose of an undirected graph is an identical graph
     }
+
+    if (graph instanceof TransposedValueGraph) {
+      return ((TransposedValueGraph<N, V>) graph).graph;
+    }
+
+    return new TransposedValueGraph<>(graph);
   }
 
   // NOTE: this should work as long as the delegate graph's implementation of edges() (like that of
@@ -337,12 +340,12 @@ public final class Graphs {
 
     @Override
     public int inDegree(N node) {
-      return delegate().outDegree(node); // transpose
+      return delegate().outDegree(node);  // transpose
     }
 
     @Override
     public int outDegree(N node) {
-      return delegate().inDegree(node); // transpose
+      return delegate().inDegree(node);  // transpose
     }
 
     @Override
@@ -351,29 +354,31 @@ public final class Graphs {
     }
 
     @Override
-    public boolean hasEdgeConnecting(EndpointPair<N> endpoints) {
-      return delegate().hasEdgeConnecting(transpose(endpoints));
-    }
-
-    @Override
     public Optional<V> edgeValue(N nodeU, N nodeV) {
       return delegate().edgeValue(nodeV, nodeU); // transpose
     }
 
     @Override
-    public Optional<V> edgeValue(EndpointPair<N> endpoints) {
-      return delegate().edgeValue(transpose(endpoints));
-    }
-
-    @Override
-    public @Nullable V edgeValueOrDefault(N nodeU, N nodeV, @Nullable V defaultValue) {
+    @Nullable
+    public V edgeValueOrDefault(N nodeU, N nodeV, @Nullable V defaultValue) {
       return delegate().edgeValueOrDefault(nodeV, nodeU, defaultValue); // transpose
     }
+  }
 
-    @Override
-    public @Nullable V edgeValueOrDefault(EndpointPair<N> endpoints, @Nullable V defaultValue) {
-      return delegate().edgeValueOrDefault(transpose(endpoints), defaultValue);
+  /**
+   * Returns a view of {@code network} with the direction (if any) of every edge reversed. All other
+   * properties remain intact, and further updates to {@code network} will be reflected in the view.
+   */
+  public static <N, E> Network<N, E> transpose(Network<N, E> network) {
+    if (!network.isDirected()) {
+      return network; // the transpose of an undirected network is an identical network
     }
+
+    if (network instanceof TransposedNetwork) {
+      return ((TransposedNetwork<N, E>) network).network;
+    }
+
+    return new TransposedNetwork<>(network);
   }
 
   private static class TransposedNetwork<N, E> extends ForwardingNetwork<N, E> {
@@ -400,12 +405,12 @@ public final class Graphs {
 
     @Override
     public int inDegree(N node) {
-      return delegate().outDegree(node); // transpose
+      return delegate().outDegree(node);  // transpose
     }
 
     @Override
     public int outDegree(N node) {
-      return delegate().inDegree(node); // transpose
+      return delegate().inDegree(node);  // transpose
     }
 
     @Override
@@ -430,18 +435,8 @@ public final class Graphs {
     }
 
     @Override
-    public Set<E> edgesConnecting(EndpointPair<N> endpoints) {
-      return delegate().edgesConnecting(transpose(endpoints));
-    }
-
-    @Override
     public Optional<E> edgeConnecting(N nodeU, N nodeV) {
       return delegate().edgeConnecting(nodeV, nodeU); // transpose
-    }
-
-    @Override
-    public Optional<E> edgeConnecting(EndpointPair<N> endpoints) {
-      return delegate().edgeConnecting(transpose(endpoints));
     }
 
     @Override
@@ -450,18 +445,8 @@ public final class Graphs {
     }
 
     @Override
-    public E edgeConnectingOrNull(EndpointPair<N> endpoints) {
-      return delegate().edgeConnectingOrNull(transpose(endpoints));
-    }
-
-    @Override
     public boolean hasEdgeConnecting(N nodeU, N nodeV) {
       return delegate().hasEdgeConnecting(nodeV, nodeU); // transpose
-    }
-
-    @Override
-    public boolean hasEdgeConnecting(EndpointPair<N> endpoints) {
-      return delegate().hasEdgeConnecting(transpose(endpoints));
     }
   }
 
@@ -475,10 +460,9 @@ public final class Graphs {
    * @throws IllegalArgumentException if any element in {@code nodes} is not a node in the graph
    */
   public static <N> MutableGraph<N> inducedSubgraph(Graph<N> graph, Iterable<? extends N> nodes) {
-    MutableGraph<N> subgraph =
-        (nodes instanceof Collection)
-            ? GraphBuilder.from(graph).expectedNodeCount(((Collection) nodes).size()).build()
-            : GraphBuilder.from(graph).build();
+    MutableGraph<N> subgraph = (nodes instanceof Collection)
+        ? GraphBuilder.from(graph).expectedNodeCount(((Collection) nodes).size()).build()
+        : GraphBuilder.from(graph).build();
     for (N node : nodes) {
       subgraph.addNode(node);
     }
@@ -502,10 +486,9 @@ public final class Graphs {
    */
   public static <N, V> MutableValueGraph<N, V> inducedSubgraph(
       ValueGraph<N, V> graph, Iterable<? extends N> nodes) {
-    MutableValueGraph<N, V> subgraph =
-        (nodes instanceof Collection)
-            ? ValueGraphBuilder.from(graph).expectedNodeCount(((Collection) nodes).size()).build()
-            : ValueGraphBuilder.from(graph).build();
+    MutableValueGraph<N, V> subgraph = (nodes instanceof Collection)
+        ? ValueGraphBuilder.from(graph).expectedNodeCount(((Collection) nodes).size()).build()
+        : ValueGraphBuilder.from(graph).build();
     for (N node : nodes) {
       subgraph.addNode(node);
     }
@@ -530,10 +513,9 @@ public final class Graphs {
    */
   public static <N, E> MutableNetwork<N, E> inducedSubgraph(
       Network<N, E> network, Iterable<? extends N> nodes) {
-    MutableNetwork<N, E> subgraph =
-        (nodes instanceof Collection)
-            ? NetworkBuilder.from(network).expectedNodeCount(((Collection) nodes).size()).build()
-            : NetworkBuilder.from(network).build();
+    MutableNetwork<N, E> subgraph = (nodes instanceof Collection)
+        ? NetworkBuilder.from(network).expectedNodeCount(((Collection) nodes).size()).build()
+        : NetworkBuilder.from(network).build();
     for (N node : nodes) {
       subgraph.addNode(node);
     }
@@ -598,14 +580,14 @@ public final class Graphs {
   }
 
   @CanIgnoreReturnValue
-  static long checkNonNegative(long value) {
-    checkArgument(value >= 0, "Not true that %s is non-negative.", value);
+  static int checkPositive(int value) {
+    checkArgument(value > 0, "Not true that %s is positive.", value);
     return value;
   }
 
   @CanIgnoreReturnValue
-  static int checkPositive(int value) {
-    checkArgument(value > 0, "Not true that %s is positive.", value);
+  static long checkNonNegative(long value) {
+    checkArgument(value >= 0, "Not true that %s is non-negative.", value);
     return value;
   }
 

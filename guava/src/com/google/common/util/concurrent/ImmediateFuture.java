@@ -24,11 +24,11 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /** Implementations of {@code Futures.immediate*}. */
 @GwtCompatible(emulated = true)
-abstract class ImmediateFuture<V> implements ListenableFuture<V> {
+abstract class ImmediateFuture<V> extends FluentFuture<V> {
   private static final Logger log = Logger.getLogger(ImmediateFuture.class.getName());
 
   @Override
@@ -73,7 +73,7 @@ abstract class ImmediateFuture<V> implements ListenableFuture<V> {
 
   static class ImmediateSuccessfulFuture<V> extends ImmediateFuture<V> {
     static final ImmediateSuccessfulFuture<Object> NULL = new ImmediateSuccessfulFuture<>(null);
-    private final @Nullable V value;
+    @Nullable private final V value;
 
     ImmediateSuccessfulFuture(@Nullable V value) {
       this.value = value;
@@ -95,7 +95,7 @@ abstract class ImmediateFuture<V> implements ListenableFuture<V> {
   @GwtIncompatible // TODO
   static class ImmediateSuccessfulCheckedFuture<V, X extends Exception> extends ImmediateFuture<V>
       implements CheckedFuture<V, X> {
-    private final @Nullable V value;
+    @Nullable private final V value;
 
     ImmediateSuccessfulCheckedFuture(@Nullable V value) {
       this.value = value;
