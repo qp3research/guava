@@ -15,29 +15,26 @@
 package com.google.common.collect;
 
 import com.google.common.annotations.GwtCompatible;
-import com.google.errorprone.annotations.Immutable;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
+import javax.annotation.concurrent.Immutable;
 
-/** A {@code RegularImmutableTable} optimized for sparse data. */
+/**
+ * A {@code RegularImmutableTable} optimized for sparse data.
+ */
 @GwtCompatible
-@Immutable(containerOf = {"R", "C", "V"})
+@Immutable
 final class SparseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V> {
   static final ImmutableTable<Object, Object, Object> EMPTY =
       new SparseImmutableTable<>(
           ImmutableList.<Cell<Object, Object, Object>>of(), ImmutableSet.of(), ImmutableSet.of());
 
-  private final ImmutableMap<R, ImmutableMap<C, V>> rowMap;
-  private final ImmutableMap<C, ImmutableMap<R, V>> columnMap;
-
+  private final ImmutableMap<R, Map<C, V>> rowMap;
+  private final ImmutableMap<C, Map<R, V>> columnMap;
   // For each cell in iteration order, the index of that cell's row key in the row key list.
-  @SuppressWarnings("Immutable") // We don't modify this after construction.
   private final int[] cellRowIndices;
-
   // For each cell in iteration order, the index of that cell's column key in the list of column
   // keys present in that row.
-  @SuppressWarnings("Immutable") // We don't modify this after construction.
   private final int[] cellColumnInRowIndices;
 
   SparseImmutableTable(
@@ -80,16 +77,14 @@ final class SparseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V>
     }
     this.cellRowIndices = cellRowIndices;
     this.cellColumnInRowIndices = cellColumnInRowIndices;
-    ImmutableMap.Builder<R, ImmutableMap<C, V>> rowBuilder =
-        new ImmutableMap.Builder<>(rows.size());
-    for (Entry<R, Map<C, V>> row : rows.entrySet()) {
+    ImmutableMap.Builder<R, Map<C, V>> rowBuilder = new ImmutableMap.Builder<>(rows.size());
+    for (Map.Entry<R, Map<C, V>> row : rows.entrySet()) {
       rowBuilder.put(row.getKey(), ImmutableMap.copyOf(row.getValue()));
     }
     this.rowMap = rowBuilder.build();
 
-    ImmutableMap.Builder<C, ImmutableMap<R, V>> columnBuilder =
-        new ImmutableMap.Builder<>(columns.size());
-    for (Entry<C, Map<R, V>> col : columns.entrySet()) {
+    ImmutableMap.Builder<C, Map<R, V>> columnBuilder = new ImmutableMap.Builder<>(columns.size());
+    for (Map.Entry<C, Map<R, V>> col : columns.entrySet()) {
       columnBuilder.put(col.getKey(), ImmutableMap.copyOf(col.getValue()));
     }
     this.columnMap = columnBuilder.build();
@@ -97,16 +92,12 @@ final class SparseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V>
 
   @Override
   public ImmutableMap<C, Map<R, V>> columnMap() {
-    // Casts without copying.
-    ImmutableMap<C, ImmutableMap<R, V>> columnMap = this.columnMap;
-    return ImmutableMap.<C, Map<R, V>>copyOf(columnMap);
+    return columnMap;
   }
 
   @Override
   public ImmutableMap<R, Map<C, V>> rowMap() {
-    // Casts without copying.
-    ImmutableMap<R, ImmutableMap<C, V>> rowMap = this.rowMap;
-    return ImmutableMap.<R, Map<C, V>>copyOf(rowMap);
+    return rowMap;
   }
 
   @Override
@@ -117,17 +108,17 @@ final class SparseImmutableTable<R, C, V> extends RegularImmutableTable<R, C, V>
   @Override
   Cell<R, C, V> getCell(int index) {
     int rowIndex = cellRowIndices[index];
-    Entry<R, ImmutableMap<C, V>> rowEntry = rowMap.entrySet().asList().get(rowIndex);
-    ImmutableMap<C, V> row = rowEntry.getValue();
+    Map.Entry<R, Map<C, V>> rowEntry = rowMap.entrySet().asList().get(rowIndex);
+    ImmutableMap<C, V> row = (ImmutableMap<C, V>) rowEntry.getValue();
     int columnIndex = cellColumnInRowIndices[index];
-    Entry<C, V> colEntry = row.entrySet().asList().get(columnIndex);
+    Map.Entry<C, V> colEntry = row.entrySet().asList().get(columnIndex);
     return cellOf(rowEntry.getKey(), colEntry.getKey(), colEntry.getValue());
   }
 
   @Override
   V getValue(int index) {
     int rowIndex = cellRowIndices[index];
-    ImmutableMap<C, V> row = rowMap.values().asList().get(rowIndex);
+    ImmutableMap<C, V> row = (ImmutableMap<C, V>) rowMap.values().asList().get(rowIndex);
     int columnIndex = cellColumnInRowIndices[index];
     return row.values().asList().get(columnIndex);
   }

@@ -44,27 +44,23 @@ public class AbstractExecutionThreadServiceTest extends TestCase {
 
   private Thread executionThread;
   private Throwable thrownByExecutionThread;
-  private final Executor exceptionCatchingExecutor =
-      new Executor() {
+  private final Executor exceptionCatchingExecutor = new Executor() {
+    @Override
+    public void execute(Runnable command) {
+      executionThread = new Thread(command);
+      executionThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
         @Override
-        public void execute(Runnable command) {
-          executionThread = new Thread(command);
-          executionThread.setUncaughtExceptionHandler(
-              new UncaughtExceptionHandler() {
-                @Override
-                public void uncaughtException(Thread thread, Throwable e) {
-                  thrownByExecutionThread = e;
-                }
-              });
-          executionThread.start();
+        public void uncaughtException(Thread thread, Throwable e) {
+          thrownByExecutionThread = e;
         }
-      };
+      });
+      executionThread.start();
+    }
+  };
 
-  @Override
-  protected final void tearDown() {
+  @Override protected final void tearDown() {
     tearDownStack.runTearDown();
-    assertNull(
-        "exceptions should not be propagated to uncaught exception handlers",
+    assertNull("exceptions should not be propagated to uncaught exception handlers",
         thrownByExecutionThread);
   }
 
@@ -125,8 +121,7 @@ public class AbstractExecutionThreadServiceTest extends TestCase {
     private boolean shutDownCalled = false;
     private State expectedShutdownState = State.STOPPING;
 
-    @Override
-    protected void startUp() {
+    @Override protected void startUp() {
       assertFalse(startUpCalled);
       assertFalse(runCalled);
       assertFalse(shutDownCalled);
@@ -134,8 +129,7 @@ public class AbstractExecutionThreadServiceTest extends TestCase {
       assertEquals(State.STARTING, state());
     }
 
-    @Override
-    protected void run() {
+    @Override protected void run() {
       assertTrue(startUpCalled);
       assertFalse(runCalled);
       assertFalse(shutDownCalled);
@@ -150,8 +144,7 @@ public class AbstractExecutionThreadServiceTest extends TestCase {
       }
     }
 
-    @Override
-    protected void shutDown() {
+    @Override protected void shutDown() {
       assertTrue(startUpCalled);
       assertTrue(runCalled);
       assertFalse(shutDownCalled);
@@ -159,13 +152,11 @@ public class AbstractExecutionThreadServiceTest extends TestCase {
       assertEquals(expectedShutdownState, state());
     }
 
-    @Override
-    protected void triggerShutdown() {
+    @Override protected void triggerShutdown() {
       exitRun.countDown();
     }
 
-    @Override
-    protected Executor executor() {
+    @Override protected Executor executor() {
       return exceptionCatchingExecutor;
     }
   }
@@ -191,19 +182,16 @@ public class AbstractExecutionThreadServiceTest extends TestCase {
   private class ThrowOnStartUpService extends AbstractExecutionThreadService {
     private boolean startUpCalled = false;
 
-    @Override
-    protected void startUp() {
+    @Override protected void startUp() {
       startUpCalled = true;
       throw new UnsupportedOperationException("kaboom!");
     }
 
-    @Override
-    protected void run() {
+    @Override protected void run() {
       throw new AssertionError("run() should not be called");
     }
 
-    @Override
-    protected Executor executor() {
+    @Override protected Executor executor() {
       return exceptionCatchingExecutor;
     }
   }
@@ -246,21 +234,18 @@ public class AbstractExecutionThreadServiceTest extends TestCase {
     private boolean shutDownCalled = false;
     private boolean throwOnShutDown = false;
 
-    @Override
-    protected void run() {
+    @Override protected void run() {
       throw new UnsupportedOperationException("kaboom!");
     }
 
-    @Override
-    protected void shutDown() {
+    @Override protected void shutDown() {
       shutDownCalled = true;
       if (throwOnShutDown) {
         throw new UnsupportedOperationException("double kaboom!");
       }
     }
 
-    @Override
-    protected Executor executor() {
+    @Override protected Executor executor() {
       return exceptionCatchingExecutor;
     }
   }
@@ -280,8 +265,7 @@ public class AbstractExecutionThreadServiceTest extends TestCase {
   }
 
   private class ThrowOnShutDown extends AbstractExecutionThreadService {
-    @Override
-    protected void run() {
+    @Override protected void run() {
       try {
         enterRun.await();
       } catch (InterruptedException e) {
@@ -289,13 +273,11 @@ public class AbstractExecutionThreadServiceTest extends TestCase {
       }
     }
 
-    @Override
-    protected void shutDown() {
+    @Override protected void shutDown() {
       throw new UnsupportedOperationException("kaboom!");
     }
 
-    @Override
-    protected Executor executor() {
+    @Override protected Executor executor() {
       return exceptionCatchingExecutor;
     }
   }
@@ -312,28 +294,26 @@ public class AbstractExecutionThreadServiceTest extends TestCase {
   }
 
   private class TimeoutOnStartUp extends AbstractExecutionThreadService {
-    @Override
-    protected Executor executor() {
+    @Override protected Executor executor() {
       return new Executor() {
-        @Override
-        public void execute(Runnable command) {}
+        @Override public void execute(Runnable command) {
+        }
       };
     }
 
     @Override
-    protected void run() throws Exception {}
+    protected void run() throws Exception {
+    }
   }
 
   public void testStopWhileStarting_runNotCalled() throws Exception {
     final CountDownLatch started = new CountDownLatch(1);
-    FakeService service =
-        new FakeService() {
-          @Override
-          protected void startUp() throws Exception {
-            super.startUp();
-            started.await();
-          }
-        };
+    FakeService service = new FakeService() {
+      @Override protected void startUp() throws Exception {
+        super.startUp();
+        started.await();
+      }
+    };
     service.startAsync();
     service.stopAsync();
     started.countDown();
@@ -362,21 +342,17 @@ public class AbstractExecutionThreadServiceTest extends TestCase {
 
   public void testTimeout() {
     // Create a service whose executor will never run its commands
-    Service service =
-        new AbstractExecutionThreadService() {
-          @Override
-          protected void run() throws Exception {}
+    Service service = new AbstractExecutionThreadService() {
+      @Override protected void run() throws Exception {}
 
-          @Override
-          protected ScheduledExecutorService executor() {
-            return TestingExecutors.noOpScheduledExecutor();
-          }
+      @Override protected ScheduledExecutorService executor() {
+        return TestingExecutors.noOpScheduledExecutor();
+      }
 
-          @Override
-          protected String serviceName() {
-            return "Foo";
-          }
-        };
+      @Override protected String serviceName() {
+        return "Foo";
+      }
+    };
     try {
       service.startAsync().awaitRunning(1, TimeUnit.MILLISECONDS);
       fail("Expected timeout");
@@ -397,37 +373,32 @@ public class AbstractExecutionThreadServiceTest extends TestCase {
     volatile int shutdownCalled = 0;
     volatile int runCalled = 0;
 
-    @Override
-    protected void startUp() throws Exception {
+    @Override protected void startUp() throws Exception {
       assertEquals(0, startupCalled);
       assertEquals(0, runCalled);
       assertEquals(0, shutdownCalled);
       startupCalled++;
     }
 
-    @Override
-    protected void run() throws Exception {
+    @Override protected void run() throws Exception {
       assertEquals(1, startupCalled);
       assertEquals(0, runCalled);
       assertEquals(0, shutdownCalled);
       runCalled++;
     }
 
-    @Override
-    protected void shutDown() throws Exception {
+    @Override protected void shutDown() throws Exception {
       assertEquals(1, startupCalled);
       assertEquals(0, shutdownCalled);
       assertEquals(Service.State.STOPPING, state());
       shutdownCalled++;
     }
 
-    @Override
-    protected Executor executor() {
+    @Override protected Executor executor() {
       return executor;
     }
 
-    @Override
-    public void tearDown() throws Exception {
+    @Override public void tearDown() throws Exception {
       executor.shutdown();
     }
   }

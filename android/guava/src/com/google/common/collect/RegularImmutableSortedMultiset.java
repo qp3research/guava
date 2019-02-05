@@ -22,7 +22,7 @@ import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.primitives.Ints;
 import java.util.Comparator;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
 /**
  * An immutable sorted multiset with one or more distinct elements.
@@ -37,7 +37,8 @@ final class RegularImmutableSortedMultiset<E> extends ImmutableSortedMultiset<E>
   static final ImmutableSortedMultiset<Comparable> NATURAL_EMPTY_MULTISET =
       new RegularImmutableSortedMultiset<>(Ordering.natural());
 
-  @VisibleForTesting final transient RegularImmutableSortedSet<E> elementSet;
+  @VisibleForTesting
+  final transient RegularImmutableSortedSet<E> elementSet;
   private final transient long[] cumulativeCounts;
   private final transient int offset;
   private final transient int length;
@@ -77,7 +78,7 @@ final class RegularImmutableSortedMultiset<E> extends ImmutableSortedMultiset<E>
   }
 
   @Override
-  public int count(@NullableDecl Object element) {
+  public int count(@Nullable Object element) {
     int index = elementSet.indexOf(element);
     return (index >= 0) ? getCount(index) : 0;
   }

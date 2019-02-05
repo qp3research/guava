@@ -24,9 +24,11 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.util.List;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
-/** Aggregate future that collects (stores) results of each future. */
+/**
+ * Aggregate future that collects (stores) results of each future.
+ */
 @GwtCompatible(emulated = true)
 abstract class CollectionFuture<V, C> extends AggregateFuture<V, C> {
 
@@ -50,7 +52,7 @@ abstract class CollectionFuture<V, C> extends AggregateFuture<V, C> {
     }
 
     @Override
-    final void collectOneValue(boolean allMustSucceed, int index, @NullableDecl V returnValue) {
+    final void collectOneValue(boolean allMustSucceed, int index, @Nullable V returnValue) {
       List<Optional<V>> localValues = values;
 
       if (localValues != null) {

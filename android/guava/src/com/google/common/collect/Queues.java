@@ -34,8 +34,8 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Static utility methods pertaining to {@link Queue} and {@link Deque} instances. Also see this
- * class's counterparts {@link Lists}, {@link Sets}, and {@link Maps}.
+ * Static utility methods pertaining to {@link Queue} and {@link Deque} instances.
+ * Also see this class's counterparts {@link Lists}, {@link Sets}, and {@link Maps}.
  *
  * @author Kurt Alfred Kluever
  * @since 11.0
@@ -47,8 +47,8 @@ public final class Queues {
   // ArrayBlockingQueue
 
   /**
-   * Creates an empty {@code ArrayBlockingQueue} with the given (fixed) capacity and nonfair access
-   * policy.
+   * Creates an empty {@code ArrayBlockingQueue} with the given (fixed) capacity
+   * and nonfair access policy.
    */
   @GwtIncompatible // ArrayBlockingQueue
   public static <E> ArrayBlockingQueue<E> newArrayBlockingQueue(int capacity) {
@@ -67,8 +67,8 @@ public final class Queues {
   }
 
   /**
-   * Creates an {@code ArrayDeque} containing the elements of the specified iterable, in the order
-   * they are returned by the iterable's iterator.
+   * Creates an {@code ArrayDeque} containing the elements of the specified iterable,
+   * in the order they are returned by the iterable's iterator.
    *
    * @since 12.0
    */
@@ -83,15 +83,17 @@ public final class Queues {
 
   // ConcurrentLinkedQueue
 
-  /** Creates an empty {@code ConcurrentLinkedQueue}. */
+  /**
+   * Creates an empty {@code ConcurrentLinkedQueue}.
+   */
   @GwtIncompatible // ConcurrentLinkedQueue
   public static <E> ConcurrentLinkedQueue<E> newConcurrentLinkedQueue() {
     return new ConcurrentLinkedQueue<E>();
   }
 
   /**
-   * Creates a {@code ConcurrentLinkedQueue} containing the elements of the specified iterable, in
-   * the order they are returned by the iterable's iterator.
+   * Creates a {@code ConcurrentLinkedQueue} containing the elements of the specified iterable,
+   * in the order they are returned by the iterable's iterator.
    */
   @GwtIncompatible // ConcurrentLinkedQueue
   public static <E> ConcurrentLinkedQueue<E> newConcurrentLinkedQueue(
@@ -128,9 +130,9 @@ public final class Queues {
   }
 
   /**
-   * Creates a {@code LinkedBlockingDeque} with a capacity of {@link Integer#MAX_VALUE}, containing
-   * the elements of the specified iterable, in the order they are returned by the iterable's
-   * iterator.
+   * Creates a {@code LinkedBlockingDeque} with a capacity of {@link Integer#MAX_VALUE},
+   * containing the elements of the specified iterable,
+   * in the order they are returned by the iterable's iterator.
    *
    * @since 12.0
    */
@@ -146,7 +148,9 @@ public final class Queues {
 
   // LinkedBlockingQueue
 
-  /** Creates an empty {@code LinkedBlockingQueue} with a capacity of {@link Integer#MAX_VALUE}. */
+  /**
+   * Creates an empty {@code LinkedBlockingQueue} with a capacity of {@link Integer#MAX_VALUE}.
+   */
   @GwtIncompatible // LinkedBlockingQueue
   public static <E> LinkedBlockingQueue<E> newLinkedBlockingQueue() {
     return new LinkedBlockingQueue<E>();
@@ -163,9 +167,9 @@ public final class Queues {
   }
 
   /**
-   * Creates a {@code LinkedBlockingQueue} with a capacity of {@link Integer#MAX_VALUE}, containing
-   * the elements of the specified iterable, in the order they are returned by the iterable's
-   * iterator.
+   * Creates a {@code LinkedBlockingQueue} with a capacity of {@link Integer#MAX_VALUE},
+   * containing the elements of the specified iterable,
+   * in the order they are returned by the iterable's iterator.
    *
    * @param elements the elements that the queue should contain, in order
    * @return a new {@code LinkedBlockingQueue} containing those elements
@@ -185,8 +189,8 @@ public final class Queues {
   // PriorityBlockingQueue
 
   /**
-   * Creates an empty {@code PriorityBlockingQueue} with the ordering given by its elements' natural
-   * ordering.
+   * Creates an empty {@code PriorityBlockingQueue} with the ordering given by its
+   * elements' natural ordering.
    *
    * @since 11.0 (requires that {@code E} be {@code Comparable} since 15.0).
    */
@@ -198,7 +202,7 @@ public final class Queues {
   /**
    * Creates a {@code PriorityBlockingQueue} containing the given elements.
    *
-   * <p><b>Note:</b> If the specified iterable is a {@code SortedSet} or a {@code PriorityQueue},
+   * <b>Note:</b> If the specified iterable is a {@code SortedSet} or a {@code PriorityQueue},
    * this priority queue will be ordered according to the same ordering.
    *
    * @since 11.0 (requires that {@code E} be {@code Comparable} since 15.0).
@@ -217,8 +221,8 @@ public final class Queues {
   // PriorityQueue
 
   /**
-   * Creates an empty {@code PriorityQueue} with the ordering given by its elements' natural
-   * ordering.
+   * Creates an empty {@code PriorityQueue} with the ordering given by its
+   * elements' natural ordering.
    *
    * @since 11.0 (requires that {@code E} be {@code Comparable} since 15.0).
    */
@@ -229,7 +233,7 @@ public final class Queues {
   /**
    * Creates a {@code PriorityQueue} containing the given elements.
    *
-   * <p><b>Note:</b> If the specified iterable is a {@code SortedSet} or a {@code PriorityQueue},
+   * <b>Note:</b> If the specified iterable is a {@code SortedSet} or a {@code PriorityQueue},
    * this priority queue will be ordered according to the same ordering.
    *
    * @since 11.0 (requires that {@code E} be {@code Comparable} since 15.0).
@@ -246,15 +250,18 @@ public final class Queues {
 
   // SynchronousQueue
 
-  /** Creates an empty {@code SynchronousQueue} with nonfair access policy. */
+  /**
+   * Creates an empty {@code SynchronousQueue} with nonfair access policy.
+   */
   @GwtIncompatible // SynchronousQueue
   public static <E> SynchronousQueue<E> newSynchronousQueue() {
     return new SynchronousQueue<E>();
   }
 
   /**
-   * Drains the queue as {@link BlockingQueue#drainTo(Collection, int)}, but if the requested {@code
-   * numElements} elements are not available, it will wait for them up to the specified timeout.
+   * Drains the queue as {@link BlockingQueue#drainTo(Collection, int)}, but if the requested
+   * {@code numElements} elements are not available, it will wait for them up to the specified
+   * timeout.
    *
    * @param q the blocking queue to be drained
    * @param buffer where to add the transferred elements
@@ -299,10 +306,10 @@ public final class Queues {
   }
 
   /**
-   * Drains the queue as {@linkplain #drain(BlockingQueue, Collection, int, long, TimeUnit)}, but
-   * with a different behavior in case it is interrupted while waiting. In that case, the operation
-   * will continue as usual, and in the end the thread's interruption status will be set (no {@code
-   * InterruptedException} is thrown).
+   * Drains the queue as {@linkplain #drain(BlockingQueue, Collection, int, long, TimeUnit)},
+   * but with a different behavior in case it is interrupted while waiting. In that case, the
+   * operation will continue as usual, and in the end the thread's interruption status will be set
+   * (no {@code InterruptedException} is thrown).
    *
    * @param q the blocking queue to be drained
    * @param buffer where to add the transferred elements
@@ -355,25 +362,23 @@ public final class Queues {
   }
 
   /**
-   * Returns a synchronized (thread-safe) queue backed by the specified queue. In order to guarantee
-   * serial access, it is critical that <b>all</b> access to the backing queue is accomplished
-   * through the returned queue.
+   * Returns a synchronized (thread-safe) queue backed by the specified queue. In order to
+   * guarantee serial access, it is critical that <b>all</b> access to the backing queue is
+   * accomplished through the returned queue.
    *
-   * <p>It is imperative that the user manually synchronize on the returned queue when accessing the
-   * queue's iterator:
+   * <p>It is imperative that the user manually synchronize on the returned queue when accessing
+   * the queue's iterator: <pre>   {@code
    *
-   * <pre>{@code
-   * Queue<E> queue = Queues.synchronizedQueue(MinMaxPriorityQueue.<E>create());
-   * ...
-   * queue.add(element);  // Needn't be in synchronized block
-   * ...
-   * synchronized (queue) {  // Must synchronize on queue!
-   *   Iterator<E> i = queue.iterator(); // Must be in synchronized block
-   *   while (i.hasNext()) {
-   *     foo(i.next());
-   *   }
-   * }
-   * }</pre>
+   *   Queue<E> queue = Queues.synchronizedQueue(MinMaxPriorityQueue.<E>create());
+   *   ...
+   *   queue.add(element);  // Needn't be in synchronized block
+   *   ...
+   *   synchronized (queue) {  // Must synchronize on queue!
+   *     Iterator<E> i = queue.iterator(); // Must be in synchronized block
+   *     while (i.hasNext()) {
+   *       foo(i.next());
+   *     }
+   *   }}</pre>
    *
    * <p>Failure to follow this advice may result in non-deterministic behavior.
    *
@@ -388,25 +393,23 @@ public final class Queues {
   }
 
   /**
-   * Returns a synchronized (thread-safe) deque backed by the specified deque. In order to guarantee
-   * serial access, it is critical that <b>all</b> access to the backing deque is accomplished
-   * through the returned deque.
+   * Returns a synchronized (thread-safe) deque backed by the specified deque. In order to
+   * guarantee serial access, it is critical that <b>all</b> access to the backing deque is
+   * accomplished through the returned deque.
    *
-   * <p>It is imperative that the user manually synchronize on the returned deque when accessing any
-   * of the deque's iterators:
+   * <p>It is imperative that the user manually synchronize on the returned deque when accessing
+   * any of the deque's iterators: <pre>   {@code
    *
-   * <pre>{@code
-   * Deque<E> deque = Queues.synchronizedDeque(Queues.<E>newArrayDeque());
-   * ...
-   * deque.add(element);  // Needn't be in synchronized block
-   * ...
-   * synchronized (deque) {  // Must synchronize on deque!
-   *   Iterator<E> i = deque.iterator(); // Must be in synchronized block
-   *   while (i.hasNext()) {
-   *     foo(i.next());
-   *   }
-   * }
-   * }</pre>
+   *   Deque<E> deque = Queues.synchronizedDeque(Queues.<E>newArrayDeque());
+   *   ...
+   *   deque.add(element);  // Needn't be in synchronized block
+   *   ...
+   *   synchronized (deque) {  // Must synchronize on deque!
+   *     Iterator<E> i = deque.iterator(); // Must be in synchronized block
+   *     while (i.hasNext()) {
+   *       foo(i.next());
+   *     }
+   *   }}</pre>
    *
    * <p>Failure to follow this advice may result in non-deterministic behavior.
    *

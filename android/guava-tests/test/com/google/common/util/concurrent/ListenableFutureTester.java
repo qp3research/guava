@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
 /**
  * Used to test listenable future implementations.
@@ -49,14 +49,11 @@ public class ListenableFutureTester {
   }
 
   public void setUp() {
-    future.addListener(
-        new Runnable() {
-          @Override
-          public void run() {
-            latch.countDown();
-          }
-        },
-        exec);
+    future.addListener(new Runnable() {
+      @Override public void run() {
+        latch.countDown();
+      }
+    }, exec);
 
     assertEquals(1, latch.getCount());
     assertFalse(future.isDone());
@@ -67,7 +64,7 @@ public class ListenableFutureTester {
     exec.shutdown();
   }
 
-  public void testCompletedFuture(@NullableDecl Object expectedValue)
+  public void testCompletedFuture(@Nullable Object expectedValue)
       throws InterruptedException, ExecutionException {
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
@@ -79,7 +76,8 @@ public class ListenableFutureTester {
     assertEquals(expectedValue, future.get());
   }
 
-  public void testCancelledFuture() throws InterruptedException, ExecutionException {
+  public void testCancelledFuture()
+      throws InterruptedException, ExecutionException {
     assertTrue(future.isDone());
     assertTrue(future.isCancelled());
 
@@ -90,11 +88,11 @@ public class ListenableFutureTester {
     try {
       future.get();
       fail("Future should throw CancellationException on cancel.");
-    } catch (CancellationException expected) {
-    }
+    } catch (CancellationException expected) {}
   }
 
-  public void testFailedFuture(@NullableDecl String message) throws InterruptedException {
+  public void testFailedFuture(@Nullable String message)
+      throws InterruptedException {
     assertTrue(future.isDone());
     assertFalse(future.isCancelled());
 

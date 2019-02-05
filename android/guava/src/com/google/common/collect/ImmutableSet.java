@@ -35,7 +35,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
 /**
  * A {@link Set} whose contents will never change, with many other important properties detailed at
@@ -105,15 +105,10 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
    * first specified. That is, if multiple elements are {@linkplain Object#equals equal}, all except
    * the first are ignored.
    *
-   * <p>The array {@code others} must not be longer than {@code Integer.MAX_VALUE - 6}.
-   *
    * @since 3.0 (source-compatible since 2.0)
    */
   @SafeVarargs // For Eclipse. For internal javac we have disabled this pointless type of warning.
   public static <E> ImmutableSet<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E... others) {
-    checkArgument(
-        others.length <= Integer.MAX_VALUE - 6,
-        "the total number of elements must fit in an int");
     final int paramCount = 6;
     Object[] elements = new Object[paramCount + others.length];
     elements[0] = e1;
@@ -187,7 +182,7 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
       return new RegularImmutableSet<E>(uniqueElements, hashCode, table, mask, uniques);
     }
   }
-
+  
   private static boolean shouldTrim(int actualUnique, int expectedUnique) {
     return actualUnique < (expectedUnique >> 1) + (expectedUnique >> 2);
   }
@@ -204,7 +199,7 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
   /**
    * Returns an array size suitable for the backing array of a hash table that uses open addressing
    * with linear probing in its implementation. The returned size is the smallest power of two that
-   * can hold setSize elements with the desired load factor. Always returns at least setSize + 2.
+   * can hold setSize elements with the desired load factor.  Always returns at least setSize + 2.
    */
   @VisibleForTesting
   static int chooseTableSize(int setSize) {
@@ -316,7 +311,7 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
   }
 
   @Override
-  public boolean equals(@NullableDecl Object object) {
+  public boolean equals(@Nullable Object object) {
     if (object == this) {
       return true;
     } else if (object instanceof ImmutableSet
@@ -338,7 +333,9 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
   @Override
   public abstract UnmodifiableIterator<E> iterator();
 
-  @LazyInit @RetainedWith @NullableDecl private transient ImmutableList<E> asList;
+  @LazyInit
+  @RetainedWith
+  private transient ImmutableList<E> asList;
 
   @Override
   public ImmutableList<E> asList() {
@@ -348,6 +345,35 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
 
   ImmutableList<E> createAsList() {
     return ImmutableList.asImmutableList(toArray());
+  }
+
+  abstract static class Indexed<E> extends ImmutableSet<E> {
+    abstract E get(int index);
+
+    @Override
+    public UnmodifiableIterator<E> iterator() {
+      return asList().iterator();
+    }
+
+    @Override
+    ImmutableList<E> createAsList() {
+      return new ImmutableList<E>() {
+        @Override
+        public E get(int index) {
+          return Indexed.this.get(index);
+        }
+
+        @Override
+        boolean isPartialView() {
+          return Indexed.this.isPartialView();
+        }
+
+        @Override
+        public int size() {
+          return Indexed.this.size();
+        }
+      };
+    }
   }
 
   /*
@@ -377,8 +403,8 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
   }
 
   /**
-   * Returns a new builder. The generated builder is equivalent to the builder created by the {@link
-   * Builder} constructor.
+   * Returns a new builder. The generated builder is equivalent to the builder
+   * created by the {@link Builder} constructor.
    */
   public static <E> Builder<E> builder() {
     return new Builder<E>();
@@ -403,15 +429,13 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
   }
 
   /**
-   * A builder for creating {@code ImmutableSet} instances. Example:
+   * A builder for creating {@code ImmutableSet} instances. Example: <pre>   {@code
    *
-   * <pre>{@code
-   * static final ImmutableSet<Color> GOOGLE_COLORS =
-   *     ImmutableSet.<Color>builder()
-   *         .addAll(WEBSAFE_COLORS)
-   *         .add(new Color(0, 191, 255))
-   *         .build();
-   * }</pre>
+   *   static final ImmutableSet<Color> GOOGLE_COLORS =
+   *       ImmutableSet.<Color>builder()
+   *           .addAll(WEBSAFE_COLORS)
+   *           .add(new Color(0, 191, 255))
+   *           .build();}</pre>
    *
    * <p>Elements appear in the resulting set in the same order they were first added to the builder.
    *
@@ -421,12 +445,13 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
    * @since 2.0
    */
   public static class Builder<E> extends ImmutableCollection.ArrayBasedBuilder<E> {
-    @NullableDecl @VisibleForTesting Object[] hashTable;
+    @VisibleForTesting
+    Object[] hashTable;
     private int hashCode;
-
+    
     /**
-     * Creates a new builder. The returned builder is equivalent to the builder generated by {@link
-     * ImmutableSet#builder}.
+     * Creates a new builder. The returned builder is equivalent to the builder
+     * generated by {@link ImmutableSet#builder}.
      */
     public Builder() {
       super(DEFAULT_INITIAL_CAPACITY);
@@ -438,9 +463,9 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
     }
 
     /**
-     * Adds {@code element} to the {@code ImmutableSet}. If the {@code ImmutableSet} already
-     * contains {@code element}, then {@code add} has no effect (only the previously added element
-     * is retained).
+     * Adds {@code element} to the {@code ImmutableSet}.  If the {@code
+     * ImmutableSet} already contains {@code element}, then {@code add} has no
+     * effect (only the previously added element is retained).
      *
      * @param element the element to add
      * @return this {@code Builder} object
@@ -459,28 +484,7 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
         return this;
       }
     }
-
-    /**
-     * Adds each element of {@code elements} to the {@code ImmutableSet}, ignoring duplicate
-     * elements (only the first duplicate element is added).
-     *
-     * @param elements the elements to add
-     * @return this {@code Builder} object
-     * @throws NullPointerException if {@code elements} is null or contains a null element
-     */
-    @CanIgnoreReturnValue
-    @Override
-    public Builder<E> add(E... elements) {
-      if (hashTable != null) {
-        for (E e : elements) {
-          add(e);
-        }
-      } else {
-        super.add(elements);
-      }
-      return this;
-    }
-
+    
     private void addDeduping(E element) {
       int mask = hashTable.length - 1;
       int hash = element.hashCode();
@@ -499,12 +503,35 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
     }
 
     /**
-     * Adds each element of {@code elements} to the {@code ImmutableSet}, ignoring duplicate
-     * elements (only the first duplicate element is added).
+     * Adds each element of {@code elements} to the {@code ImmutableSet},
+     * ignoring duplicate elements (only the first duplicate element is added).
+     *
+     * @param elements the elements to add
+     * @return this {@code Builder} object
+     * @throws NullPointerException if {@code elements} is null or contains a
+     *     null element
+     */
+    @CanIgnoreReturnValue
+    @Override
+    public Builder<E> add(E... elements) {
+      if (hashTable != null) {
+        for (E e : elements) {
+          add(e);
+        }
+      } else {
+        super.add(elements);
+      }
+      return this;
+    }
+
+    /**
+     * Adds each element of {@code elements} to the {@code ImmutableSet},
+     * ignoring duplicate elements (only the first duplicate element is added).
      *
      * @param elements the {@code Iterable} to add to the {@code ImmutableSet}
      * @return this {@code Builder} object
-     * @throws NullPointerException if {@code elements} is null or contains a null element
+     * @throws NullPointerException if {@code elements} is null or contains a
+     *     null element
      */
     @CanIgnoreReturnValue
     @Override
@@ -521,12 +548,13 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
     }
 
     /**
-     * Adds each element of {@code elements} to the {@code ImmutableSet}, ignoring duplicate
-     * elements (only the first duplicate element is added).
+     * Adds each element of {@code elements} to the {@code ImmutableSet},
+     * ignoring duplicate elements (only the first duplicate element is added).
      *
      * @param elements the elements to add to the {@code ImmutableSet}
      * @return this {@code Builder} object
-     * @throws NullPointerException if {@code elements} is null or contains a null element
+     * @throws NullPointerException if {@code elements} is null or contains a
+     *     null element
      */
     @CanIgnoreReturnValue
     @Override
@@ -539,7 +567,8 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements 
     }
 
     /**
-     * Returns a newly-created {@code ImmutableSet} based on the contents of the {@code Builder}.
+     * Returns a newly-created {@code ImmutableSet} based on the contents of
+     * the {@code Builder}.
      */
     @SuppressWarnings("unchecked")
     @Override

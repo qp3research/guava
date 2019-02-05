@@ -23,7 +23,6 @@ import com.google.common.collect.testing.features.MapFeature;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import org.junit.Ignore;
 
 /**
  * Tests for {@link SetMultimap#replaceValues}.
@@ -31,7 +30,6 @@ import org.junit.Ignore;
  * @author Louis Wasserman
  */
 @GwtCompatible
-@Ignore // Affects only Android test runner, which respects JUnit 4 annotations on JUnit 3 tests.
 public class SetMultimapPutAllTester<K, V> extends AbstractMultimapTester<K, V, SetMultimap<K, V>> {
 
   @MapFeature.Require(SUPPORTS_PUT)

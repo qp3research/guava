@@ -23,7 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Implementation of {@code Futures#withTimeout}.
@@ -70,8 +70,8 @@ final class TimeoutFuture<V> extends AbstractFuture.TrustedFuture<V> {
    * write-barriers).
    */
 
-  private @Nullable ListenableFuture<V> delegateRef;
-  private @Nullable Future<?> timer;
+  @Nullable private ListenableFuture<V> delegateRef;
+  @Nullable private Future<?> timer;
 
   private TimeoutFuture(ListenableFuture<V> delegate) {
     this.delegateRef = Preconditions.checkNotNull(delegate);

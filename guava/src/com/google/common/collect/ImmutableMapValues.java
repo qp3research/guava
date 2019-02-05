@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.util.Map.Entry;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * {@code values()} implementation for {@link ImmutableMap}.
@@ -63,8 +63,7 @@ final class ImmutableMapValues<K, V> extends ImmutableCollection<V> {
     };
   }
 
-  @Override
-  public Spliterator<V> spliterator() {
+  @Override public Spliterator<V> spliterator() {
     return CollectSpliterators.map(map.entrySet().spliterator(), Entry::getValue);
   }
 

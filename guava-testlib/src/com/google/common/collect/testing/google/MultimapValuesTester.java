@@ -27,8 +27,7 @@ import com.google.common.collect.testing.features.CollectionFeature;
 import com.google.common.collect.testing.features.CollectionSize;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
-import org.junit.Ignore;
+import java.util.Map;
 
 /**
  * Tester for {@code Multimap.values}.
@@ -36,11 +35,10 @@ import org.junit.Ignore;
  * @author Louis Wasserman
  */
 @GwtCompatible
-@Ignore // Affects only Android test runner, which respects JUnit 4 annotations on JUnit 3 tests.
 public class MultimapValuesTester<K, V> extends AbstractMultimapTester<K, V, Multimap<K, V>> {
   public void testValues() {
     List<V> expected = Lists.newArrayList();
-    for (Entry<K, V> entry : getSampleElements()) {
+    for (Map.Entry<K, V> entry : getSampleElements()) {
       expected.add(entry.getValue());
     }
     assertEqualIgnoringOrder(expected, multimap().values());
@@ -49,7 +47,7 @@ public class MultimapValuesTester<K, V> extends AbstractMultimapTester<K, V, Mul
   @CollectionFeature.Require(KNOWN_ORDER)
   public void testValuesInOrder() {
     List<V> expected = Lists.newArrayList();
-    for (Entry<K, V> entry : getOrderedElements()) {
+    for (Map.Entry<K, V> entry : getOrderedElements()) {
       expected.add(entry.getValue());
     }
     assertEqualInOrder(expected, multimap().values());

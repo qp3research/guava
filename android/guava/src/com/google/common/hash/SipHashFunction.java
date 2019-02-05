@@ -21,10 +21,9 @@ package com.google.common.hash;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
 /**
  * {@link HashFunction} implementation of SipHash-c-d.
@@ -33,7 +32,6 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @author Jean-Philippe Aumasson
  * @author Daniel J. Bernstein
  */
-@Immutable
 final class SipHashFunction extends AbstractHashFunction implements Serializable {
   static final HashFunction SIP_HASH_24 =
       new SipHashFunction(2, 4, 0x0706050403020100L, 0x0f0e0d0c0b0a0908L);
@@ -81,10 +79,13 @@ final class SipHashFunction extends AbstractHashFunction implements Serializable
   }
 
   @Override
-  public boolean equals(@NullableDecl Object object) {
+  public boolean equals(@Nullable Object object) {
     if (object instanceof SipHashFunction) {
       SipHashFunction other = (SipHashFunction) object;
-      return (c == other.c) && (d == other.d) && (k0 == other.k0) && (k1 == other.k1);
+      return (c == other.c)
+          && (d == other.d)
+          && (k0 == other.k0)
+          && (k1 == other.k1);
     }
     return false;
   }

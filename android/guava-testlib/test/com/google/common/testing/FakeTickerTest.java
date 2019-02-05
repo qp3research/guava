@@ -86,8 +86,7 @@ public class FakeTickerTest extends TestCase {
       ticker.setAutoIncrementStep(0, timeUnit);
       assertEquals(
           "Expected no auto-increment when setting autoIncrementStep to 0 " + timeUnit,
-          30,
-          ticker.read());
+          30, ticker.read());
     }
   }
 
@@ -106,8 +105,7 @@ public class FakeTickerTest extends TestCase {
     final FakeTicker ticker = new FakeTicker();
 
     int numberOfThreads = 64;
-    runConcurrentTest(
-        numberOfThreads,
+    runConcurrentTest(numberOfThreads,
         new Callable<Void>() {
           @Override
           public Void call() throws Exception {
@@ -130,8 +128,7 @@ public class FakeTickerTest extends TestCase {
         new FakeTicker().setAutoIncrementStep(incrementByNanos, TimeUnit.NANOSECONDS);
 
     int numberOfThreads = 64;
-    runConcurrentTest(
-        numberOfThreads,
+    runConcurrentTest(numberOfThreads,
         new Callable<Void>() {
           @Override
           public Void call() throws Exception {
@@ -143,7 +140,9 @@ public class FakeTickerTest extends TestCase {
     assertEquals(incrementByNanos * numberOfThreads, ticker.read());
   }
 
-  /** Runs {@code callable} concurrently {@code numberOfThreads} times. */
+  /**
+   * Runs {@code callable} concurrently {@code numberOfThreads} times.
+   */
   @GwtIncompatible // concurrency
   private void runConcurrentTest(int numberOfThreads, final Callable<Void> callable)
       throws Exception {

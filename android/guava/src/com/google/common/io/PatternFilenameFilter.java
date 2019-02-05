@@ -21,7 +21,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
 /**
  * File name filter that only accepts files matching a regular expression. This class is thread-safe
@@ -40,6 +40,7 @@ public final class PatternFilenameFilter implements FilenameFilter {
    * Constructs a pattern file name filter object.
    *
    * @param patternStr the pattern string on which to filter file names
+   *
    * @throws PatternSyntaxException if pattern compilation fails (runtime)
    */
   public PatternFilenameFilter(String patternStr) {
@@ -56,7 +57,7 @@ public final class PatternFilenameFilter implements FilenameFilter {
   }
 
   @Override
-  public boolean accept(@NullableDecl File dir, String fileName) {
+  public boolean accept(@Nullable File dir, String fileName) {
     return pattern.matcher(fileName).matches();
   }
 }

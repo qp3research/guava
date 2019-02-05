@@ -17,7 +17,7 @@
 package com.google.common.graph;
 
 import java.util.Map;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * A {@link MapIteratorCache} that adds additional caching. In addition to the caching provided by
@@ -26,8 +26,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @author James Sexton
  */
 class MapRetrievalCache<K, V> extends MapIteratorCache<K, V> {
-  private transient @Nullable CacheEntry<K, V> cacheEntry1;
-  private transient @Nullable CacheEntry<K, V> cacheEntry2;
+  @Nullable private transient CacheEntry<K, V> cacheEntry1;
+  @Nullable private transient CacheEntry<K, V> cacheEntry2;
 
   MapRetrievalCache(Map<K, V> backingMap) {
     super(backingMap);

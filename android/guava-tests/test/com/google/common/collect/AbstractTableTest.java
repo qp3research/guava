@@ -30,10 +30,12 @@ import java.util.Map;
 @GwtCompatible
 public abstract class AbstractTableTest extends AbstractTableReadTest {
 
-  protected void populate(Table<String, Integer, Character> table, Object... data) {
+  protected void populate(
+      Table<String, Integer, Character> table, Object... data) {
     checkArgument(data.length % 3 == 0);
-    for (int i = 0; i < data.length; i += 3) {
-      table.put((String) data[i], (Integer) data[i + 1], (Character) data[i + 2]);
+    for (int i = 0; i < data.length; i+= 3) {
+      table.put(
+          (String) data[i], (Integer) data[i+1], (Character) data[i+2]);
     }
   }
 
@@ -55,8 +57,7 @@ public abstract class AbstractTableTest extends AbstractTableReadTest {
       try {
         table.clear();
         fail();
-      } catch (UnsupportedOperationException expected) {
-      }
+      } catch (UnsupportedOperationException expected) {}
     }
   }
 
@@ -80,13 +81,11 @@ public abstract class AbstractTableTest extends AbstractTableReadTest {
     try {
       table.put(null, 2, 'd');
       fail();
-    } catch (NullPointerException expected) {
-    }
+    } catch (NullPointerException expected) {}
     try {
       table.put("cat", null, 'd');
       fail();
-    } catch (NullPointerException expected) {
-    }
+    } catch (NullPointerException expected) {}
     if (supportsNullValues()) {
       assertNull(table.put("cat", 2, null));
       assertTrue(table.contains("cat", 2));
@@ -94,8 +93,7 @@ public abstract class AbstractTableTest extends AbstractTableReadTest {
       try {
         table.put("cat", 2, null);
         fail();
-      } catch (NullPointerException expected) {
-      }
+      } catch (NullPointerException expected) {}
     }
     assertSize(3);
   }
@@ -110,8 +108,7 @@ public abstract class AbstractTableTest extends AbstractTableReadTest {
       try {
         table.put("bar", 1, null);
         fail();
-      } catch (NullPointerException expected) {
-      }
+      } catch (NullPointerException expected) {}
     }
   }
 
@@ -149,8 +146,7 @@ public abstract class AbstractTableTest extends AbstractTableReadTest {
       try {
         table.remove("foo", 3);
         fail();
-      } catch (UnsupportedOperationException expected) {
-      }
+      } catch (UnsupportedOperationException expected) {}
       assertEquals((Character) 'c', table.get("foo", 3));
     }
   }

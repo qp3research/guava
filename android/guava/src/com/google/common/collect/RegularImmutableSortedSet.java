@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
+
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,11 +28,11 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
 /**
- * An immutable sorted set with one or more elements. TODO(jlevy): Consider separate class for a
- * single-element sorted set.
+ * An immutable sorted set with one or more elements. TODO(jlevy): Consider
+ * separate class for a single-element sorted set.
  *
  * @author Jared Levy
  * @author Louis Wasserman
@@ -42,7 +43,8 @@ final class RegularImmutableSortedSet<E> extends ImmutableSortedSet<E> {
   static final RegularImmutableSortedSet<Comparable> NATURAL_EMPTY_SET =
       new RegularImmutableSortedSet<>(ImmutableList.<Comparable>of(), Ordering.natural());
 
-  @VisibleForTesting final transient ImmutableList<E> elements;
+  @VisibleForTesting
+  final transient ImmutableList<E> elements;
 
   RegularImmutableSortedSet(ImmutableList<E> elements, Comparator<? super E> comparator) {
     super(comparator);
@@ -66,7 +68,7 @@ final class RegularImmutableSortedSet<E> extends ImmutableSortedSet<E> {
   }
 
   @Override
-  public boolean contains(@NullableDecl Object o) {
+  public boolean contains(@Nullable Object o) {
     try {
       return o != null && unsafeBinarySearch(o) >= 0;
     } catch (ClassCastException e) {
@@ -92,14 +94,14 @@ final class RegularImmutableSortedSet<E> extends ImmutableSortedSet<E> {
      * in O(n) time stepping through the two collections.
      */
     Iterator<E> thisIterator = iterator();
-
-    Iterator<?> thatIterator = targets.iterator();
+    
+    Iterator<?> thatIterator = targets.iterator(); 
     // known nonempty since we checked targets.size() > 1
-
+    
     if (!thisIterator.hasNext()) {
       return false;
     }
-
+    
     Object target = thatIterator.next();
     E current = thisIterator.next();
     try {
@@ -141,7 +143,7 @@ final class RegularImmutableSortedSet<E> extends ImmutableSortedSet<E> {
   }
 
   @Override
-  public boolean equals(@NullableDecl Object object) {
+  public boolean equals(@Nullable Object object) {
     if (object == this) {
       return true;
     }
@@ -271,7 +273,7 @@ final class RegularImmutableSortedSet<E> extends ImmutableSortedSet<E> {
   }
 
   @Override
-  int indexOf(@NullableDecl Object target) {
+  int indexOf(@Nullable Object target) {
     if (target == null) {
       return -1;
     }

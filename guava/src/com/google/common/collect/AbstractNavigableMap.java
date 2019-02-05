@@ -24,7 +24,7 @@ import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Skeletal implementation of {@link NavigableMap}.
@@ -36,25 +36,30 @@ abstract class AbstractNavigableMap<K, V> extends IteratorBasedAbstractMap<K, V>
     implements NavigableMap<K, V> {
 
   @Override
-  public abstract @Nullable V get(@Nullable Object key);
+  @Nullable
+  public abstract V get(@Nullable Object key);
 
   @Override
-  public @Nullable Entry<K, V> firstEntry() {
+  @Nullable
+  public Entry<K, V> firstEntry() {
     return Iterators.getNext(entryIterator(), null);
   }
 
   @Override
-  public @Nullable Entry<K, V> lastEntry() {
+  @Nullable
+  public Entry<K, V> lastEntry() {
     return Iterators.getNext(descendingEntryIterator(), null);
   }
 
   @Override
-  public @Nullable Entry<K, V> pollFirstEntry() {
+  @Nullable
+  public Entry<K, V> pollFirstEntry() {
     return Iterators.pollNext(entryIterator());
   }
 
   @Override
-  public @Nullable Entry<K, V> pollLastEntry() {
+  @Nullable
+  public Entry<K, V> pollLastEntry() {
     return Iterators.pollNext(descendingEntryIterator());
   }
 
@@ -79,22 +84,26 @@ abstract class AbstractNavigableMap<K, V> extends IteratorBasedAbstractMap<K, V>
   }
 
   @Override
-  public @Nullable Entry<K, V> lowerEntry(K key) {
+  @Nullable
+  public Entry<K, V> lowerEntry(K key) {
     return headMap(key, false).lastEntry();
   }
 
   @Override
-  public @Nullable Entry<K, V> floorEntry(K key) {
+  @Nullable
+  public Entry<K, V> floorEntry(K key) {
     return headMap(key, true).lastEntry();
   }
 
   @Override
-  public @Nullable Entry<K, V> ceilingEntry(K key) {
+  @Nullable
+  public Entry<K, V> ceilingEntry(K key) {
     return tailMap(key, true).firstEntry();
   }
 
   @Override
-  public @Nullable Entry<K, V> higherEntry(K key) {
+  @Nullable
+  public Entry<K, V> higherEntry(K key) {
     return tailMap(key, false).firstEntry();
   }
 

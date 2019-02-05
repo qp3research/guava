@@ -21,7 +21,6 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.collect.testing.Helpers;
 import com.google.common.collect.testing.features.CollectionSize;
 import com.google.common.testing.EqualsTester;
-import org.junit.Ignore;
 
 /**
  * Testers for {@link SetMultimap#equals(Object)}.
@@ -29,7 +28,6 @@ import org.junit.Ignore;
  * @author Louis Wasserman
  */
 @GwtCompatible
-@Ignore // Affects only Android test runner, which respects JUnit 4 annotations on JUnit 3 tests.
 public class SetMultimapEqualsTester<K, V> extends AbstractMultimapTester<K, V, SetMultimap<K, V>> {
   @CollectionSize.Require(SEVERAL)
   public void testOrderingDoesntAffectEqualsComparisons() {
