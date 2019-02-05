@@ -153,7 +153,7 @@ public class TestsForMapsInJavaUtil {
   }
 
   protected Collection<Method> suppressForConcurrentSkipListMap() {
-    return asList(MapEntrySetTester.getSetValueMethod(), MapEntrySetTester.getSetValueWithNullValuesAbsentMethod(), MapEntrySetTester.getSetValueWithNullValuesPresentMethod());
+    return asList(MapEntrySetTester.getSetValueMethod());
   }
 
   public Test testsForCheckedMap() {
