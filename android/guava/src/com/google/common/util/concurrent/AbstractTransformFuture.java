@@ -69,7 +69,6 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
       return;
     }
     inputFuture = null;
-    function = null;
 
     /*
      * Any of the setException() calls below can fail if the output Future is cancelled between now
@@ -118,6 +117,8 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
       // This exception is irrelevant in this thread, but useful for the client.
       setException(t);
       return;
+    } finally {
+      function = null;
     }
 
     /*
@@ -179,8 +180,15 @@ abstract class AbstractTransformFuture<I, O, F, T> extends AbstractFuture.Truste
   protected String pendingToString() {
     ListenableFuture<? extends I> localInputFuture = inputFuture;
     F localFunction = function;
-    if (localInputFuture != null && localFunction != null) {
-      return "inputFuture=[" + localInputFuture + "], function=[" + localFunction + "]";
+    String superString = super.pendingToString();
+    String resultString = "";
+    if (localInputFuture != null) {
+      resultString = "inputFuture=[" + localInputFuture + "], ";
+    }
+    if (localFunction != null) {
+      return resultString + "function=[" + localFunction + "]";
+    } else if (superString != null) {
+      return resultString + superString;
     }
     return null;
   }

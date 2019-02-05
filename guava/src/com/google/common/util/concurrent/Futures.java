@@ -33,6 +33,7 @@ import com.google.common.util.concurrent.ImmediateFuture.ImmediateFailedFuture;
 import com.google.common.util.concurrent.ImmediateFuture.ImmediateSuccessfulCheckedFuture;
 import com.google.common.util.concurrent.ImmediateFuture.ImmediateSuccessfulFuture;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.DoNotCall;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -44,7 +45,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Static utility methods pertaining to the {@link Future} interface.
@@ -144,8 +145,9 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
    *     untouched. Guava users who want a {@code CheckedFuture} can fork the classes for their own
    *     use, possibly specializing them to the particular exception type they use. We recommend
    *     that most people use {@code ListenableFuture} and perform any exception wrapping
-   *     themselves. This method is scheduled for removal from Guava in February 2018.
+   *     themselves. This method is scheduled for removal from Guava in July 2018.
    */
+  // TODO(b/72241575): Remove by 2018-07
   @Deprecated
   @GwtIncompatible // TODO
   public static <V, X extends Exception> CheckedFuture<V, X> makeChecked(
@@ -158,7 +160,7 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
    * getters just return the value. This {@code Future} can't be canceled or timed out and its
    * {@code isDone()} method always returns {@code true}.
    */
-  public static <V> ListenableFuture<V> immediateFuture(@NullableDecl V value) {
+  public static <V> ListenableFuture<V> immediateFuture(@Nullable V value) {
     if (value == null) {
       // This cast is safe because null is assignable to V for all V (i.e. it is covariant)
       @SuppressWarnings({"unchecked", "rawtypes"})
@@ -182,12 +184,13 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
    *     untouched. Guava users who want a {@code CheckedFuture} can fork the classes for their own
    *     use, possibly specializing them to the particular exception type they use. We recommend
    *     that most people use {@code ListenableFuture} and perform any exception wrapping
-   *     themselves. This method is scheduled for removal from Guava in February 2018.
+   *     themselves. This method is scheduled for removal from Guava in July 2018.
    */
+  // TODO(b/72241893): Remove by 2018-07
   @Deprecated
   @GwtIncompatible // TODO
   public static <V, X extends Exception> CheckedFuture<V, X> immediateCheckedFuture(
-      @NullableDecl V value) {
+      @Nullable V value) {
     return new ImmediateSuccessfulCheckedFuture<>(value);
   }
 
@@ -228,8 +231,9 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
    *     untouched. Guava users who want a {@code CheckedFuture} can fork the classes for their own
    *     use, possibly specializing them to the particular exception type they use. We recommend
    *     that most people use {@code ListenableFuture} and perform any exception wrapping
-   *     themselves. This method is scheduled for removal from Guava in February 2018.
+   *     themselves. This method is scheduled for removal from Guava in July 2018.
    */
+  // TODO(b/72241500): Remove by 2018-07
   @Deprecated
   @GwtIncompatible // TODO
   public static <V, X extends Exception> CheckedFuture<V, X> immediateFailedCheckedFuture(
@@ -316,9 +320,10 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
    *     that requires an executor}. For identical behavior, pass {@link
    *     MoreExecutors#directExecutor}, but consider whether another executor would be safer, as
    *     discussed in the {@link ListenableFuture#addListener ListenableFuture.addListener}
-   *     documentation. This method is scheduled to be removed in April 2018.
+   *     documentation. This method is scheduled to be removed in July 2018.
    */
   @Deprecated
+  @DoNotCall
   @Partially.GwtIncompatible("AVAILABLE but requires exceptionType to be Throwable.class")
   public static <V, X extends Throwable> ListenableFuture<V> catching(
       ListenableFuture<? extends V> input,
@@ -435,10 +440,11 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
    *     the overload that requires an executor}. For identical behavior, pass {@link
    *     MoreExecutors#directExecutor}, but consider whether another executor would be safer, as
    *     discussed in the {@link ListenableFuture#addListener ListenableFuture.addListener}
-   *     documentation. This method is scheduled to be removed in April 2018.
+   *     documentation. This method is scheduled to be removed in July 2018.
    */
   @CanIgnoreReturnValue // TODO(kak): @CheckReturnValue
   @Deprecated
+  @DoNotCall
   @Partially.GwtIncompatible("AVAILABLE but requires exceptionType to be Throwable.class")
   public static <V, X extends Throwable> ListenableFuture<V> catchingAsync(
       ListenableFuture<? extends V> input,
@@ -576,9 +582,10 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
    *     overload that requires an executor}. For identical behavior, pass {@link
    *     MoreExecutors#directExecutor}, but consider whether another executor would be safer, as
    *     discussed in the {@link ListenableFuture#addListener ListenableFuture.addListener}
-   *     documentation. This method is scheduled to be removed in April 2018.
+   *     documentation. This method is scheduled to be removed in July 2018.
    */
   @Deprecated
+  @DoNotCall
   public static <I, O> ListenableFuture<O> transformAsync(
       ListenableFuture<I> input, AsyncFunction<? super I, ? extends O> function) {
     return AbstractTransformFuture.create(input, function, directExecutor());
@@ -660,9 +667,10 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
    *     requires an executor}. For identical behavior, pass {@link MoreExecutors#directExecutor},
    *     but consider whether another executor would be safer, as discussed in the {@link
    *     ListenableFuture#addListener ListenableFuture.addListener} documentation. This method is
-   *     scheduled to be removed in April 2018.
+   *     scheduled to be removed in July 2018.
    */
   @Deprecated
+  @DoNotCall
   public static <I, O> ListenableFuture<O> transform(
       ListenableFuture<I> input, Function<? super I, ? extends O> function) {
     return AbstractTransformFuture.create(input, function, directExecutor());
@@ -766,55 +774,6 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
       }
     };
   }
-
-  /**
-   * Returns a new {@code ListenableFuture} whose result is the product of calling {@code get()} on
-   * the {@code Future} nested within the given {@code Future}, effectively chaining the futures one
-   * after the other. Example:
-   *
-   * <pre>{@code
-   * SettableFuture<ListenableFuture<String>> nested = SettableFuture.create();
-   * ListenableFuture<String> dereferenced = dereference(nested);
-   * }</pre>
-   *
-   * <p>Most users will not need this method. To create a {@code Future} that completes with the
-   * result of another {@code Future}, create a {@link SettableFuture}, and call {@link
-   * SettableFuture#setFuture setFuture(otherFuture)} on it.
-   *
-   * <p>{@code dereference} has the same cancellation and execution semantics as {@link
-   * #transformAsync(ListenableFuture, AsyncFunction, Executor)}, in that the returned {@code
-   * Future} attempts to keep its cancellation state in sync with both the input {@code Future} and
-   * the nested {@code Future}. The transformation is very lightweight and therefore takes place in
-   * the same thread (either the thread that called {@code dereference}, or the thread in which the
-   * dereferenced future completes).
-   *
-   * @deprecated Use {@link #submitAsync(AsyncCallable, Executor)} or {@link
-   *     SettableFuture#setFuture} instead. Or, if you're dereferencing the output of {@link
-   *     #transform} or {@link #catching}, switch to {@link #transformAsync} or {@link
-   *     #catchingAsync} (and likewise for similar APIs). If the cancellation of this method's
-   *     output future races with completion of the outer input future, cancellation may not be
-   *     propagated to the inner input future. This method is scheduled to be removed in January
-   *     2018.
-   * @param nested The nested future to transform.
-   * @return A future that holds result of the inner future.
-   * @since 13.0
-   */
-  @Deprecated
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  public static <V> ListenableFuture<V> dereference(
-      ListenableFuture<? extends ListenableFuture<? extends V>> nested) {
-    return transformAsync(
-        (ListenableFuture) nested, (AsyncFunction) DEREFERENCER, directExecutor());
-  }
-
-  /** Helper {@code Function} for {@link #dereference}. */
-  private static final AsyncFunction<ListenableFuture<Object>, Object> DEREFERENCER =
-      new AsyncFunction<ListenableFuture<Object>, Object>() {
-        @Override
-        public ListenableFuture<Object> apply(ListenableFuture<Object> input) {
-          return input;
-        }
-      };
 
   /**
    * Creates a new {@code ListenableFuture} whose value is a list containing the values of all its
@@ -966,9 +925,10 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
      *     executor}. For identical behavior, pass {@link MoreExecutors#directExecutor}, but
      *     consider whether another executor would be safer, as discussed in the {@link
      *     ListenableFuture#addListener ListenableFuture.addListener} documentation. This method is
-     *     scheduled to be removed in April 2018.
+     *     scheduled to be removed in July 2018.
      */
     @Deprecated
+    @DoNotCall
     public <C> ListenableFuture<C> callAsync(AsyncCallable<C> combiner) {
       return callAsync(combiner, directExecutor());
     }
@@ -1000,10 +960,11 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
      *     executor}. For identical behavior, pass {@link MoreExecutors#directExecutor}, but
      *     consider whether another executor would be safer, as discussed in the {@link
      *     ListenableFuture#addListener ListenableFuture.addListener} documentation. This method is
-     *     scheduled to be removed in April 2018.
+     *     scheduled to be removed in July 2018.
      */
     @CanIgnoreReturnValue // TODO(cpovirk): Remove this
     @Deprecated
+    @DoNotCall
     public <C> ListenableFuture<C> call(Callable<C> combiner) {
       return call(combiner, directExecutor());
     }
@@ -1314,9 +1275,10 @@ public final class Futures extends GwtFuturesCatchingSpecialization {
    *     overload that requires an executor}. For identical behavior, pass {@link
    *     MoreExecutors#directExecutor}, but consider whether another executor would be safer, as
    *     discussed in the {@link ListenableFuture#addListener ListenableFuture.addListener}
-   *     documentation. This method is scheduled to be removed in April 2018.
+   *     documentation. This method is scheduled to be removed in July 2018.
    */
   @Deprecated
+  @DoNotCall
   public static <V> void addCallback(
       ListenableFuture<V> future, FutureCallback<? super V> callback) {
     addCallback(future, callback, directExecutor());

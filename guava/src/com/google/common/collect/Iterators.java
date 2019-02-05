@@ -45,7 +45,7 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * This class contains static utility methods that operate on or return objects of type {@link
@@ -124,6 +124,7 @@ public final class Iterators {
   /** Returns an unmodifiable view of {@code iterator}. */
   public static <T> UnmodifiableIterator<T> unmodifiableIterator(
       final Iterator<? extends T> iterator) {
+    checkNotNull(iterator);
     if (iterator instanceof UnmodifiableIterator) {
       @SuppressWarnings("unchecked") // Since it's unmodifiable, the covariant cast is safe
       UnmodifiableIterator<T> result = (UnmodifiableIterator<T>) iterator;
@@ -150,7 +151,7 @@ public final class Iterators {
    */
   @Deprecated
   public static <T> UnmodifiableIterator<T> unmodifiableIterator(UnmodifiableIterator<T> iterator) {
-    return iterator;
+    return checkNotNull(iterator);
   }
 
   /**
@@ -167,7 +168,7 @@ public final class Iterators {
   }
 
   /** Returns {@code true} if {@code iterator} contains {@code element}. */
-  public static boolean contains(Iterator<?> iterator, @NullableDecl Object element) {
+  public static boolean contains(Iterator<?> iterator, @Nullable Object element) {
     if (element == null) {
       while (iterator.hasNext()) {
         if (iterator.next() == null) {
@@ -194,6 +195,7 @@ public final class Iterators {
    */
   @CanIgnoreReturnValue
   public static boolean removeAll(Iterator<?> removeFrom, Collection<?> elementsToRemove) {
+    checkNotNull(elementsToRemove);
     boolean result = false;
     while (removeFrom.hasNext()) {
       if (elementsToRemove.contains(removeFrom.next())) {
@@ -215,6 +217,7 @@ public final class Iterators {
    */
   @CanIgnoreReturnValue
   public static <T> boolean removeIf(Iterator<T> removeFrom, Predicate<? super T> predicate) {
+    checkNotNull(predicate);
     boolean modified = false;
     while (removeFrom.hasNext()) {
       if (predicate.apply(removeFrom.next())) {
@@ -236,6 +239,7 @@ public final class Iterators {
    */
   @CanIgnoreReturnValue
   public static boolean retainAll(Iterator<?> removeFrom, Collection<?> elementsToRetain) {
+    checkNotNull(elementsToRetain);
     boolean result = false;
     while (removeFrom.hasNext()) {
       if (!elementsToRetain.contains(removeFrom.next())) {
@@ -320,8 +324,8 @@ public final class Iterators {
    *     iterator is unspecified.
    */
   @CanIgnoreReturnValue // TODO(kak): Consider removing this?
-  @NullableDecl
-  public static <T> T getOnlyElement(Iterator<? extends T> iterator, @NullableDecl T defaultValue) {
+  public static <T> @Nullable T getOnlyElement(
+      Iterator<? extends T> iterator, @Nullable T defaultValue) {
     return iterator.hasNext() ? getOnlyElement(iterator) : defaultValue;
   }
 
@@ -347,6 +351,8 @@ public final class Iterators {
    */
   @CanIgnoreReturnValue
   public static <T> boolean addAll(Collection<T> addTo, Iterator<? extends T> iterator) {
+    checkNotNull(addTo);
+    checkNotNull(iterator);
     boolean wasModified = false;
     while (iterator.hasNext()) {
       wasModified |= addTo.add(iterator.next());
@@ -360,7 +366,7 @@ public final class Iterators {
    *
    * @see Collections#frequency
    */
-  public static int frequency(Iterator<?> iterator, @NullableDecl Object element) {
+  public static int frequency(Iterator<?> iterator, @Nullable Object element) {
     int count = 0;
     while (contains(iterator, element)) {
       // Since it lives in the same class, we know contains gets to the element and then stops,
@@ -383,6 +389,7 @@ public final class Iterators {
    * elements.
    */
   public static <T> Iterator<T> cycle(final Iterable<T> iterable) {
+    checkNotNull(iterable);
     return new Iterator<T>() {
       Iterator<T> iterator = emptyModifiableIterator();
 
@@ -472,6 +479,8 @@ public final class Iterators {
    * supports it.
    */
   public static <T> Iterator<T> concat(Iterator<? extends T> a, Iterator<? extends T> b) {
+    checkNotNull(a);
+    checkNotNull(b);
     return concat(consumingForArray(a, b));
   }
 
@@ -485,6 +494,9 @@ public final class Iterators {
    */
   public static <T> Iterator<T> concat(
       Iterator<? extends T> a, Iterator<? extends T> b, Iterator<? extends T> c) {
+    checkNotNull(a);
+    checkNotNull(b);
+    checkNotNull(c);
     return concat(consumingForArray(a, b, c));
   }
 
@@ -502,6 +514,10 @@ public final class Iterators {
       Iterator<? extends T> b,
       Iterator<? extends T> c,
       Iterator<? extends T> d) {
+    checkNotNull(a);
+    checkNotNull(b);
+    checkNotNull(c);
+    checkNotNull(d);
     return concat(consumingForArray(a, b, c, d));
   }
 
@@ -519,14 +535,6 @@ public final class Iterators {
     return concatNoDefensiveCopy(Arrays.copyOf(inputs, inputs.length));
   }
 
-  /** Concats a varargs array of iterators without making a defensive copy of the array. */
-  static <T> Iterator<T> concatNoDefensiveCopy(Iterator<? extends T>... inputs) {
-    for (Iterator<? extends T> input : inputs) {
-      checkNotNull(input);
-    }
-    return concat(consumingForArray(inputs));
-  }
-
   /**
    * Combines multiple iterators into a single iterator. The returned iterator iterates across the
    * elements of each iterator in {@code inputs}. The input iterators are not polled until
@@ -538,6 +546,14 @@ public final class Iterators {
    */
   public static <T> Iterator<T> concat(Iterator<? extends Iterator<? extends T>> inputs) {
     return new ConcatenatedIterator<T>(inputs);
+  }
+
+  /** Concats a varargs array of iterators without making a defensive copy of the array. */
+  static <T> Iterator<T> concatNoDefensiveCopy(Iterator<? extends T>... inputs) {
+    for (Iterator<? extends T> input : checkNotNull(inputs)) {
+      checkNotNull(input);
+    }
+    return concat(consumingForArray(inputs));
   }
 
   /**
@@ -578,6 +594,7 @@ public final class Iterators {
 
   private static <T> UnmodifiableIterator<List<T>> partitionImpl(
       final Iterator<T> iterator, final int size, final boolean pad) {
+    checkNotNull(iterator);
     checkArgument(size > 0);
     return new UnmodifiableIterator<List<T>>() {
       @Override
@@ -612,6 +629,8 @@ public final class Iterators {
    */
   public static <T> UnmodifiableIterator<T> filter(
       final Iterator<T> unfiltered, final Predicate<? super T> retainIfTrue) {
+    checkNotNull(unfiltered);
+    checkNotNull(retainIfTrue);
     return new AbstractIterator<T>() {
       @Override
       protected T computeNext() {
@@ -649,6 +668,7 @@ public final class Iterators {
    * predicate. If {@code iterator} is empty, {@code true} is returned.
    */
   public static <T> boolean all(Iterator<T> iterator, Predicate<? super T> predicate) {
+    checkNotNull(predicate);
     while (iterator.hasNext()) {
       T element = iterator.next();
       if (!predicate.apply(element)) {
@@ -668,6 +688,8 @@ public final class Iterators {
    * @throws NoSuchElementException if no element in {@code iterator} matches the given predicate
    */
   public static <T> T find(Iterator<T> iterator, Predicate<? super T> predicate) {
+    checkNotNull(iterator);
+    checkNotNull(predicate);
     while (iterator.hasNext()) {
       T t = iterator.next();
       if (predicate.apply(t)) {
@@ -685,11 +707,10 @@ public final class Iterators {
    *
    * @since 7.0
    */
-  @NullableDecl
-  public static <T> T find(
-      Iterator<? extends T> iterator,
-      Predicate<? super T> predicate,
-      @NullableDecl T defaultValue) {
+  public static <T> @Nullable T find(
+      Iterator<? extends T> iterator, Predicate<? super T> predicate, @Nullable T defaultValue) {
+    checkNotNull(iterator);
+    checkNotNull(predicate);
     while (iterator.hasNext()) {
       T t = iterator.next();
       if (predicate.apply(t)) {
@@ -711,6 +732,8 @@ public final class Iterators {
    * @since 11.0
    */
   public static <T> Optional<T> tryFind(Iterator<T> iterator, Predicate<? super T> predicate) {
+    checkNotNull(iterator);
+    checkNotNull(predicate);
     while (iterator.hasNext()) {
       T t = iterator.next();
       if (predicate.apply(t)) {
@@ -735,6 +758,7 @@ public final class Iterators {
    * @since 2.0
    */
   public static <T> int indexOf(Iterator<T> iterator, Predicate<? super T> predicate) {
+    checkNotNull(predicate, "predicate");
     for (int i = 0; iterator.hasNext(); i++) {
       T current = iterator.next();
       if (predicate.apply(current)) {
@@ -754,6 +778,7 @@ public final class Iterators {
    */
   public static <F, T> Iterator<T> transform(
       final Iterator<F> fromIterator, final Function<? super F, ? extends T> function) {
+    checkNotNull(function);
     return new TransformedIterator<F, T>(fromIterator) {
       @Override
       T transform(F from) {
@@ -785,12 +810,6 @@ public final class Iterators {
     return iterator.next();
   }
 
-  static void checkNonnegative(int position) {
-    if (position < 0) {
-      throw new IndexOutOfBoundsException("position (" + position + ") must not be negative");
-    }
-  }
-
   /**
    * Advances {@code iterator} {@code position + 1} times, returning the element at the {@code
    * position}th position or {@code defaultValue} otherwise.
@@ -803,12 +822,17 @@ public final class Iterators {
    * @throws IndexOutOfBoundsException if {@code position} is negative
    * @since 4.0
    */
-  @NullableDecl
-  public static <T> T get(
-      Iterator<? extends T> iterator, int position, @NullableDecl T defaultValue) {
+  public static <T> @Nullable T get(
+      Iterator<? extends T> iterator, int position, @Nullable T defaultValue) {
     checkNonnegative(position);
     advance(iterator, position);
     return getNext(iterator, defaultValue);
+  }
+
+  static void checkNonnegative(int position) {
+    if (position < 0) {
+      throw new IndexOutOfBoundsException("position (" + position + ") must not be negative");
+    }
   }
 
   /**
@@ -819,8 +843,7 @@ public final class Iterators {
    * @return the next element of {@code iterator} or the default value
    * @since 7.0
    */
-  @NullableDecl
-  public static <T> T getNext(Iterator<? extends T> iterator, @NullableDecl T defaultValue) {
+  public static <T> @Nullable T getNext(Iterator<? extends T> iterator, @Nullable T defaultValue) {
     return iterator.hasNext() ? iterator.next() : defaultValue;
   }
 
@@ -847,8 +870,7 @@ public final class Iterators {
    * @return the last element of {@code iterator}
    * @since 3.0
    */
-  @NullableDecl
-  public static <T> T getLast(Iterator<? extends T> iterator, @NullableDecl T defaultValue) {
+  public static <T> @Nullable T getLast(Iterator<? extends T> iterator, @Nullable T defaultValue) {
     return iterator.hasNext() ? getLast(iterator) : defaultValue;
   }
 
@@ -861,6 +883,7 @@ public final class Iterators {
    */
   @CanIgnoreReturnValue
   public static int advance(Iterator<?> iterator, int numberToAdvance) {
+    checkNotNull(iterator);
     checkArgument(numberToAdvance >= 0, "numberToAdvance must be nonnegative");
 
     int i;
@@ -881,6 +904,7 @@ public final class Iterators {
    * @since 3.0
    */
   public static <T> Iterator<T> limit(final Iterator<T> iterator, final int limitSize) {
+    checkNotNull(iterator);
     checkArgument(limitSize >= 0, "limit is negative");
     return new Iterator<T>() {
       private int count;
@@ -918,6 +942,7 @@ public final class Iterators {
    * @since 2.0
    */
   public static <T> Iterator<T> consumingIterator(final Iterator<T> iterator) {
+    checkNotNull(iterator);
     return new UnmodifiableIterator<T>() {
       @Override
       public boolean hasNext() {
@@ -942,8 +967,7 @@ public final class Iterators {
    * Deletes and returns the next value from the iterator, or returns {@code null} if there is no
    * such value.
    */
-  @NullableDecl
-  static <T> T pollNext(Iterator<T> iterator) {
+  static <T> @Nullable T pollNext(Iterator<T> iterator) {
     if (iterator.hasNext()) {
       T result = iterator.next();
       iterator.remove();
@@ -957,6 +981,7 @@ public final class Iterators {
 
   /** Clears the iterator using its remove method. */
   static void clear(Iterator<?> iterator) {
+    checkNotNull(iterator);
     while (iterator.hasNext()) {
       iterator.next();
       iterator.remove();
@@ -976,24 +1001,6 @@ public final class Iterators {
   @SafeVarargs
   public static <T> UnmodifiableIterator<T> forArray(final T... array) {
     return forArray(array, 0, array.length, 0);
-  }
-
-  private static final class ArrayItr<T> extends AbstractIndexedListIterator<T> {
-    static final UnmodifiableListIterator<Object> EMPTY = new ArrayItr<>(new Object[0], 0, 0, 0);
-
-    private final T[] array;
-    private final int offset;
-
-    ArrayItr(T[] array, int offset, int length, int index) {
-      super(length, index);
-      this.array = array;
-      this.offset = offset;
-    }
-
-    @Override
-    protected T get(int index) {
-      return array[offset + index];
-    }
   }
 
   /**
@@ -1017,12 +1024,30 @@ public final class Iterators {
     return new ArrayItr<T>(array, offset, length, index);
   }
 
+  private static final class ArrayItr<T> extends AbstractIndexedListIterator<T> {
+    static final UnmodifiableListIterator<Object> EMPTY = new ArrayItr<>(new Object[0], 0, 0, 0);
+
+    private final T[] array;
+    private final int offset;
+
+    ArrayItr(T[] array, int offset, int length, int index) {
+      super(length, index);
+      this.array = array;
+      this.offset = offset;
+    }
+
+    @Override
+    protected T get(int index) {
+      return array[offset + index];
+    }
+  }
+
   /**
    * Returns an iterator containing only {@code value}.
    *
    * <p>The {@link Iterable} equivalent of this method is {@link Collections#singleton}.
    */
-  public static <T> UnmodifiableIterator<T> singletonIterator(@NullableDecl final T value) {
+  public static <T> UnmodifiableIterator<T> singletonIterator(final @Nullable T value) {
     return new UnmodifiableIterator<T>() {
       boolean done;
 
@@ -1050,6 +1075,7 @@ public final class Iterators {
    * using {@link Collections#list}.
    */
   public static <T> UnmodifiableIterator<T> forEnumeration(final Enumeration<T> enumeration) {
+    checkNotNull(enumeration);
     return new UnmodifiableIterator<T>() {
       @Override
       public boolean hasNext() {
@@ -1070,6 +1096,7 @@ public final class Iterators {
    * you have a {@link Collection}), or {@code Iterators.asEnumeration(collection.iterator())}.
    */
   public static <T> Enumeration<T> asEnumeration(final Iterator<T> iterator) {
+    checkNotNull(iterator);
     return new Enumeration<T>() {
       @Override
       public boolean hasMoreElements() {
@@ -1088,10 +1115,10 @@ public final class Iterators {
 
     private final Iterator<? extends E> iterator;
     private boolean hasPeeked;
-    private E peekedElement;
+    private @Nullable E peekedElement;
 
     public PeekingImpl(Iterator<? extends E> iterator) {
-      this.iterator = iterator;
+      this.iterator = checkNotNull(iterator);
     }
 
     @Override
@@ -1181,7 +1208,7 @@ public final class Iterators {
    */
   @Deprecated
   public static <T> PeekingIterator<T> peekingIterator(PeekingIterator<T> iterator) {
-    return iterator;
+    return checkNotNull(iterator);
   }
 
   /**
@@ -1199,6 +1226,9 @@ public final class Iterators {
   @Beta
   public static <T> UnmodifiableIterator<T> mergeSorted(
       Iterable<? extends Iterator<? extends T>> iterators, Comparator<? super T> comparator) {
+    checkNotNull(iterators, "iterators");
+    checkNotNull(comparator, "comparator");
+
     return new MergingIterator<T>(iterators, comparator);
   }
 
@@ -1254,7 +1284,7 @@ public final class Iterators {
 
   private static class ConcatenatedIterator<T> implements Iterator<T> {
     /* The last iterator to return an element.  Calls to remove() go to this iterator. */
-    private Iterator<? extends T> toRemove;
+    private @Nullable Iterator<? extends T> toRemove;
 
     /* The iterator currently returning elements. */
     private Iterator<? extends T> iterator;
@@ -1269,16 +1299,15 @@ public final class Iterators {
     private Iterator<? extends Iterator<? extends T>> topMetaIterator;
 
     // Only becomes nonnull if we encounter nested concatenations.
-    @NullableDecl private Deque<Iterator<? extends Iterator<? extends T>>> metaIterators;
+    private @Nullable Deque<Iterator<? extends Iterator<? extends T>>> metaIterators;
 
     ConcatenatedIterator(Iterator<? extends Iterator<? extends T>> metaIterator) {
       iterator = emptyIterator();
-      topMetaIterator = metaIterator;
+      topMetaIterator = checkNotNull(metaIterator);
     }
 
     // Returns a nonempty meta-iterator or, if all meta-iterators are empty, null.
-    @NullableDecl
-    private Iterator<? extends Iterator<? extends T>> getTopMetaIterator() {
+    private @Nullable Iterator<? extends Iterator<? extends T>> getTopMetaIterator() {
       while (topMetaIterator == null || !topMetaIterator.hasNext()) {
         if (metaIterators != null && !metaIterators.isEmpty()) {
           topMetaIterator = metaIterators.removeFirst();

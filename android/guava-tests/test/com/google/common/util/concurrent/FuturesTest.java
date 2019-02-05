@@ -27,7 +27,6 @@ import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.util.concurrent.Futures.allAsList;
 import static com.google.common.util.concurrent.Futures.catching;
 import static com.google.common.util.concurrent.Futures.catchingAsync;
-import static com.google.common.util.concurrent.Futures.dereference;
 import static com.google.common.util.concurrent.Futures.getDone;
 import static com.google.common.util.concurrent.Futures.immediateCancelledFuture;
 import static com.google.common.util.concurrent.Futures.immediateCheckedFuture;
@@ -80,6 +79,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -838,6 +838,38 @@ public class FuturesTest extends TestCase {
     assertTrue(spy.wasExecuted);
   }
 
+  @GwtIncompatible // Threads
+
+  public void testTransformAsync_functionToString() throws Exception {
+    final CountDownLatch functionCalled = new CountDownLatch(1);
+    final CountDownLatch functionBlocking = new CountDownLatch(1);
+    AsyncFunction<Object, Object> function =
+        new AsyncFunction<Object, Object>() {
+          @Override
+          public ListenableFuture<Object> apply(Object input) throws Exception {
+            functionCalled.countDown();
+            functionBlocking.await();
+            return immediateFuture(null);
+          }
+
+          @Override
+          public String toString() {
+            return "Called my toString";
+          }
+        };
+
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    try {
+      ListenableFuture<?> output =
+          Futures.transformAsync(immediateFuture(null), function, executor);
+      functionCalled.await();
+      assertThat(output.toString()).contains("Called my toString");
+    } finally {
+      functionBlocking.countDown();
+      executor.shutdown();
+    }
+  }
+
   @GwtIncompatible // lazyTransform
   public void testLazyTransform() throws Exception {
     FunctionSpy<Object, String> spy = new FunctionSpy<>(constant("bar"));
@@ -894,10 +926,6 @@ public class FuturesTest extends TestCase {
     }
   }
 
-  private static <I, O> FunctionSpy<I, O> spy(Function<I, O> delegate) {
-    return new FunctionSpy<>(delegate);
-  }
-
   private static <X extends Throwable, V> Function<X, V> unexpectedFunction() {
     return new Function<X, V>() {
       @Override
@@ -924,6 +952,10 @@ public class FuturesTest extends TestCase {
     void verifyCallCount(int expected) {
       assertThat(count).isEqualTo(expected);
     }
+  }
+
+  private static <I, O> FunctionSpy<I, O> spy(Function<I, O> delegate) {
+    return new FunctionSpy<>(delegate);
   }
 
   private static <X extends Throwable, V> AsyncFunctionSpy<X, V> spy(AsyncFunction<X, V> delegate) {
@@ -1166,6 +1198,63 @@ public class FuturesTest extends TestCase {
     // https://github.com/google/guava/issues/1989
     assertEquals(1, gotException.getCount());
     // gotException.await();
+  }
+
+  @GwtIncompatible // Threads
+
+  public void testCatchingAsync_functionToString() throws Exception {
+    final CountDownLatch functionCalled = new CountDownLatch(1);
+    final CountDownLatch functionBlocking = new CountDownLatch(1);
+    AsyncFunction<Object, Object> function =
+        new AsyncFunction<Object, Object>() {
+          @Override
+          public ListenableFuture<Object> apply(Object input) throws Exception {
+            functionCalled.countDown();
+            functionBlocking.await();
+            return immediateFuture(null);
+          }
+
+          @Override
+          public String toString() {
+            return "Called my toString";
+          }
+        };
+
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    try {
+      ListenableFuture<?> output =
+          Futures.catchingAsync(
+              immediateFailedFuture(new RuntimeException()), Throwable.class, function, executor);
+      functionCalled.await();
+      assertThat(output.toString()).contains("Called my toString");
+    } finally {
+      functionBlocking.countDown();
+      executor.shutdown();
+    }
+  }
+
+  public void testCatchingAsync_futureToString() throws Exception {
+    final SettableFuture<Object> toReturn = SettableFuture.create();
+    AsyncFunction<Object, Object> function =
+        new AsyncFunction<Object, Object>() {
+          @Override
+          public ListenableFuture<Object> apply(Object input) throws Exception {
+            return toReturn;
+          }
+
+          @Override
+          public String toString() {
+            return "Called my toString";
+          }
+        };
+
+    ListenableFuture<?> output =
+        Futures.catchingAsync(
+            immediateFailedFuture(new RuntimeException()),
+            Throwable.class,
+            function,
+            directExecutor());
+    assertThat(output.toString()).contains(toReturn.toString());
   }
 
   // catching tests cloned from the old withFallback tests:
@@ -1990,52 +2079,6 @@ public class FuturesTest extends TestCase {
         return returnValue;
       }
     };
-  }
-
-  public void testDereference_genericsWildcard() throws Exception {
-    ListenableFuture<?> inner = immediateFuture(null);
-    ListenableFuture<ListenableFuture<?>> outer =
-        Futures.<ListenableFuture<?>>immediateFuture(inner);
-    ListenableFuture<?> dereferenced = dereference(outer);
-    assertNull(getDone(dereferenced));
-  }
-
-  public void testDereference_genericsHierarchy() throws Exception {
-    FooChild fooChild = new FooChild();
-    ListenableFuture<FooChild> inner = immediateFuture(fooChild);
-    ListenableFuture<ListenableFuture<FooChild>> outer = immediateFuture(inner);
-    ListenableFuture<Foo> dereferenced = Futures.<Foo>dereference(outer);
-    assertSame(fooChild, getDone(dereferenced));
-  }
-
-  public void testDereference_resultCancelsOuter() throws Exception {
-    ListenableFuture<ListenableFuture<Foo>> outer = SettableFuture.create();
-    ListenableFuture<Foo> dereferenced = dereference(outer);
-    dereferenced.cancel(true);
-    assertTrue(outer.isCancelled());
-  }
-
-  public void testDereference_resultCancelsInner() throws Exception {
-    ListenableFuture<Foo> inner = SettableFuture.create();
-    ListenableFuture<ListenableFuture<Foo>> outer = immediateFuture(inner);
-    ListenableFuture<Foo> dereferenced = dereference(outer);
-    dereferenced.cancel(true);
-    assertTrue(inner.isCancelled());
-  }
-
-  public void testDereference_outerCancelsResult() throws Exception {
-    ListenableFuture<ListenableFuture<Foo>> outer = SettableFuture.create();
-    ListenableFuture<Foo> dereferenced = dereference(outer);
-    outer.cancel(true);
-    assertTrue(dereferenced.isCancelled());
-  }
-
-  public void testDereference_innerCancelsResult() throws Exception {
-    ListenableFuture<Foo> inner = SettableFuture.create();
-    ListenableFuture<ListenableFuture<Foo>> outer = immediateFuture(inner);
-    ListenableFuture<Foo> dereferenced = dereference(outer);
-    inner.cancel(true);
-    assertTrue(dereferenced.isCancelled());
   }
 
   /** Runnable which can be called a single time, and only after {@link #expectCall} is called. */
