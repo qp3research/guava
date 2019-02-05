@@ -25,7 +25,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * An abstract {@code TestMultisetGenerator} for generating multisets containing enum values.
+ * An abstract {@code TestMultisetGenerator} for generating multisets containing
+ * enum values.
  *
  * @author Jared Levy
  */
@@ -53,7 +54,9 @@ public abstract class TestEnumMultisetGenerator implements TestMultisetGenerator
     return new AnEnum[length];
   }
 
-  /** Sorts the enums according to their natural ordering. */
+  /**
+   * Sorts the enums according to their natural ordering.
+   */
   @Override
   public List<AnEnum> order(List<AnEnum> insertionOrder) {
     Collections.sort(insertionOrder);

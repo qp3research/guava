@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.google.common.collect;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -22,10 +21,11 @@ import com.google.common.annotations.GwtCompatible;
 import com.google.common.collect.ImmutableMap.IteratorBasedImmutableMap;
 import java.io.Serializable;
 import java.util.EnumMap;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
 /**
- * Implementation of {@link ImmutableMap} backed by a non-empty {@link java.util.EnumMap}.
+ * Implementation of {@link ImmutableMap} backed by a non-empty {@link
+ * java.util.EnumMap}.
  *
  * @author Louis Wasserman
  */
@@ -62,7 +62,7 @@ final class ImmutableEnumMap<K extends Enum<K>, V> extends IteratorBasedImmutabl
   }
 
   @Override
-  public boolean containsKey(@NullableDecl Object key) {
+  public boolean containsKey(@Nullable Object key) {
     return delegate.containsKey(key);
   }
 

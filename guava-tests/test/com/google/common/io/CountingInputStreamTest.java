@@ -30,8 +30,7 @@ import java.io.InputStream;
 public class CountingInputStreamTest extends IoTestCase {
   private CountingInputStream counter;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Override protected void setUp() throws Exception {
     super.setUp();
     counter = new CountingInputStream(new ByteArrayInputStream(new byte[20]));
   }

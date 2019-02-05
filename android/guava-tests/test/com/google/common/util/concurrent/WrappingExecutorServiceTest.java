@@ -182,8 +182,7 @@ public class WrappingExecutorServiceTest extends TestCase {
       return new WrappedCallable<T>(callable);
     }
 
-    @Override
-    protected Runnable wrapTask(Runnable command) {
+    @Override protected Runnable wrapTask(Runnable command) {
       return new WrappedRunnable(command);
     }
   }
@@ -296,9 +295,11 @@ public class WrappingExecutorServiceTest extends TestCase {
       inline.execute(command);
     }
 
-    private static <T> void assertTaskWrapped(Collection<? extends Callable<T>> tasks) {
+    private static <T> void assertTaskWrapped(
+        Collection<? extends Callable<T>> tasks) {
       Predicate<Object> p = Predicates.instanceOf(WrappedCallable.class);
       assertTrue(Iterables.all(tasks, p));
     }
+
   }
 }

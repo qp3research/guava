@@ -32,7 +32,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * This class provides a skeletal implementation of {@link Network}. It is recommended to extend
@@ -192,7 +192,8 @@ public abstract class AbstractNetwork<N, E> implements Network<N, E> {
   }
 
   @Override
-  public @Nullable E edgeConnectingOrNull(N nodeU, N nodeV) {
+  @Nullable
+  public E edgeConnectingOrNull(N nodeU, N nodeV) {
     return edgeConnecting(nodeU, nodeV).orElse(null);
   }
 

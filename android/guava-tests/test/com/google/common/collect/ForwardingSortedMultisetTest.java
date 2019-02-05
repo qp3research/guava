@@ -27,10 +27,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
+import javax.annotation.Nullable;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Tests for {@link ForwardingSortedMultiset}.
@@ -56,7 +56,10 @@ public class ForwardingSortedMultisetTest extends TestCase {
 
         @Override
         Iterator<Entry<E>> entryIterator() {
-          return backingMultiset.descendingMultiset().entrySet().iterator();
+          return backingMultiset
+              .descendingMultiset()
+              .entrySet()
+              .iterator();
         }
       };
     }
@@ -93,12 +96,12 @@ public class ForwardingSortedMultisetTest extends TestCase {
     }
 
     @Override
-    public int count(@NullableDecl Object element) {
+    public int count(@Nullable Object element) {
       return standardCount(element);
     }
 
     @Override
-    public boolean equals(@NullableDecl Object object) {
+    public boolean equals(@Nullable Object object) {
       return standardEquals(object);
     }
 
@@ -123,7 +126,7 @@ public class ForwardingSortedMultisetTest extends TestCase {
     }
 
     @Override
-    public boolean contains(@NullableDecl Object object) {
+    public boolean contains(@Nullable Object object) {
       return standardContains(object);
     }
 
@@ -143,7 +146,7 @@ public class ForwardingSortedMultisetTest extends TestCase {
     }
 
     @Override
-    public boolean remove(@NullableDecl Object object) {
+    public boolean remove(@Nullable Object object) {
       return standardRemove(object);
     }
 
@@ -205,14 +208,11 @@ public class ForwardingSortedMultisetTest extends TestCase {
   @SuppressWarnings({"rawtypes", "unchecked"})
   public void testForwarding() {
     new ForwardingWrapperTester()
-        .testForwarding(
-            SortedMultiset.class,
-            new Function<SortedMultiset, SortedMultiset>() {
-              @Override
-              public SortedMultiset apply(SortedMultiset delegate) {
-                return wrap(delegate);
-              }
-            });
+        .testForwarding(SortedMultiset.class, new Function<SortedMultiset, SortedMultiset>() {
+          @Override public SortedMultiset apply(SortedMultiset delegate) {
+            return wrap(delegate);
+          }
+        });
   }
 
   public void testEquals() {
@@ -226,8 +226,7 @@ public class ForwardingSortedMultisetTest extends TestCase {
 
   private static <T> SortedMultiset<T> wrap(final SortedMultiset<T> delegate) {
     return new ForwardingSortedMultiset<T>() {
-      @Override
-      protected SortedMultiset<T> delegate() {
+      @Override protected SortedMultiset<T> delegate() {
         return delegate;
       }
     };

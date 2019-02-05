@@ -20,7 +20,7 @@ import com.google.common.annotations.GwtIncompatible;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import javax.annotation.Nullable;
 
 /**
  * An {@link InputStream} that concatenates multiple substreams. At most one stream will be open at
@@ -33,7 +33,7 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 final class MultiInputStream extends InputStream {
 
   private Iterator<? extends ByteSource> it;
-  @NullableDecl private InputStream in;
+  private InputStream in;
 
   /**
    * Creates a new instance.
@@ -56,7 +56,9 @@ final class MultiInputStream extends InputStream {
     }
   }
 
-  /** Closes the current input stream and opens the next one, if any. */
+  /**
+   * Closes the current input stream and opens the next one, if any.
+   */
   private void advance() throws IOException {
     close();
     if (it.hasNext()) {
@@ -79,26 +81,28 @@ final class MultiInputStream extends InputStream {
 
   @Override
   public int read() throws IOException {
-    while (in != null) {
-      int result = in.read();
-      if (result != -1) {
-        return result;
-      }
-      advance();
+    if (in == null) {
+      return -1;
     }
-    return -1;
+    int result = in.read();
+    if (result == -1) {
+      advance();
+      return read();
+    }
+    return result;
   }
 
   @Override
-  public int read(@NullableDecl byte[] b, int off, int len) throws IOException {
-    while (in != null) {
-      int result = in.read(b, off, len);
-      if (result != -1) {
-        return result;
-      }
-      advance();
+  public int read(@Nullable byte[] b, int off, int len) throws IOException {
+    if (in == null) {
+      return -1;
     }
-    return -1;
+    int result = in.read(b, off, len);
+    if (result == -1) {
+      advance();
+      return read(b, off, len);
+    }
+    return result;
   }
 
   @Override

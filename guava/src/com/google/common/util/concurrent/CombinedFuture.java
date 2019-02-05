@@ -25,9 +25,11 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
-/** Aggregate future that computes its value by calling a callable. */
+/**
+ * Aggregate future that computes its value by calling a callable.
+ */
 @GwtCompatible
 final class CombinedFuture<V> extends AggregateFuture<Object, V> {
   CombinedFuture(
@@ -159,7 +161,7 @@ final class CombinedFuture<V> extends AggregateFuture<Object, V> {
     }
 
     @Override
-    String toPendingString() {
+    public String toString() {
       return callable.toString();
     }
   }
@@ -185,7 +187,7 @@ final class CombinedFuture<V> extends AggregateFuture<Object, V> {
     }
 
     @Override
-    String toPendingString() {
+    public String toString() {
       return callable.toString();
     }
   }

@@ -35,12 +35,11 @@ public class CharSequenceReaderTest extends TestCase {
     assertReadsCorrectly("abc");
     assertReadsCorrectly("abcde");
     assertReadsCorrectly("abcdefghijkl");
-    assertReadsCorrectly(
-        ""
-            + "abcdefghijklmnopqrstuvwxyz\n"
-            + "ABCDEFGHIJKLMNOPQRSTUVWXYZ\r"
-            + "0123456789\r\n"
-            + "!@#$%^&*()-=_+\t[]{};':\",./<>?\\| ");
+    assertReadsCorrectly(""
+        + "abcdefghijklmnopqrstuvwxyz\n"
+        + "ABCDEFGHIJKLMNOPQRSTUVWXYZ\r"
+        + "0123456789\r\n"
+        + "!@#$%^&*()-=_+\t[]{};':\",./<>?\\| ");
   }
 
   public void testMarkAndReset() throws IOException {

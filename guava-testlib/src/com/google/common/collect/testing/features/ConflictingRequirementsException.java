@@ -20,7 +20,8 @@ import com.google.common.annotations.GwtCompatible;
 import java.util.Set;
 
 /**
- * Thrown when requirements on a tester method or class conflict with each other.
+ * Thrown when requirements on a tester method or class conflict with
+ * each other.
  *
  * @author George van den Driessche
  */

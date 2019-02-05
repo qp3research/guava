@@ -24,8 +24,8 @@ import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.VisibleForTesting;
 import java.util.AbstractMap;
 import java.util.Arrays;
-import java.util.Map.Entry;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * A hash-based implementation of {@link ImmutableMap}.
@@ -39,26 +39,27 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
   @SuppressWarnings("unchecked")
   static final ImmutableMap<Object, Object> EMPTY =
       new RegularImmutableMap<>(null, new Object[0], 0);
-
+  
   /*
    * This is an implementation of ImmutableMap optimized especially for Android, which does not like
    * objects per entry.  Instead we use an open-addressed hash table.  This design is basically
-   * equivalent to RegularImmutableSet, save that instead of having a hash table containing the
+   * equivalent to RegularImmutableSet, save that instead of having a hash table containing the 
    * elements directly and null for empty positions, we store indices of the keys in the hash table,
    * and ABSENT for empty positions.  We then look up the keys in alternatingKeysAndValues.
-   *
+   * 
    * (The index actually stored is the index of the key in alternatingKeysAndValues, which is
    * double the index of the entry in entrySet.asList.)
-   *
+   * 
    * The basic data structure is described in https://en.wikipedia.org/wiki/Open_addressing.
    * The pointer to a key is stored in hashTable[Hashing.smear(key.hashCode())] % table.length,
    * save that if that location is already full, we try the next index, and the next, until we
-   * find an empty table position.  Since the table has a power-of-two size, we use
+   * find an empty table position.  Since the table has a power-of-two size, we use 
    * & (table.length - 1) instead of % table.length, though.
    */
 
   private final transient int[] hashTable;
-  @VisibleForTesting final transient Object[] alternatingKeysAndValues;
+  @VisibleForTesting
+  final transient Object[] alternatingKeysAndValues;
   private final transient int size;
 
   @SuppressWarnings("unchecked")
@@ -129,17 +130,17 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
 
   @SuppressWarnings("unchecked")
   @Override
-  @NullableDecl
-  public V get(@NullableDecl Object key) {
+  @Nullable
+  public V get(@Nullable Object key) {
     return (V) get(hashTable, alternatingKeysAndValues, size, 0, key);
   }
-
+  
   static Object get(
-      @NullableDecl int[] hashTable,
-      @NullableDecl Object[] alternatingKeysAndValues,
+      @Nullable int[] hashTable,
+      @Nullable Object[] alternatingKeysAndValues,
       int size,
       int keyOffset,
-      @NullableDecl Object key) {
+      @Nullable Object key) {
     if (key == null) {
       return null;
     } else if (size == 1) {
@@ -165,12 +166,12 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
   ImmutableSet<Entry<K, V>> createEntrySet() {
     return new EntrySet<>(this, alternatingKeysAndValues, 0, size);
   }
-
+  
   static class EntrySet<K, V> extends ImmutableSet<Entry<K, V>> {
-    private final transient ImmutableMap<K, V> map;
-    private final transient Object[] alternatingKeysAndValues;
-    private final transient int keyOffset;
-    private final transient int size;
+    private transient final ImmutableMap<K, V> map;
+    private transient final Object[] alternatingKeysAndValues;
+    private transient final int keyOffset;
+    private transient final int size;
 
     EntrySet(ImmutableMap<K, V> map, Object[] alternatingKeysAndValues, int keyOffset, int size) {
       this.map = map;
@@ -182,11 +183,6 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
     @Override
     public UnmodifiableIterator<Entry<K, V>> iterator() {
       return asList().iterator();
-    }
-
-    @Override
-    int copyIntoArray(Object[] dst, int offset) {
-      return asList().copyIntoArray(dst, offset);
     }
 
     @Override
@@ -216,8 +212,8 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
 
     @Override
     public boolean contains(Object object) {
-      if (object instanceof Entry) {
-        Entry<?, ?> entry = (Entry<?, ?>) object;
+      if (object instanceof Map.Entry) {
+        Map.Entry<?, ?> entry = (Map.Entry<?, ?>) object;
         Object k = entry.getKey();
         Object v = entry.getValue();
         return v != null && v.equals(map.get(k));
@@ -235,19 +231,19 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
       return size;
     }
   }
-
+ 
   @Override
   ImmutableSet<K> createKeySet() {
     @SuppressWarnings("unchecked")
-    ImmutableList<K> keyList =
+    ImmutableList<K> keyList = 
         (ImmutableList<K>) new KeysOrValuesAsList(alternatingKeysAndValues, 0, size);
     return new KeySet<K>(this, keyList);
   }
 
   static final class KeysOrValuesAsList extends ImmutableList<Object> {
-    private final transient Object[] alternatingKeysAndValues;
-    private final transient int offset;
-    private final transient int size;
+    private transient final Object[] alternatingKeysAndValues;
+    private transient final int offset;
+    private transient final int size;
 
     KeysOrValuesAsList(Object[] alternatingKeysAndValues, int offset, int size) {
       this.alternatingKeysAndValues = alternatingKeysAndValues;
@@ -271,7 +267,7 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
       return size;
     }
   }
-
+  
   static final class KeySet<K> extends ImmutableSet<K> {
     private final transient ImmutableMap<K, ?> map;
     private final transient ImmutableList<K> list;
@@ -287,17 +283,12 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
     }
 
     @Override
-    int copyIntoArray(Object[] dst, int offset) {
-      return asList().copyIntoArray(dst, offset);
-    }
-
-    @Override
     public ImmutableList<K> asList() {
       return list;
     }
 
     @Override
-    public boolean contains(@NullableDecl Object object) {
+    public boolean contains(@Nullable Object object) {
       return map.get(object) != null;
     }
 
@@ -311,7 +302,7 @@ final class RegularImmutableMap<K, V> extends ImmutableMap<K, V> {
       return map.size();
     }
   }
-
+  
   @SuppressWarnings("unchecked")
   @Override
   ImmutableCollection<V> createValues() {

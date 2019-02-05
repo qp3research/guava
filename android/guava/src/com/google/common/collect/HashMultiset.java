@@ -16,21 +16,11 @@
 
 package com.google.common.collect;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.CollectPreconditions.checkNonnegative;
-
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
-import com.google.common.primitives.Ints;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Multiset implementation that uses hashing for key and entry access.
@@ -40,16 +30,19 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
  * @since 2.0
  */
 @GwtCompatible(serializable = true, emulated = true)
-public class HashMultiset<E> extends AbstractMapBasedMultiset<E> {
+public final class HashMultiset<E> extends AbstractMapBasedMultiset<E> {
 
-  /** Creates a new, empty {@code HashMultiset} using the default initial capacity. */
+  /**
+   * Creates a new, empty {@code HashMultiset} using the default initial
+   * capacity.
+   */
   public static <E> HashMultiset<E> create() {
-    return create(ObjectCountHashMap.DEFAULT_SIZE);
+    return new HashMultiset<E>();
   }
 
   /**
-   * Creates a new, empty {@code HashMultiset} with the specified expected number of distinct
-   * elements.
+   * Creates a new, empty {@code HashMultiset} with the specified expected
+   * number of distinct elements.
    *
    * @param distinctElements the expected number of distinct elements
    * @throws IllegalArgumentException if {@code distinctElements} is negative
@@ -61,7 +54,8 @@ public class HashMultiset<E> extends AbstractMapBasedMultiset<E> {
   /**
    * Creates a new {@code HashMultiset} containing the specified elements.
    *
-   * <p>This implementation is highly efficient when {@code elements} is itself a {@link Multiset}.
+   * <p>This implementation is highly efficient when {@code elements} is itself
+   * a {@link Multiset}.
    *
    * @param elements the elements that the multiset should contain
    */
@@ -71,13 +65,30 @@ public class HashMultiset<E> extends AbstractMapBasedMultiset<E> {
     return multiset;
   }
 
-  HashMultiset(int distinctElements) {
-    super(distinctElements);
+  private HashMultiset() {
+    super(new ObjectCountHashMap<E>());
   }
 
-  @Override
-  void init(int distinctElements) {
-    backingMap = new ObjectCountHashMap<>(distinctElements);
+  private HashMultiset(int distinctElements) {
+    super(new ObjectCountHashMap<E>(distinctElements));
+  }
+
+  /**
+   * @serialData the number of distinct elements, the first element, its count,
+   *     the second element, its count, and so on
+   */
+  @GwtIncompatible // java.io.ObjectOutputStream
+  private void writeObject(ObjectOutputStream stream) throws IOException {
+    stream.defaultWriteObject();
+    Serialization.writeMultiset(this, stream);
+  }
+
+  @GwtIncompatible // java.io.ObjectInputStream
+  private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+    stream.defaultReadObject();
+    int distinctElements = Serialization.readCount(stream);
+    setBackingMap(new ObjectCountHashMap<E>());
+    Serialization.populateMultiset(this, stream, distinctElements);
   }
 
   @GwtIncompatible // Not needed in emulated source.

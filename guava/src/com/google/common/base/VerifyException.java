@@ -14,16 +14,18 @@
 
 package com.google.common.base;
 
+import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtCompatible;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 /**
- * Exception thrown upon the failure of a <a
- * href="https://github.com/google/guava/wiki/ConditionalFailuresExplained">verification check</a>,
- * including those performed by the convenience methods of the {@link Verify} class.
+ * Exception thrown upon the failure of a
+ * <a href="https://github.com/google/guava/wiki/ConditionalFailuresExplained">verification
+ * check</a>, including those performed by the convenience methods of the {@link Verify} class.
  *
  * @since 17.0
  */
+@Beta
 @GwtCompatible
 public class VerifyException extends RuntimeException {
   /** Constructs a {@code VerifyException} with no message. */
@@ -35,8 +37,8 @@ public class VerifyException extends RuntimeException {
   }
 
   /**
-   * Constructs a {@code VerifyException} with the cause {@code cause} and a message that is {@code
-   * null} if {@code cause} is null, and {@code cause.toString()} otherwise.
+   * Constructs a {@code VerifyException} with the cause {@code cause} and a message that is
+   * {@code null} if {@code cause} is null, and {@code cause.toString()} otherwise.
    *
    * @since 19.0
    */
@@ -45,8 +47,8 @@ public class VerifyException extends RuntimeException {
   }
 
   /**
-   * Constructs a {@code VerifyException} with the message {@code message} and the cause {@code
-   * cause}.
+   * Constructs a {@code VerifyException} with the message {@code message} and the cause
+   * {@code cause}.
    *
    * @since 19.0
    */

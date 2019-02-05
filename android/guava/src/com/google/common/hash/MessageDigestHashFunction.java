@@ -18,7 +18,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.errorprone.annotations.Immutable;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
@@ -31,10 +30,7 @@ import java.util.Arrays;
  * @author Kevin Bourrillion
  * @author Dimitris Andreou
  */
-@Immutable
 final class MessageDigestHashFunction extends AbstractHashFunction implements Serializable {
-
-  @SuppressWarnings("Immutable") // cloned before each use
   private final MessageDigest prototype;
   private final int bytes;
   private final boolean supportsClone;
@@ -118,7 +114,9 @@ final class MessageDigestHashFunction extends AbstractHashFunction implements Se
     return new SerializedForm(prototype.getAlgorithm(), bytes, toString);
   }
 
-  /** Hasher that updates a message digest. */
+  /**
+   * Hasher that updates a message digest.
+   */
   private static final class MessageDigestHasher extends AbstractByteHasher {
     private final MessageDigest digest;
     private final int bytes;

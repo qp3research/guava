@@ -18,7 +18,6 @@ import com.google.common.annotations.GwtCompatible;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
@@ -29,10 +28,10 @@ import java.util.concurrent.ExecutionException;
  *
  * <p>To implement a cache, the programmer needs only to extend this class and provide an
  * implementation for the {@link #put} and {@link #getIfPresent} methods. {@link #getAllPresent} is
- * implemented in terms of {@link #getIfPresent}; {@link #putAll} is implemented in terms of {@link
- * #put}, {@link #invalidateAll(Iterable)} is implemented in terms of {@link #invalidate}. The
- * method {@link #cleanUp} is a no-op. All other methods throw an {@link
- * UnsupportedOperationException}.
+ * implemented in terms of {@link #getIfPresent}; {@link #putAll} is implemented in terms of
+ * {@link #put}, {@link #invalidateAll(Iterable)} is implemented in terms of {@link #invalidate}.
+ * The method {@link #cleanUp} is a no-op. All other methods throw an
+ * {@link UnsupportedOperationException}.
  *
  * @author Charles Fry
  * @since 10.0
@@ -43,7 +42,9 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
   /** Constructor for use by subclasses. */
   protected AbstractCache() {}
 
-  /** @since 11.0 */
+  /**
+   * @since 11.0
+   */
   @Override
   public V get(K key, Callable<? extends V> valueLoader) throws ExecutionException {
     throw new UnsupportedOperationException();
@@ -74,16 +75,20 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     return ImmutableMap.copyOf(result);
   }
 
-  /** @since 11.0 */
+  /**
+   * @since 11.0
+   */
   @Override
   public void put(K key, V value) {
     throw new UnsupportedOperationException();
   }
 
-  /** @since 12.0 */
+  /**
+   * @since 12.0
+   */
   @Override
   public void putAll(Map<? extends K, ? extends V> m) {
-    for (Entry<? extends K, ? extends V> entry : m.entrySet()) {
+    for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
       put(entry.getKey(), entry.getValue());
     }
   }
@@ -101,7 +106,9 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     throw new UnsupportedOperationException();
   }
 
-  /** @since 11.0 */
+  /**
+   * @since 11.0
+   */
   @Override
   public void invalidateAll(Iterable<?> keys) {
     for (Object key : keys) {
@@ -125,8 +132,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
   }
 
   /**
-   * Accumulates statistics during the operation of a {@link Cache} for presentation by {@link
-   * Cache#stats}. This is solely intended for consumption by {@code Cache} implementors.
+   * Accumulates statistics during the operation of a {@link Cache} for presentation by
+   * {@link Cache#stats}. This is solely intended for consumption by {@code Cache} implementors.
    *
    * @since 10.0
    */
@@ -154,8 +161,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
     /**
      * Records the successful load of a new entry. This should be called when a cache request causes
-     * an entry to be loaded, and the loading completes successfully. In contrast to {@link
-     * #recordMisses}, this method should only be called by the loading thread.
+     * an entry to be loaded, and the loading completes successfully. In contrast to
+     * {@link #recordMisses}, this method should only be called by the loading thread.
      *
      * @param loadTime the number of nanoseconds the cache spent computing or retrieving the new
      *     value
@@ -164,8 +171,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
     /**
      * Records the failed load of a new entry. This should be called when a cache request causes an
-     * entry to be loaded, but an exception is thrown while loading the entry. In contrast to {@link
-     * #recordMisses}, this method should only be called by the loading thread.
+     * entry to be loaded, but an exception is thrown while loading the entry. In contrast to
+     * {@link #recordMisses}, this method should only be called by the loading thread.
      *
      * @param loadTime the number of nanoseconds the cache spent computing or retrieving the new
      *     value prior to an exception being thrown
@@ -174,8 +181,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
     /**
      * Records the eviction of an entry from the cache. This should only been called when an entry
-     * is evicted due to the cache's eviction strategy, and not as a result of manual {@linkplain
-     * Cache#invalidate invalidations}.
+     * is evicted due to the cache's eviction strategy, and not as a result of manual
+     * {@linkplain Cache#invalidate invalidations}.
      */
     void recordEviction();
 
@@ -199,16 +206,22 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     private final LongAddable totalLoadTime = LongAddables.create();
     private final LongAddable evictionCount = LongAddables.create();
 
-    /** Constructs an instance with all counts initialized to zero. */
+    /**
+     * Constructs an instance with all counts initialized to zero.
+     */
     public SimpleStatsCounter() {}
 
-    /** @since 11.0 */
+    /**
+     * @since 11.0
+     */
     @Override
     public void recordHits(int count) {
       hitCount.add(count);
     }
 
-    /** @since 11.0 */
+    /**
+     * @since 11.0
+     */
     @Override
     public void recordMisses(int count) {
       missCount.add(count);
@@ -242,7 +255,9 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
           evictionCount.sum());
     }
 
-    /** Increments all counters by the values in {@code other}. */
+    /**
+     * Increments all counters by the values in {@code other}.
+     */
     public void incrementBy(StatsCounter other) {
       CacheStats otherStats = other.snapshot();
       hitCount.add(otherStats.hitCount());

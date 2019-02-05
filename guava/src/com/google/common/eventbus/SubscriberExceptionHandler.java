@@ -11,7 +11,6 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.google.common.eventbus;
 
 /**
@@ -20,6 +19,8 @@ package com.google.common.eventbus;
  * @since 16.0
  */
 public interface SubscriberExceptionHandler {
-  /** Handles exceptions thrown by subscribers. */
+  /**
+   * Handles exceptions thrown by subscribers.
+   */
   void handleException(Throwable exception, SubscriberExceptionContext context);
 }

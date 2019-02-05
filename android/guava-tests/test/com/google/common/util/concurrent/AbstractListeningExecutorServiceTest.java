@@ -74,7 +74,9 @@ public class AbstractListeningExecutorServiceTest extends TestCase {
     }
   }
 
-  /** Simple same thread listening executor service that doesn't handle shutdown. */
+  /**
+   * Simple same thread listening executor service that doesn't handle shutdown.
+   */
   private static class TestListeningExecutorService extends AbstractListeningExecutorService {
 
     @Override
@@ -84,7 +86,8 @@ public class AbstractListeningExecutorServiceTest extends TestCase {
     }
 
     @Override
-    public void shutdown() {}
+    public void shutdown() {
+    }
 
     @Override
     public List<Runnable> shutdownNow() {

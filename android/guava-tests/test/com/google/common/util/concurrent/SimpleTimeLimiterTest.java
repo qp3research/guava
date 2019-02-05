@@ -260,7 +260,6 @@ public class SimpleTimeLimiterTest extends TestCase {
 
   @SuppressWarnings("serial")
   private static class SampleException extends Exception {}
-
   @SuppressWarnings("serial")
   private static class SampleRuntimeException extends RuntimeException {}
 

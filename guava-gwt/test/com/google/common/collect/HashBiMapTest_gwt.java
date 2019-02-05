@@ -58,9 +58,9 @@ public void testInsertionOrderAfterRemoveMiddle() throws Exception {
   testCase.testInsertionOrderAfterRemoveMiddle();
 }
 
-public void testInverseEntrySetValueNewKey() throws Exception {
+public void testInverseEntrySetValue() throws Exception {
   com.google.common.collect.HashBiMapTest testCase = new com.google.common.collect.HashBiMapTest();
-  testCase.testInverseEntrySetValueNewKey();
+  testCase.testInverseEntrySetValue();
 }
 
 public void testInverseInsertionOrderAfterInverse() throws Exception {
@@ -71,11 +71,6 @@ public void testInverseInsertionOrderAfterInverse() throws Exception {
 public void testInverseInsertionOrderAfterInverseForcePut() throws Exception {
   com.google.common.collect.HashBiMapTest testCase = new com.google.common.collect.HashBiMapTest();
   testCase.testInverseInsertionOrderAfterInverseForcePut();
-}
-
-public void testInverseInsertionOrderAfterInverseForcePutPresentKey() throws Exception {
-  com.google.common.collect.HashBiMapTest testCase = new com.google.common.collect.HashBiMapTest();
-  testCase.testInverseInsertionOrderAfterInverseForcePutPresentKey();
 }
 
 public void testMapConstructor() throws Exception {

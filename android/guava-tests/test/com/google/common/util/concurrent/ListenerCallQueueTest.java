@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.testing.TestLogHandler;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,7 +31,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import junit.framework.TestCase;
 
-/** Tests for {@link ListenerCallQueue}. */
+/**
+ * Tests for {@link ListenerCallQueue}.
+ */
 public class ListenerCallQueueTest extends TestCase {
 
   private static final ListenerCallQueue.Event<Object> THROWING_EVENT =
@@ -185,6 +186,22 @@ public class ListenerCallQueueTest extends TestCase {
     return incrementingEvent(counters, multiset(expectedListener, expectedCount));
   }
 
+  private static <T> ImmutableMultiset<T> multiset(T value, int count) {
+    return multiset(ImmutableMap.of(value, count));
+  }
+
+  private static <T> ImmutableMultiset<T> multiset(T value1, int count1, T value2, int count2) {
+    return multiset(ImmutableMap.of(value1, count1, value2, count2));
+  }
+
+  private static <T> ImmutableMultiset<T> multiset(Map<T, Integer> counts) {
+    ImmutableMultiset.Builder<T> builder = ImmutableMultiset.builder();
+    for (Map.Entry<T, Integer> entry : counts.entrySet()) {
+      builder.addCopies(entry.getKey(), entry.getValue());
+    }
+    return builder.build();
+  }
+
   private ListenerCallQueue.Event<Object> incrementingEvent(
       final Multiset<Object> counters, final Multiset<Object> expected) {
     return new ListenerCallQueue.Event<Object>() {
@@ -199,22 +216,6 @@ public class ListenerCallQueueTest extends TestCase {
         return "incrementing";
       }
     };
-  }
-
-  private static <T> ImmutableMultiset<T> multiset(T value, int count) {
-    return multiset(ImmutableMap.of(value, count));
-  }
-
-  private static <T> ImmutableMultiset<T> multiset(T value1, int count1, T value2, int count2) {
-    return multiset(ImmutableMap.of(value1, count1, value2, count2));
-  }
-
-  private static <T> ImmutableMultiset<T> multiset(Map<T, Integer> counts) {
-    ImmutableMultiset.Builder<T> builder = ImmutableMultiset.builder();
-    for (Entry<T, Integer> entry : counts.entrySet()) {
-      builder.addCopies(entry.getKey(), entry.getValue());
-    }
-    return builder.build();
   }
 
   private ListenerCallQueue.Event<Object> countDownEvent(final CountDownLatch latch) {

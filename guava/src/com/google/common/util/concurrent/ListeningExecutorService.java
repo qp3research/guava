@@ -59,9 +59,7 @@ public interface ListeningExecutorService extends ExecutorService {
    *
    * <p>All elements in the returned list must be {@link ListenableFuture} instances. The easiest
    * way to obtain a {@code List<ListenableFuture<T>>} from this method is an unchecked (but safe)
-   * cast:
-   *
-   * <pre>
+   * cast:<pre>
    *   {@code @SuppressWarnings("unchecked") // guaranteed by invokeAll contract}
    *   {@code List<ListenableFuture<T>> futures = (List) executor.invokeAll(tasks);}
    * </pre>
@@ -81,9 +79,7 @@ public interface ListeningExecutorService extends ExecutorService {
    *
    * <p>All elements in the returned list must be {@link ListenableFuture} instances. The easiest
    * way to obtain a {@code List<ListenableFuture<T>>} from this method is an unchecked (but safe)
-   * cast:
-   *
-   * <pre>
+   * cast:<pre>
    *   {@code @SuppressWarnings("unchecked") // guaranteed by invokeAll contract}
    *   {@code List<ListenableFuture<T>> futures = (List) executor.invokeAll(tasks, timeout, unit);}
    * </pre>
