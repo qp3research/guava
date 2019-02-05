@@ -22,6 +22,7 @@ import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.base.Supplier;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.concurrent.GuardedBy;
 import com.google.j2objc.annotations.WeakOuter;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
@@ -34,7 +35,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.concurrent.GuardedBy;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
  * Base class for services that can implement {@link #startUp} and {@link #shutDown} but while in
@@ -57,7 +58,9 @@ import javax.annotation.concurrent.GuardedBy;
  * <h3>Usage Example</h3>
  *
  * <p>Here is a sketch of a service which crawls a website and uses the scheduling capabilities to
- * rate limit itself. <pre> {@code
+ * rate limit itself.
+ *
+ * <pre>{@code
  * class CrawlingService extends AbstractScheduledService {
  *   private Set<Uri> visited;
  *   private Queue<Uri> toCrawl;
@@ -81,7 +84,8 @@ import javax.annotation.concurrent.GuardedBy;
  *   protected Scheduler scheduler() {
  *     return Scheduler.newFixedRateSchedule(0, 1, TimeUnit.SECONDS);
  *   }
- * }}</pre>
+ * }
+ * }</pre>
  *
  * <p>This class uses the life cycle methods to read in a list of starting URIs and save the set of
  * outstanding URIs when shutting down. Also, it takes advantage of the scheduling functionality to
@@ -374,25 +378,19 @@ public abstract class AbstractScheduledService implements Service {
     return delegate.state();
   }
 
-  /**
-   * @since 13.0
-   */
+  /** @since 13.0 */
   @Override
   public final void addListener(Listener listener, Executor executor) {
     delegate.addListener(listener, executor);
   }
 
-  /**
-   * @since 14.0
-   */
+  /** @since 14.0 */
   @Override
   public final Throwable failureCause() {
     return delegate.failureCause();
   }
 
-  /**
-   * @since 15.0
-   */
+  /** @since 15.0 */
   @CanIgnoreReturnValue
   @Override
   public final Service startAsync() {
@@ -400,9 +398,7 @@ public abstract class AbstractScheduledService implements Service {
     return this;
   }
 
-  /**
-   * @since 15.0
-   */
+  /** @since 15.0 */
   @CanIgnoreReturnValue
   @Override
   public final Service stopAsync() {
@@ -410,33 +406,25 @@ public abstract class AbstractScheduledService implements Service {
     return this;
   }
 
-  /**
-   * @since 15.0
-   */
+  /** @since 15.0 */
   @Override
   public final void awaitRunning() {
     delegate.awaitRunning();
   }
 
-  /**
-   * @since 15.0
-   */
+  /** @since 15.0 */
   @Override
   public final void awaitRunning(long timeout, TimeUnit unit) throws TimeoutException {
     delegate.awaitRunning(timeout, unit);
   }
 
-  /**
-   * @since 15.0
-   */
+  /** @since 15.0 */
   @Override
   public final void awaitTerminated() {
     delegate.awaitTerminated();
   }
 
-  /**
-   * @since 15.0
-   */
+  /** @since 15.0 */
   @Override
   public final void awaitTerminated(long timeout, TimeUnit unit) throws TimeoutException {
     delegate.awaitTerminated(timeout, unit);
@@ -453,9 +441,7 @@ public abstract class AbstractScheduledService implements Service {
   @Beta
   public abstract static class CustomScheduler extends Scheduler {
 
-    /**
-     * A callable class that can reschedule itself using a {@link CustomScheduler}.
-     */
+    /** A callable class that can reschedule itself using a {@link CustomScheduler}. */
     private class ReschedulableCallable extends ForwardingFuture<Void> implements Callable<Void> {
 
       /** The underlying task. */
@@ -479,7 +465,7 @@ public abstract class AbstractScheduledService implements Service {
 
       /** The future that represents the next execution of this task. */
       @GuardedBy("lock")
-      private Future<Void> currentFuture;
+      @NullableDecl private Future<Void> currentFuture;
 
       ReschedulableCallable(
           AbstractService service, ScheduledExecutorService executor, Runnable runnable) {
@@ -495,9 +481,7 @@ public abstract class AbstractScheduledService implements Service {
         return null;
       }
 
-      /**
-       * Atomically reschedules this task and assigns the new future to {@link #currentFuture}.
-       */
+      /** Atomically reschedules this task and assigns the new future to {@link #currentFuture}. */
       public void reschedule() {
         // invoke the callback outside the lock, prevents some shenanigans.
         Schedule schedule;

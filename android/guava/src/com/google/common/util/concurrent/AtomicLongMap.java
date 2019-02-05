@@ -25,8 +25,10 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import org.checkerframework.checker.nullness.compatqual.MonotonicNonNullDecl;
 
 /**
  * A map containing {@code long} values that can be atomically updated. While writes to a
@@ -45,7 +47,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * {@link com.google.common.collect.Multiset} such as {@link
  * com.google.common.collect.ConcurrentHashMultiset} instead.
  *
- * <b>Warning:</b> Unlike {@code Multiset}, entries whose values are zero are not automatically
+ * <p><b>Warning:</b> Unlike {@code Multiset}, entries whose values are zero are not automatically
  * removed from the map. Instead they must be removed manually with {@link #removeAllZeros}.
  *
  * @author Charles Fry
@@ -59,16 +61,12 @@ public final class AtomicLongMap<K> implements Serializable {
     this.map = checkNotNull(map);
   }
 
-  /**
-   * Creates an {@code AtomicLongMap}.
-   */
+  /** Creates an {@code AtomicLongMap}. */
   public static <K> AtomicLongMap<K> create() {
     return new AtomicLongMap<K>(new ConcurrentHashMap<K, AtomicLong>());
   }
 
-  /**
-   * Creates an {@code AtomicLongMap} with the same mappings as the specified {@code Map}.
-   */
+  /** Creates an {@code AtomicLongMap} with the same mappings as the specified {@code Map}. */
   public static <K> AtomicLongMap<K> create(Map<? extends K, ? extends Long> m) {
     AtomicLongMap<K> result = create();
     result.putAll(m);
@@ -233,7 +231,7 @@ public final class AtomicLongMap<K> implements Serializable {
    * if the specified map is modified while the operation is in progress.
    */
   public void putAll(Map<? extends K, ? extends Long> m) {
-    for (Map.Entry<? extends K, ? extends Long> entry : m.entrySet()) {
+    for (Entry<? extends K, ? extends Long> entry : m.entrySet()) {
       put(entry.getKey(), entry.getValue());
     }
   }
@@ -278,9 +276,9 @@ public final class AtomicLongMap<K> implements Serializable {
    * zero values have been removed and others have not.
    */
   public void removeAllZeros() {
-    Iterator<Map.Entry<K, AtomicLong>> entryIterator = map.entrySet().iterator();
+    Iterator<Entry<K, AtomicLong>> entryIterator = map.entrySet().iterator();
     while (entryIterator.hasNext()) {
-      Map.Entry<K, AtomicLong> entry = entryIterator.next();
+      Entry<K, AtomicLong> entry = entryIterator.next();
       AtomicLong atomic = entry.getValue();
       if (atomic != null && atomic.get() == 0L) {
         entryIterator.remove();
@@ -301,11 +299,9 @@ public final class AtomicLongMap<K> implements Serializable {
     return sum;
   }
 
-  private transient Map<K, Long> asMap;
+  @MonotonicNonNullDecl private transient Map<K, Long> asMap;
 
-  /**
-   * Returns a live, read-only view of the map backing this {@code AtomicLongMap}.
-   */
+  /** Returns a live, read-only view of the map backing this {@code AtomicLongMap}. */
   public Map<K, Long> asMap() {
     Map<K, Long> result = asMap;
     return (result == null) ? asMap = createAsMap() : result;
@@ -323,9 +319,7 @@ public final class AtomicLongMap<K> implements Serializable {
             }));
   }
 
-  /**
-   * Returns true if this map contains a mapping for the specified key.
-   */
+  /** Returns true if this map contains a mapping for the specified key. */
   public boolean containsKey(Object key) {
     return map.containsKey(key);
   }
@@ -338,9 +332,7 @@ public final class AtomicLongMap<K> implements Serializable {
     return map.size();
   }
 
-  /**
-   * Returns {@code true} if this map contains no key-value mappings.
-   */
+  /** Returns {@code true} if this map contains no key-value mappings. */
   public boolean isEmpty() {
     return map.isEmpty();
   }
