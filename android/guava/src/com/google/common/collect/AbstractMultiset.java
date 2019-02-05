@@ -26,19 +26,17 @@ import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 /**
- * This class provides a skeletal implementation of the {@link Multiset}
- * interface. A new multiset implementation can be created easily by extending
- * this class and implementing the {@link Multiset#entrySet()} method, plus
- * optionally overriding {@link #add(Object, int)} and
- * {@link #remove(Object, int)} to enable modifications to the multiset.
+ * This class provides a skeletal implementation of the {@link Multiset} interface. A new multiset
+ * implementation can be created easily by extending this class and implementing the {@link
+ * Multiset#entrySet()} method, plus optionally overriding {@link #add(Object, int)} and {@link
+ * #remove(Object, int)} to enable modifications to the multiset.
  *
- * <p>The {@link #count} and {@link #size} implementations all iterate across
- * the set returned by {@link Multiset#entrySet()}, as do many methods acting on
- * the set returned by {@link #elementSet()}. Override those methods for better
- * performance.
+ * <p>The {@link #count} and {@link #size} implementations all iterate across the set returned by
+ * {@link Multiset#entrySet()}, as do many methods acting on the set returned by {@link
+ * #elementSet()}. Override those methods for better performance.
  *
  * @author Kevin Bourrillion
  * @author Louis Wasserman
@@ -58,7 +56,7 @@ abstract class AbstractMultiset<E> extends AbstractCollection<E> implements Mult
   }
 
   @Override
-  public boolean contains(@Nullable Object element) {
+  public boolean contains(@NullableDecl Object element) {
     return count(element) > 0;
   }
 
@@ -68,7 +66,7 @@ abstract class AbstractMultiset<E> extends AbstractCollection<E> implements Mult
   }
 
   @Override
-  public int count(@Nullable Object element) {
+  public int count(@NullableDecl Object element) {
     for (Entry<E> entry : entrySet()) {
       if (Objects.equal(entry.getElement(), element)) {
         return entry.getCount();
@@ -80,38 +78,38 @@ abstract class AbstractMultiset<E> extends AbstractCollection<E> implements Mult
   // Modification Operations
   @CanIgnoreReturnValue
   @Override
-  public boolean add(@Nullable E element) {
+  public boolean add(@NullableDecl E element) {
     add(element, 1);
     return true;
   }
 
   @CanIgnoreReturnValue
   @Override
-  public int add(@Nullable E element, int occurrences) {
+  public int add(@NullableDecl E element, int occurrences) {
     throw new UnsupportedOperationException();
   }
 
   @CanIgnoreReturnValue
   @Override
-  public boolean remove(@Nullable Object element) {
+  public boolean remove(@NullableDecl Object element) {
     return remove(element, 1) > 0;
   }
 
   @CanIgnoreReturnValue
   @Override
-  public int remove(@Nullable Object element, int occurrences) {
+  public int remove(@NullableDecl Object element, int occurrences) {
     throw new UnsupportedOperationException();
   }
 
   @CanIgnoreReturnValue
   @Override
-  public int setCount(@Nullable E element, int count) {
+  public int setCount(@NullableDecl E element, int count) {
     return setCountImpl(this, element, count);
   }
 
   @CanIgnoreReturnValue
   @Override
-  public boolean setCount(@Nullable E element, int oldCount, int newCount) {
+  public boolean setCount(@NullableDecl E element, int oldCount, int newCount) {
     return setCountImpl(this, element, oldCount, newCount);
   }
 
@@ -120,8 +118,8 @@ abstract class AbstractMultiset<E> extends AbstractCollection<E> implements Mult
   /**
    * {@inheritDoc}
    *
-   * <p>This implementation is highly efficient when {@code elementsToAdd}
-   * is itself a {@link Multiset}.
+   * <p>This implementation is highly efficient when {@code elementsToAdd} is itself a {@link
+   * Multiset}.
    */
   @CanIgnoreReturnValue
   @Override
@@ -160,8 +158,8 @@ abstract class AbstractMultiset<E> extends AbstractCollection<E> implements Mult
   }
 
   /**
-   * Creates a new instance of this multiset's element set, which will be
-   * returned by {@link #elementSet()}.
+   * Creates a new instance of this multiset's element set, which will be returned by {@link
+   * #elementSet()}.
    */
   Set<E> createElementSet() {
     return new ElementSet();
@@ -217,20 +215,18 @@ abstract class AbstractMultiset<E> extends AbstractCollection<E> implements Mult
   /**
    * {@inheritDoc}
    *
-   * <p>This implementation returns {@code true} if {@code object} is a multiset
-   * of the same size and if, for each element, the two multisets have the same
-   * count.
+   * <p>This implementation returns {@code true} if {@code object} is a multiset of the same size
+   * and if, for each element, the two multisets have the same count.
    */
   @Override
-  public boolean equals(@Nullable Object object) {
+  public boolean equals(@NullableDecl Object object) {
     return Multisets.equalsImpl(this, object);
   }
 
   /**
    * {@inheritDoc}
    *
-   * <p>This implementation returns the hash code of {@link
-   * Multiset#entrySet()}.
+   * <p>This implementation returns the hash code of {@link Multiset#entrySet()}.
    */
   @Override
   public int hashCode() {
@@ -240,8 +236,8 @@ abstract class AbstractMultiset<E> extends AbstractCollection<E> implements Mult
   /**
    * {@inheritDoc}
    *
-   * <p>This implementation returns the result of invoking {@code toString} on
-   * {@link Multiset#entrySet()}.
+   * <p>This implementation returns the result of invoking {@code toString} on {@link
+   * Multiset#entrySet()}.
    */
   @Override
   public String toString() {
